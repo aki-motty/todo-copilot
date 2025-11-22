@@ -238,27 +238,27 @@
 
 ### 2.7 Operational Scripts
 
-- [ ] T044 [P] init.sh スクリプト `infrastructure/scripts/init.sh`
+- [x] T044 [P] init.sh スクリプト `infrastructure/scripts/init.sh`
   - バックエンド初期化、ワークスペース作成
   - 見積もり時間：1時間
 
-- [ ] T045 [P] plan.sh スクリプト `infrastructure/scripts/plan.sh`
+- [x] T045 [P] plan.sh スクリプト `infrastructure/scripts/plan.sh`
   - Terraform plan 実行、出力解析
   - 見積もり時間：1時間
 
-- [ ] T046 [P] apply.sh スクリプト `infrastructure/scripts/apply.sh`
+- [x] T046 [P] apply.sh スクリプト `infrastructure/scripts/apply.sh`
   - Terraform apply 実行、デプロイメント確認
   - 見積もり時間：1時間
 
-- [ ] T047 [P] destroy.sh スクリプト `infrastructure/scripts/destroy.sh`
+- [x] T047 [P] destroy.sh スクリプト `infrastructure/scripts/destroy.sh`
   - 本番保護機構を持つ destroy スクリプト
   - 見積もり時間：1-2時間
 
-- [ ] T048 [P] validate.sh スクリプト `infrastructure/scripts/validate.sh`
+- [x] T048 [P] validate.sh スクリプト `infrastructure/scripts/validate.sh`
   - Terraform validate、terraform-compliance チェック
   - 見積もり時間：1時間
 
-- [ ] T049 [P] import.sh スクリプト `infrastructure/scripts/import.sh`
+- [x] T049 [P] import.sh スクリプト `infrastructure/scripts/import.sh`
   - 既存 AWS リソースのインポート
   - 見積もり時間：1時間
 
