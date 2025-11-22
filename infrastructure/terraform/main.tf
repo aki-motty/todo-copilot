@@ -33,6 +33,9 @@ provider "aws" {
   }
 }
 
+# Data source for current AWS account
+data "aws_caller_identity" "current" {}
+
 # Local values
 locals {
   common_tags = merge(
@@ -43,6 +46,8 @@ locals {
     },
     var.common_tags
   )
+  
+  lambda_execution_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lambda-execution-${var.environment}"
 }
 
 # Data Module - DynamoDB Table
@@ -54,17 +59,6 @@ module "data" {
   common_tags  = local.common_tags
 }
 
-# IAM Module - Lambda Execution Role
-module "iam" {
-  source = "./modules/iam"
-
-  environment              = var.environment
-  aws_region               = var.aws_region
-  dynamodb_table_arn       = module.data.dynamodb_table_arn
-  cloudwatch_log_group_arn = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"
-  common_tags              = local.common_tags
-}
-
 # Compute Module - Lambda + API Gateway
 module "compute" {
   source = "./modules/compute"
@@ -74,10 +68,7 @@ module "compute" {
   lambda_memory_size        = var.lambda_memory_size
   lambda_timeout            = var.lambda_timeout
   dynamodb_table_name       = module.data.dynamodb_table_name
-  lambda_execution_role_arn = module.iam.lambda_execution_role_arn
+  lambda_execution_role_arn = local.lambda_execution_role_arn
   project_name              = var.project_name
   common_tags               = local.common_tags
 }
-
-# Data source for current AWS account
-data "aws_caller_identity" "current" {}
