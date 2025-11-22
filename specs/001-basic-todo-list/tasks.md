@@ -15,24 +15,24 @@
 
 ---
 
-## Phase 1: Setup（共有インフラストラクチャ）
+## Phase 1: Setup（共有インフラストラクチャ）✅ COMPLETED
 
 **目的**: プロジェクト初期化と基本構造構築
 
-- [ ] T001 [P] プロジェクト構造を plan.md に基づいて作成（src/、tests/、vite.config.ts など）
-- [ ] T002 [P] npm dependencies インストール（React/Vite、Jest、Playwright、Biome）
-- [ ] T003 [P] TypeScript 設定（strict モード有効化）
-- [ ] T004 [P] Jest 設定（coverage thresholds ≥80% ビジネスロジック）
-- [ ] T005 [P] Playwright 設定（E2E テスト基盤）
-- [ ] T006 [P] Biome 設定（リント・フォーマット・型チェック）
-- [ ] T007 [P] Git hooks 設定（pre-commit）
-- [ ] T008 [P] 開発スクリプト設定（npm run dev、test、lint など）
+- [x] T001 [P] プロジェクト構造を plan.md に基づいて作成（src/、tests/、vite.config.ts など）
+- [x] T002 [P] npm dependencies インストール（React/Vite、Jest、Playwright、Biome）
+- [x] T003 [P] TypeScript 設定（strict モード有効化）
+- [x] T004 [P] Jest 設定（coverage thresholds ≥80% ビジネスロジック）
+- [x] T005 [P] Playwright 設定（E2E テスト基盤）
+- [x] T006 [P] Biome 設定（リント・フォーマット・型チェック）
+- [x] T007 [P] Git hooks 設定（pre-commit）
+- [x] T008 [P] 開発スクリプト設定（npm run dev、test、lint など）
 
-**Checkpoint**: 開発環境完全セットアップ完了 → ユーザーストーリー実装開始可能
+**Checkpoint**: ✅ 開発環境完全セットアップ完了 → Phase 2 Foundation 開始可能
 
 ---
 
-## Phase 2: Foundational（ブロッキング前提条件）
+## Phase 2: Foundational（ブロッキング前提条件）🚀 IN PROGRESS
 
 **目的**: すべてのユーザーストーリーの実装前に完成させるべき基盤
 
