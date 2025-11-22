@@ -592,8 +592,11 @@ GitHub 環境の作成、環境保護ルール設定、AWS リソースの確認
    ├── todo-copilot-dev
    └── todo-copilot-terraform-locks-dev
 
-✅ API Gateway
-   └── 設定済み・デプロイ可能状態
+✅ API Gateway V2 (HTTP API)
+   ├── ID: ada8f6v36f
+   ├── 名前: todo-copilot-api-dev
+   ├── エンドポイント: https://ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com
+   └── ステータス: 正常に動作
 ```
 
 #### GitHub 環境設定 ✅
@@ -714,12 +717,11 @@ aws apigateway get-rest-apis --region ap-northeast-1 \
 #### 3. API エンドポイント動作確認
 
 ```bash
-# API Gateway エンドポイント ID を取得
-API_ID=$(aws apigateway get-rest-apis --region ap-northeast-1 \
-  --query 'items[0].id' --output text)
+# API Gateway V2 (HTTP API) エンドポイント
+API_ENDPOINT="https://ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com"
 
-# API をテスト
-curl -X GET "https://${API_ID}.execute-api.ap-northeast-1.amazonaws.com/dev/todos" \
+# API をテスト（/todos エンドポイント）
+curl -X GET "${API_ENDPOINT}/todos" \
   -H "Content-Type: application/json"
 
 # 期待される応答:
