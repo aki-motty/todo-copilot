@@ -1,7 +1,7 @@
-import { useTodoList } from "./hooks/useTodoList";
+import "./App.css";
 import { CreateTodoInput } from "./components/CreateTodoInput";
 import { TodoList } from "./components/TodoList";
-import "./App.css";
+import { useTodoList } from "./hooks/useTodoList";
 
 /**
  * Root application component

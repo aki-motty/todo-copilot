@@ -1,7 +1,6 @@
-import type { CreateTodoCommand } from "./CreateTodoCommand";
+import { Todo, TodoTitle } from "../../domain/entities/Todo";
 import { CommandHandler } from "../handlers/base";
-import { Todo } from "../../domain/entities/Todo";
-import { TodoTitle } from "../../domain/entities/Todo";
+import type { CreateTodoCommand } from "./CreateTodoCommand";
 
 /**
  * Handler for CreateTodoCommand

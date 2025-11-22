@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from "react";
-import type { Todo } from "../../domain/entities/Todo";
-import { TodoController } from "../controllers/TodoController";
-import { createLogger } from "../../infrastructure/config/logger";
+import { useCallback, useEffect, useState } from "react";
 import { TodoApplicationService } from "../../application/services/TodoApplicationService";
+import type { Todo } from "../../domain/entities/Todo";
+import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
+import { TodoController } from "../controllers/TodoController";
 
 // Initialize services
 const repository = new LocalStorageTodoRepository();

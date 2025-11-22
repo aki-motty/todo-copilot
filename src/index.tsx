@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./presentation/App";
 import "./index.css";
+import App from "./presentation/App";
 
 const root = document.getElementById("root");
 if (!root) {
