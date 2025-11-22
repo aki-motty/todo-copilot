@@ -218,7 +218,119 @@ GitHub UI から確認:
 
 ---
 
-## 🚀 本番デプロイ前チェックリスト
+## ✅ GitHub Actions 動作確認
+
+セットアップ完了後、GitHub Actions が正常に動作しているか確認します。
+
+### 前提条件
+
+- ✅ AWS OIDC プロバイダー登録済み
+- ✅ GitHub 秘密 6 個登録済み
+- ✅ GitHub 環境 3 個作成済み（develop/staging/production）
+
+### 確認手順
+
+#### 1. main ブランチにプッシュ
+
+```bash
+cd /workspaces/todo-copilot
+
+# 現在のブランチ確認
+git branch
+
+# main にマージして Push
+git checkout main
+git merge 003-github-actions-deploy
+git push origin main
+```
+
+#### 2. GitHub Actions ワークフロー実行確認
+
+GitHub の Actions タブで確認:
+- URL: https://github.com/aki-motty/todo-copilot/actions
+
+**期待される実行結果:**
+- ✅ `terraform-ci.yml` ワークフローが自動トリガー
+- ✅ `validate` ジョブ: terraform validate 成功
+- ✅ `test` ジョブ: Jest テスト成功
+- ✅ `security-scan` ジョブ: TFLint/Checkov 成功
+- ✅ `deploy-dev` ジョブ: develop 環境へのデプロイ成功
+
+#### 3. OIDC 認証確認
+
+ワークフローの `deploy-dev` ジョブログで確認:
+
+```
+✓ Configure AWS credentials (OIDC)
+  - AWS STS AssumeRoleWithWebIdentity successful
+  - Credentials assumed: arn:aws:iam::446713282258:role/github-actions-role-dev
+```
+
+このメッセージが表示されれば、OIDC 認証が正常に動作しています。
+
+#### 4. AWS リソース確認
+
+デプロイが成功したか AWS 側で確認:
+
+```bash
+# Lambda 関数確認
+aws lambda list-functions --region ap-northeast-1 \
+  --query 'Functions[?contains(FunctionName, `todo`)]'
+
+# API Gateway 確認
+aws apigateway get-rest-apis --region ap-northeast-1
+
+# DynamoDB テーブル確認
+aws dynamodb list-tables --region ap-northeast-1
+```
+
+#### 5. API エンドポイント確認
+
+デプロイされたAPIが応答するか確認:
+
+```bash
+# develop 環境の API Gateway エンドポイントを取得
+API_ENDPOINT=$(aws apigateway get-rest-apis --region ap-northeast-1 \
+  --query 'items[0].id' --output text)
+
+# API をテスト
+curl "https://${API_ENDPOINT}.execute-api.ap-northeast-1.amazonaws.com/dev/todos"
+```
+
+### トラブルシューティング
+
+#### ワークフロー実行が開始されない
+
+```bash
+# 1. ブランチプッシュを確認
+git log --oneline -5
+
+# 2. GitHub 設定確認
+gh repo view --json nameWithOwner
+```
+
+#### OIDC 認証エラー (AccessDenied)
+
+```bash
+# IAM ロール確認
+aws iam get-role --role-name github-actions-role-dev
+
+# 信頼ポリシー確認
+aws iam get-role --role-name github-actions-role-dev \
+  --query 'Role.AssumeRolePolicyDocument'
+```
+
+#### Terraform apply エラー
+
+```bash
+# Terraform 状態確認
+aws s3 ls s3://todo-copilot-terraform-state-prod-446713282258/
+
+# DynamoDB ロックテーブル確認
+aws dynamodb scan --table-name todo-copilot-terraform-lock --region ap-northeast-1
+```
+
+---
 
 デプロイ前に以下をすべて確認:
 
