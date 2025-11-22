@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Display Todos - End-to-End", () => {
   test.beforeEach(async ({ page }) => {

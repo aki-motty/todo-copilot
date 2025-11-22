@@ -1,6 +1,6 @@
+import type { GetAllTodosQuery } from "../../../../src/application/queries";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
-import type { GetAllTodosQuery } from "../../../../src/application/queries";
 
 describe("GetAllTodosQuery - Integration Tests", () => {
   let service: TodoApplicationService;

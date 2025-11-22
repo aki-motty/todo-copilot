@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Toggle Completion - End-to-End", () => {
   test.beforeEach(async ({ page }) => {

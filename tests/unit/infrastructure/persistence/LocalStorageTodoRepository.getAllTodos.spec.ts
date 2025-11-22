@@ -1,5 +1,5 @@
-import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { Todo } from "../../../../src/domain/entities/Todo";
+import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 
 describe("LocalStorageTodoRepository - getAllTodos", () => {
   let repository: LocalStorageTodoRepository;
