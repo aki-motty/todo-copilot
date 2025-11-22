@@ -1,10 +1,10 @@
 import {
-  CloudWatchLogsClient,
-  CreateLogGroupCommand,
-  CreateLogStreamCommand,
-  PutLogEventsCommand,
-  DescribeLogGroupsCommand,
-  DescribeLogStreamsCommand,
+    CloudWatchLogsClient,
+    CreateLogGroupCommand,
+    CreateLogStreamCommand,
+    DescribeLogGroupsCommand,
+    DescribeLogStreamsCommand,
+    PutLogEventsCommand,
 } from '@aws-sdk/client-cloudwatch-logs';
 
 /**
