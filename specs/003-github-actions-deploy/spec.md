@@ -41,7 +41,7 @@ GitHub リポジトリシークレットを整理し、環境別 (dev, staging, 
 
 ### User Story 3 - Develop ブランチ→Main への変更・ワークフロー修正 (Priority: P1)
 
-現在 `develop` ブランチにトリガーされているデプロイ条件を `main` ブランチに修正。`develop` ブランチは検証用に保持しつつ、本番デプロイ構成を main で実行するよう修正。
+現在 `develop` ブランチにトリガーされているデプロイ条件を `main` ブランチに修正。`develop` ブランチは検証用に保持しつつ、本番デプロイ構成を main で実行するよう修正。Staging/Prod へのデプロイは PR ラベル (`deploy-staging`, `deploy-prod`) で制御。
 
 **Why this priority**: ワークフロー動作の根本的問題。現在動作していないパイプラインの核。すべてのデプロイケース (dev/staging/prod) に影響。
 
@@ -51,7 +51,8 @@ GitHub リポジトリシークレットを整理し、環境別 (dev, staging, 
 
 1. **Given** main ブランチへプッシュ, **When** terraform-ci.yml トリガー, **Then** terraform-validate ジョブが実行開始
 2. **Given** develop ブランチ存在, **When** develop へプッシュ, **Then** ワークフロー実行されず (オプション検証環境として)
-3. **Given** ワークフロー実行, **When** 全ジョブ完了, **Then** dev 環境に自動デプロイ、staging/prod は手動承認待ちの状態
+3. **Given** PR に `deploy-staging` ラベル付与, **When** PR マージ後 main へプッシュ, **Then** staging 環境に手動承認フロー起動
+4. **Given** PR に `deploy-prod` ラベル付与, **When** PR マージ後 main へプッシュ, **Then** prod 環境に複数承認フロー起動
 
 ---
 
@@ -140,7 +141,7 @@ Terraform Apply 失敗時、Terraform Plan 構文エラー時など、詳細な�
 ### Measurable Outcomes
 
 - **SC-001**: AWS OIDC プロバイダー設定完了後、GitHub Actions で AWS リソースへの認証が 100% 成功 (0 認証エラー)
-- **SC-002**: ワークフロー実行時間が 15 分以内で完了 (validate + test + security-scan + dev deploy)
+- **SC-002**: ワークフロー実行時間が段階別タイムアウト以内で完了 (validate 5分、test 10分、security-scan 10分、deploy 15分)
 - **SC-003**: Dev 環境へのデプロイが main プッシュから 10 分以内に完了し、AWS リソースが ACTIVE 状態に到達
 - **SC-004**: Staging/Prod への manual approval プロセスが正常に動作し、承認から 5 分以内にデプロイ実行開始
 - **SC-005**: Terraform Validate ジョブが format/validate/plan をすべて実行し、エラーがない場合 100% 成功率で通過
@@ -149,6 +150,16 @@ Terraform Apply 失敗時、Terraform Plan 構文エラー時など、詳細な�
 - **SC-008**: 本番環境デプロイで 2 名以上の承認が記録され、監査ログに履歴が残る
 - **SC-009**: ワークフロー失敗時に Slack 通知が送信され、デプロイ担当者が 5 分以内に気づける
 - **SC-010**: CI/CD パイプライン導入後、手動デプロイ時間が 50% 削減 (手動: 20 分 → 自動: 10 分)
+
+## Clarifications
+
+### Session 2025-11-22
+
+- Q: Manual Approval メカニズム (Staging/Prod 承認フロー実装方式) → A: GitHub Environment Protection Rules を使用し、UI ベースで承認管理 ✅
+- Q: GitHub Secrets 最小化の範囲 → A: AWS_REGION と TF_BACKEND_REGION はハードコード、AWS_ROLE_* と S3/DynamoDB 参照情報のみ Secret として管理 ✅
+- Q: Staging/Prod デプロイトリガー条件 → A: PR ラベル `deploy-staging` / `deploy-prod` を用いたトリガー (UI で明確、視認性高い) ✅
+- Q: ワークフロー実行タイムアウト戦略 → A: 段階別タイムアウト (validate 5分、test 10分、deploy 15分) で早期中止と効率化 ✅
+- Q: Lambda ハンドラー実装スコープ → A: 本フィーチャーに含めず、別フィーチャー (004 以降) で実装してスコープを明確化 ✅
 
 ## Implementation Notes
 
@@ -165,7 +176,7 @@ Terraform Apply 失敗時、Terraform Plan 構文エラー時など、詳細な�
    - 修正: develop/staging/production environment を定義、各環境で異なるシークレット設定
 
 4. **Manual Approval アクション問題**: `trstringer/manual-approval@v1` では GitHub team 指定が難しい
-   - 修正: より新しい方式 (GitHub Environment Protection Rules) への移行検討
+   - 修正: GitHub Environment Protection Rules に移行して UI ベース承認を実装 ✅ (Q1 決定)
 
 5. **Terraform Wrapper 設定**: `terraform_wrapper: false` が inconsistent に設定
    - 修正: すべての Terraform Setup ステップで統一
@@ -175,5 +186,5 @@ Terraform Apply 失敗時、Terraform Plan 構文エラー時など、詳細な�
 - AWS アカウント (446713282258) に管理者アクセス権限がある
 - GitHub Organization (aki-motty) の admin 権限でシークレット・環境設定可能
 - Terraform State 用 S3 バケット、DynamoDB Lock テーブルが既に存在 (別フィーチャー 002 で実装)
-- Lambda handler コード (dist-lambda/index.js) が準備されている
+- Lambda handler コード (dist-lambda/index.js) はプレースホルダーで十分 (別フィーチャー 004 以降で実装)
 - Slack Webhook URL は オプショナル (設定しなければ通知スキップ)
