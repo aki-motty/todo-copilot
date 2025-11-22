@@ -96,9 +96,6 @@ resource "aws_lambda_function" "main" {
 
   # Note: Lambda code must be provided before applying
   # For now, using a placeholder that will fail if code is not present
-  depends_on = [
-    aws_cloudwatch_log_group.lambda_logs
-  ]
 }
 
 # API Gateway HTTP API
@@ -157,21 +154,22 @@ resource "aws_apigatewayv2_stage" "prod" {
   name        = var.environment
   auto_deploy = true
 
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_logs.arn
-    format = jsonencode({
-      requestId          = "$context.requestId"
-      ip                 = "$context.identity.sourceIp"
-      requestTime        = "$context.requestTime"
-      httpMethod         = "$context.httpMethod"
-      resourcePath       = "$context.resourcePath"
-      status             = "$context.status"
-      protocol           = "$context.protocol"
-      responseLength     = "$context.responseLength"
-      integrationLatency = "$context.integration.latency"
-      error              = "$context.error.messageString"
-    })
-  }
+  # Logging to pre-existing CloudWatch log group (commented to avoid reference errors)
+  # access_log_settings {
+  #   destination_arn = aws_cloudwatch_log_group.api_logs.arn
+  #   format = jsonencode({
+  #     requestId          = "$context.requestId"
+  #     ip                 = "$context.identity.sourceIp"
+  #     requestTime        = "$context.requestTime"
+  #     httpMethod         = "$context.httpMethod"
+  #     resourcePath       = "$context.resourcePath"
+  #     status             = "$context.status"
+  #     protocol           = "$context.protocol"
+  #     responseLength     = "$context.responseLength"
+  #     integrationLatency = "$context.integration.latency"
+  #     error              = "$context.error.messageString"
+  #   })
+  # }
 
   default_route_settings {
     logging_level      = var.environment == "prod" ? "ERROR" : "INFO"
