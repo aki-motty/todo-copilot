@@ -1,0 +1,488 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+    paths:
+      - 'infrastructure/terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infrastructure/terraform/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AWS_REGION: ap-northeast-1
+  TERRAFORM_VERSION: 1.5.0
+
+jobs:
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Format Check
+        id: fmt
+        working-directory: infrastructure/terraform
+        run: |
+          terraform fmt -check -recursive
+          echo "✅ Format check passed"
+
+      - name: Terraform Init (Backend disabled)
+        id: init
+        working-directory: infrastructure/terraform
+        run: |
+          terraform init -backend=false -upgrade
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: infrastructure/terraform
+        run: |
+          terraform validate
+          echo "✅ Validation passed"
+
+      - name: Terraform Plan (dev)
+        id: plan-dev
+        working-directory: infrastructure/terraform
+        run: |
+          terraform plan \
+            -var-file="environments/dev.tfvars" \
+            -out=dev.tfplan \
+            -no-color
+
+      - name: Terraform Plan (staging)
+        id: plan-staging
+        working-directory: infrastructure/terraform
+        run: |
+          terraform plan \
+            -var-file="environments/staging.tfvars" \
+            -out=staging.tfplan \
+            -no-color
+
+      - name: Terraform Plan (prod)
+        id: plan-prod
+        working-directory: infrastructure/terraform
+        run: |
+          terraform plan \
+            -var-file="environments/prod.tfvars" \
+            -out=prod.tfplan \
+            -no-color
+
+      - name: Comment PR with Plan Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const comment = `## Terraform Validation Results ✅
+
+            ### Format Check
+            - Status: ✅ Passed
+
+            ### Validation
+            - Status: ✅ Passed
+
+            ### Plans
+            - Dev environment: ✅ Planned
+            - Staging environment: ✅ Planned
+            - Prod environment: ✅ Planned
+
+            All Terraform configurations are valid and ready for deployment.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  tests:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Terraform Module Tests
+        run: npm test -- tests/integration/terraform-modules.spec.ts --coverage
+
+      - name: Upload Test Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: terraform
+          name: terraform-coverage
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Run TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Init TFLint
+        working-directory: infrastructure/terraform
+        run: tflint --init
+
+      - name: Run TFLint
+        working-directory: infrastructure/terraform
+        run: tflint --format compact
+
+      - name: Checkov Security Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/terraform
+          framework: terraform
+          output_format: sarif
+          output_file_path: report.sarif
+
+      - name: Upload Checkov Results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: report.sarif
+
+  plan-summary:
+    name: Generate Plan Summary
+    runs-on: ubuntu-latest
+    needs: [terraform-validate, tests]
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: terraform init -backend=false
+
+      - name: Generate Plan Summary
+        working-directory: infrastructure/terraform
+        id: summary
+        run: |
+          echo "# Terraform Plan Summary" > plan-summary.md
+          echo "" >> plan-summary.md
+
+          for env in dev staging prod; do
+            echo "## Environment: $env" >> plan-summary.md
+            terraform plan -var-file="environments/${env}.tfvars" -json | \
+              jq -r '.resource_changes[] | "- \(.type).\(.name): \(.change.actions | join(", "))"' >> plan-summary.md 2>/dev/null || true
+            echo "" >> plan-summary.md
+          done
+
+          cat plan-summary.md
+
+      - name: Comment PR with Summary
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('infrastructure/terraform/plan-summary.md', 'utf8').substring(0, 30000);
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: [terraform-validate, tests, security-scan]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: development
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=dev/terraform.tfstate" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
+            -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform
+        run: |
+          terraform apply -auto-approve \
+            -var-file="environments/dev.tfvars"
+
+      - name: Export Outputs
+        id: outputs
+        working-directory: infrastructure/terraform
+        run: |
+          terraform output -json > outputs.json
+          cat outputs.json
+          echo "::set-output name=status::success"
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [terraform-validate, tests, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-staging]')
+    environment:
+      name: staging
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=staging/terraform.tfstate" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
+            -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: infrastructure/terraform
+        run: |
+          terraform plan \
+            -var-file="environments/staging.tfvars" \
+            -out=tfplan
+
+      - name: Wait for Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: 'devops-team'
+          minimum-approvals: 1
+          issue-title: 'Staging Deployment Approval'
+          issue-body: 'Please review and approve the staging deployment'
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform
+        run: |
+          terraform apply tfplan
+
+      - name: Export Outputs
+        id: outputs
+        working-directory: infrastructure/terraform
+        run: |
+          terraform output -json > outputs.json
+          cat outputs.json
+
+  deploy-prod:
+    name: Deploy to Prod
+    runs-on: ubuntu-latest
+    needs: [terraform-validate, tests, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-prod]')
+    environment:
+      name: production
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=prod/terraform.tfstate" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
+            -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: infrastructure/terraform
+        run: |
+          terraform plan \
+            -var-file="environments/prod.tfvars" \
+            -out=tfplan
+
+      - name: Wait for Approval (2 approvers)
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: 'devops-team,security-team'
+          minimum-approvals: 2
+          issue-title: 'Production Deployment Approval'
+          issue-body: 'PROD DEPLOYMENT: Please review and approve'
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform
+        run: |
+          terraform apply tfplan
+
+      - name: Export Outputs
+        id: outputs
+        working-directory: infrastructure/terraform
+        run: |
+          terraform output -json > outputs.json
+          cat outputs.json
+
+      - name: Create Deployment Record
+        run: |
+          echo "Production deployment completed at $(date)" >> deployment-log.txt
+          git add deployment-log.txt
+          git commit -m "chore: log prod deployment"
+          git push
+
+  notify:
+    name: Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [plan-summary]
+    if: always()
+    permissions:
+      contents: read
+
+    steps:
+      - name: Notify Slack
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Terraform CI/CD Pipeline Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Terraform CI/CD Failed* ❌\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref }}\n*Commit:* ${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Slack Success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Terraform CI/CD Pipeline Success",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Terraform CI/CD Passed* ✅\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref }}\n*Commit:* ${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
