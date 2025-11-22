@@ -408,47 +408,22 @@ jobs:
       contents: read
 
     steps:
-      - name: Notify Slack
-        if: failure()
-        continue-on-error: true
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "Terraform CI/CD Pipeline Failed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Terraform CI/CD Failed* ❌\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref }}\n*Commit:* ${{ github.sha }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-      - name: Notify Slack Success
-        if: success()
-        continue-on-error: true
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "Terraform CI/CD Pipeline Success",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Terraform CI/CD Passed* ✅\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref }}\n*Commit:* ${{ github.sha }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Workflow Summary
+        run: |
+          echo "## GitHub Actions Workflow Completed ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Workflow Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository**: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. ✅ Terraform Validation" >> $GITHUB_STEP_SUMMARY
+          echo "2. ⏳ Deploy to Dev (OIDC)" >> $GITHUB_STEP_SUMMARY
+          echo "3. ⏳ Deploy to Staging" >> $GITHUB_STEP_SUMMARY
+          echo "4. ⏳ Deploy to Prod" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "For detailed logs, visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
 
