@@ -1,5 +1,5 @@
-import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { Todo } from "../../../../src/domain/entities/Todo";
+import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { NotFoundError } from "../../../../src/shared/types";
 
 describe("LocalStorageTodoRepository - Integration Tests", () => {

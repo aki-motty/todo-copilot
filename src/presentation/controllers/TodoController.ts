@@ -1,11 +1,11 @@
-import type { Todo } from "../../domain/entities/Todo";
-import type { TodoApplicationService } from "../../application/services/TodoApplicationService";
 import type {
   CreateTodoCommand,
-  ToggleTodoCompletionCommand,
   DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../../application/commands";
 import type { GetAllTodosQuery } from "../../application/queries";
+import type { TodoApplicationService } from "../../application/services/TodoApplicationService";
+import type { Todo } from "../../domain/entities/Todo";
 import { createLogger } from "../../infrastructure/config/logger";
 
 /**

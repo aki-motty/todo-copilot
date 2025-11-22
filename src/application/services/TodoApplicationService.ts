@@ -1,17 +1,17 @@
 import { Todo, type TodoId } from "../../domain/entities/Todo";
-import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import {
-  createTodoCreatedEvent,
   createTodoCompletedEvent,
+  createTodoCreatedEvent,
   createTodoDeletedEvent,
   type DomainEvent,
 } from "../../domain/events/TodoEvents";
-import { NotFoundError } from "../../shared/types";
+import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
+import { NotFoundError } from "../../shared/types";
 import type {
   CreateTodoCommand,
-  ToggleTodoCompletionCommand,
   DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../commands";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
