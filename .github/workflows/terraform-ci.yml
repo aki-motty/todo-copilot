@@ -97,6 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: terraform-validate
+    if: github.event_name == 'pull_request'
     permissions:
       contents: read
 
@@ -128,6 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: terraform-validate
+    if: github.event_name == 'pull_request'
     permissions:
       contents: read
       security-events: write
