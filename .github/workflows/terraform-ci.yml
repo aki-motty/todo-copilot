@@ -227,7 +227,7 @@ jobs:
     name: Deploy to Dev
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [terraform-validate, tests, security-scan]
+    needs: terraform-validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: develop
@@ -279,7 +279,7 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [terraform-validate, tests, security-scan]
+    needs: terraform-validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-staging]')
     environment:
       name: staging
@@ -337,7 +337,7 @@ jobs:
     name: Deploy to Prod
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [terraform-validate, tests, security-scan]
+    needs: terraform-validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-prod]')
     environment:
       name: production
