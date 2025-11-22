@@ -26,6 +26,6 @@ output "dynamodb_table_arn" {
 }
 
 output "lambda_execution_role_arn" {
-  value       = module.iam.lambda_execution_role_arn
+  value       = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lambda-execution-${var.environment}"
   description = "IAM role ARN for Lambda execution"
 }
