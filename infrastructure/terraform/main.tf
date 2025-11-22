@@ -2,7 +2,7 @@
 
 terraform {
   required_version = ">= 1.6"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -47,9 +47,9 @@ locals {
 module "backend" {
   source = "./modules/backend"
 
-  environment  = var.environment
-  aws_region   = var.aws_region
-  common_tags  = local.common_tags
+  environment = var.environment
+  aws_region  = var.aws_region
+  common_tags = local.common_tags
 }
 
 # Data Module - DynamoDB Table
@@ -76,14 +76,14 @@ module "iam" {
 module "compute" {
   source = "./modules/compute"
 
-  environment                = var.environment
-  aws_region                 = var.aws_region
-  lambda_memory_size         = var.lambda_memory_size
-  lambda_timeout             = var.lambda_timeout
-  dynamodb_table_name        = module.data.dynamodb_table_name
-  lambda_execution_role_arn  = module.iam.lambda_execution_role_arn
-  project_name               = var.project_name
-  common_tags                = local.common_tags
+  environment               = var.environment
+  aws_region                = var.aws_region
+  lambda_memory_size        = var.lambda_memory_size
+  lambda_timeout            = var.lambda_timeout
+  dynamodb_table_name       = module.data.dynamodb_table_name
+  lambda_execution_role_arn = module.iam.lambda_execution_role_arn
+  project_name              = var.project_name
+  common_tags               = local.common_tags
 }
 
 # Data source for current AWS account

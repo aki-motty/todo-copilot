@@ -61,22 +61,22 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # Placeholder Lambda function (actual implementation in Phase 2)
 resource "aws_lambda_function" "main" {
-  filename         = "dist/index.zip"
-  function_name    = "${var.project_name}-api-${var.environment}"
-  role            = var.lambda_execution_role_arn
-  handler         = "dist/index.handler"
-  runtime         = "nodejs18.x"
-  architectures   = ["arm64"]
-  timeout         = var.lambda_timeout
-  memory_size     = var.lambda_memory_size
+  filename      = "dist/index.zip"
+  function_name = "${var.project_name}-api-${var.environment}"
+  role          = var.lambda_execution_role_arn
+  handler       = "dist/index.handler"
+  runtime       = "nodejs18.x"
+  architectures = ["arm64"]
+  timeout       = var.lambda_timeout
+  memory_size   = var.lambda_memory_size
 
   environment {
     variables = {
-      ENVIRONMENT      = var.environment
-      DYNAMODB_TABLE   = var.dynamodb_table_name
-      LOG_LEVEL        = var.environment == "prod" ? "INFO" : "DEBUG"
-      AWS_REGION       = var.aws_region
-      NODE_ENV         = "production"
+      ENVIRONMENT    = var.environment
+      DYNAMODB_TABLE = var.dynamodb_table_name
+      LOG_LEVEL      = var.environment == "prod" ? "INFO" : "DEBUG"
+      AWS_REGION     = var.aws_region
+      NODE_ENV       = "production"
     }
   }
 
@@ -102,9 +102,9 @@ resource "aws_lambda_function" "main" {
 
 # API Gateway HTTP API
 resource "aws_apigatewayv2_api" "main" {
-  name            = "${var.project_name}-api-${var.environment}"
-  protocol_type   = "HTTP"
-  description     = "API Gateway for Todo Copilot ${var.environment}"
+  name          = "${var.project_name}-api-${var.environment}"
+  protocol_type = "HTTP"
+  description   = "API Gateway for Todo Copilot ${var.environment}"
 
   cors_configuration {
     allow_origins = [
@@ -121,8 +121,8 @@ resource "aws_apigatewayv2_api" "main" {
       "x-request-id",
       "x-total-count"
     ]
-    max_age            = 300
-    allow_credentials  = true
+    max_age           = 300
+    allow_credentials = true
   }
 
   tags = merge(
@@ -136,9 +136,9 @@ resource "aws_apigatewayv2_api" "main" {
 
 # Lambda integration with API Gateway
 resource "aws_apigatewayv2_integration" "lambda" {
-  api_id                = aws_apigatewayv2_api.main.id
-  integration_type      = "AWS_PROXY"
-  integration_method    = "POST"
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
   payload_format_version = "2.0"
 }
 
@@ -158,16 +158,16 @@ resource "aws_apigatewayv2_stage" "prod" {
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_logs.arn
     format = jsonencode({
-      requestId           = "$context.requestId"
-      ip                  = "$context.identity.sourceIp"
-      requestTime         = "$context.requestTime"
-      httpMethod          = "$context.httpMethod"
-      resourcePath        = "$context.resourcePath"
-      status              = "$context.status"
-      protocol            = "$context.protocol"
-      responseLength      = "$context.responseLength"
-      integrationLatency  = "$context.integration.latency"
-      error               = "$context.error.messageString"
+      requestId          = "$context.requestId"
+      ip                 = "$context.identity.sourceIp"
+      requestTime        = "$context.requestTime"
+      httpMethod         = "$context.httpMethod"
+      resourcePath       = "$context.resourcePath"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
+      integrationLatency = "$context.integration.latency"
+      error              = "$context.error.messageString"
     })
   }
 

@@ -50,9 +50,9 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
 
 # DynamoDB table for state locking
 resource "aws_dynamodb_table" "terraform_lock" {
-  name           = "terraform-lock-${var.environment}"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = "terraform-lock-${var.environment}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"
@@ -73,16 +73,9 @@ resource "aws_dynamodb_table" "terraform_lock" {
   )
 }
 
-# Enable PITR for DynamoDB in production (requires separate resource)
-resource "aws_dynamodb_table_pitr" "terraform_lock" {
-  count           = var.environment == "prod" ? 1 : 0
-  table_name      = aws_dynamodb_table.terraform_lock.name
-  point_in_time_recovery_enabled = true
-}
-
 # IAM role for Terraform executor
 resource "aws_iam_role" "terraform_executor" {
-  name              = "terraform-executor-${var.environment}"
+  name = "terraform-executor-${var.environment}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -113,8 +106,8 @@ resource "aws_iam_role" "terraform_executor" {
 
 # IAM policy for state backend access
 resource "aws_iam_role_policy" "terraform_backend" {
-  name   = "terraform-backend-${var.environment}"
-  role   = aws_iam_role.terraform_executor.id
+  name = "terraform-backend-${var.environment}"
+  role = aws_iam_role.terraform_executor.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -151,8 +144,8 @@ resource "aws_iam_role_policy" "terraform_backend" {
 
 # IAM policy for AWS resource management (minimal for Lambda, API Gateway, DynamoDB)
 resource "aws_iam_role_policy" "terraform_resources" {
-  name   = "terraform-resources-${var.environment}"
-  role   = aws_iam_role.terraform_executor.id
+  name = "terraform-resources-${var.environment}"
+  role = aws_iam_role.terraform_executor.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

@@ -31,7 +31,7 @@ data "aws_caller_identity" "current" {}
 
 # Lambda execution role
 resource "aws_iam_role" "lambda_execution" {
-  name              = "lambda-execution-${var.environment}"
+  name = "lambda-execution-${var.environment}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -56,8 +56,8 @@ resource "aws_iam_role" "lambda_execution" {
 
 # Policy: DynamoDB access
 resource "aws_iam_role_policy" "lambda_dynamodb" {
-  name   = "lambda-dynamodb-${var.environment}"
-  role   = aws_iam_role.lambda_execution.id
+  name = "lambda-dynamodb-${var.environment}"
+  role = aws_iam_role.lambda_execution.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -82,8 +82,8 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
 
 # Policy: CloudWatch Logs
 resource "aws_iam_role_policy" "lambda_logs" {
-  name   = "lambda-logs-${var.environment}"
-  role   = aws_iam_role.lambda_execution.id
+  name = "lambda-logs-${var.environment}"
+  role = aws_iam_role.lambda_execution.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -102,9 +102,9 @@ resource "aws_iam_role_policy" "lambda_logs" {
 
 # Policy: X-Ray (production only)
 resource "aws_iam_role_policy" "lambda_xray" {
-  count  = var.environment == "prod" ? 1 : 0
-  name   = "lambda-xray-${var.environment}"
-  role   = aws_iam_role.lambda_execution.id
+  count = var.environment == "prod" ? 1 : 0
+  name  = "lambda-xray-${var.environment}"
+  role  = aws_iam_role.lambda_execution.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
