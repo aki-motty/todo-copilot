@@ -1,53 +1,66 @@
-# GitHub Actions × AWS デプロイ設定ガイド
+# GitHub Actions AWS OIDC Setup Guide
 
-**作成日**: 2025-11-22  
-**対象**: CI/CD パイプライン統合  
-**環境**: dev / staging / prod
-
----
-
-## 📋 概要
-
-GitHub Actions から安全に AWS にデプロイするための設定手順です。OIDC（OpenID Connect）を使用したセキュアな認証を実装します。
+**Last Updated**: 2025-11-22  
+**Feature**: GitHub Actions AWS Deployment Automation (003-github-actions-deploy)  
+**Audience**: DevOps Engineers, AWS Administrators
 
 ---
 
-## 🔧 前提条件
+## Overview
 
-- AWS アカウント管理者アクセス
-- GitHub リポジトリ管理者アクセス
-- AWS CLI インストール・設定済み（`terraform-dev` プロファイル使用可）
+This guide provides step-by-step instructions to configure AWS OpenID Connect (OIDC) provider for GitHub Actions. This enables secure, short-lived token authentication without storing long-lived AWS credentials in GitHub secrets.
+
+### Architecture
+
+```
+GitHub Actions Job
+  ↓ (Issues OIDC Token)
+AWS STS
+  ↓ (Validates Token)
+AWS OIDC Provider (token.actions.githubusercontent.com)
+  ↓ (Trusts)
+IAM Role (github-actions-role-{dev|staging|prod})
+  ↓ (Grants Permissions)
+AWS Services (Terraform, Lambda, etc.)
+```
+
+### Benefits
+
+- ✅ **Short-lived tokens**: 15-minute expiration (no long-lived credentials)
+- ✅ **Audit trail**: All token usage logged in CloudTrail
+- ✅ **No secret rotation**: GitHub Actions auto-refreshes tokens
+- ✅ **Least privilege**: Each job uses specific environment role
+- ✅ **Zero-trust**: Token includes job metadata (repo, branch, workflow)
 
 ---
 
-## 1️⃣ AWS 側の設定
+## Prerequisites
 
-### Step 1: GitHub OIDC プロバイダーを作成
+**Required Access**:
+- AWS Account ID: `446713282258` (ap-northeast-1)
+- AWS IAM permissions: `iam:CreateOpenIDConnectProvider`, `iam:CreateRole`, `iam:AttachRolePolicy`
+- GitHub Organization: `aki-motty` (admin access to repository settings)
+- Repository: `todo-copilot`
 
-AWS アカウントで IAM コンソールを開き、OIDC プロバイダーを作成します。
+**Already Completed** (Feature 002):
+- S3 bucket: `TODO_STATE_BUCKET` (stores Terraform state)
+- DynamoDB table: `terraform-locks` (state locking)
+- Terraform backend configured
 
-```bash
-# AWS CLI で実行
-aws iam create-open-id-connect-provider \
-  --url "https://token.actions.githubusercontent.com" \
-  --client-id-list "sts.amazonaws.com" \
-  --thumbprint-list "6938fd4d98bab03faadb97b34396831e3780aea1" \
-  --region ap-northeast-1 \
-  --profile terraform-dev
-```
+---
 
-**期待出力:**
-```
-{
-  "OpenIDConnectProviderArn": "arn:aws:iam::446713282258:oidc-provider/token.actions.githubusercontent.com"
-}
-```
+## Step 1: Create AWS OIDC Provider
 
-### Step 2: デプロイ用 IAM ロールを作成
+### 1.1 Get OIDC Provider Information
 
-各環境（dev/staging/prod）向けのロールを作成します。
+GitHub Actions OIDC provider details:
+- **Provider URL**: `https://token.actions.githubusercontent.com`
+- **Audience**: `sts.amazonaws.com`
+- **Thumbprint**: `6938FD4D98BAB503D5EB8D237B44B7D5ABD7BED4` (as of 2025-11)
 
-#### Dev 環境用ロール
+### 1.2 Create OIDC Provider in AWS
+
+**Using AWS CLI**:
 
 ```bash
 # 信頼ポリシー JSON ファイルを作成

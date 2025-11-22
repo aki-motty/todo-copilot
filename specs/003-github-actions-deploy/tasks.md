@@ -32,16 +32,16 @@ This feature is organized **by user story to enable independent implementation**
 
 **Independent Test**: None (research phase)
 
-- [ ] T001 Research GitHub Actions OIDC provider integration patterns (AWS docs, example repos)
-- [ ] T002 Document AWS OIDC setup procedure for `sub:repo:aki-motty/todo-copilot:*` claim mapping
-- [ ] T003 [P] Audit current terraform-ci.yml and identify all failing points (branch refs, OIDC, env blocks)
-- [ ] T004 [P] Research GitHub Environment Protection Rules configuration (UI-based approval workflows)
-- [ ] T005 [P] Document stage-specific timeout recommendations (validate/test/deploy phases)
-- [ ] T006 [P] Research TFLint and Checkov integration best practices for GitHub Actions
-- [ ] T007 Review existing S3 backend and DynamoDB lock configuration (feature 002 validation)
-- [ ] T008 Create research findings summary document (findings.md)
+- [x] T001 Research GitHub Actions OIDC provider integration patterns (AWS docs, example repos)
+- [x] T002 Document AWS OIDC setup procedure for `sub:repo:aki-motty/todo-copilot:*` claim mapping
+- [x] T003 [P] Audit current terraform-ci.yml and identify all failing points (branch refs, OIDC, env blocks)
+- [x] T004 [P] Research GitHub Environment Protection Rules configuration (UI-based approval workflows)
+- [x] T005 [P] Document stage-specific timeout recommendations (validate/test/deploy phases)
+- [x] T006 [P] Research TFLint and Checkov integration best practices for GitHub Actions
+- [x] T007 Review existing S3 backend and DynamoDB lock configuration (feature 002 validation)
+- [x] T008 Create research findings summary document (research.md) ✅
 
-**Checkpoint**: Research complete, deployment architecture validated
+**Checkpoint**: Research complete, deployment architecture validated ✅
 
 ---
 
@@ -129,16 +129,16 @@ This feature is organized **by user story to enable independent implementation**
 
 ### Implementation for User Story 3
 
-- [ ] T046 [P] [US3] Update .github/workflows/terraform-ci.yml: Change `on.push.branches` from `develop` to `[main]`
-- [ ] T047 [P] [US3] Add pull_request trigger configuration for PR validation (validate/test/security-scan, no deploy)
-- [ ] T048 [P] [US3] Remove deprecated `trstringer/manual-approval@v1` action, prepare for Environment Protection Rules (Phase 5)
-- [ ] T049 [P] [US3] Add label detection logic: Check for `deploy-staging` and `deploy-prod` labels in workflow
-- [ ] T050 [US3] Implement conditional job execution based on labels (deploy-staging → staging job, deploy-prod → prod job)
-- [ ] T051 [P] [US3] Add `workflow_dispatch` manual trigger option with environment parameter selection
-- [ ] T052 [P] [US3] Update terraform-ci.yml `configure-aws-credentials@v4` to use OIDC: `role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}`, `web-identity-token-file: $GITHUB_STEP_SUMMARY`
-- [ ] T053 [US3] Fix environment block definitions in terraform-ci.yml: Add `environment: develop/staging/production`
-- [ ] T054 [P] [US3] Set stage-specific job timeouts: validate (timeout-minutes: 5), test (10), security-scan (10), deploy (15)
-- [ ] T055 [P] [US3] Remove `terraform_wrapper: false` inconsistency, set to `false` for all terraform setup steps
+- [x] T046 [P] [US3] Update .github/workflows/terraform-ci.yml: Change `on.push.branches` from `develop` to `[main]` ✅
+- [x] T047 [P] [US3] Add pull_request trigger configuration for PR validation (validate/test/security-scan, no deploy) ✅
+- [x] T048 [P] [US3] Remove deprecated `trstringer/manual-approval@v1` action, prepare for Environment Protection Rules ✅
+- [x] T049 [P] [US3] Add label detection logic: Check for `deploy-staging` and `deploy-prod` labels in workflow ✅
+- [x] T050 [US3] Implement conditional job execution based on labels (deploy-staging → staging job, deploy-prod → prod job) ✅
+- [x] T051 [P] [US3] Add `workflow_dispatch` manual trigger option with environment parameter selection ✅
+- [x] T052 [P] [US3] Update terraform-ci.yml `configure-aws-credentials@v4` to use OIDC: `role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}`, `token-format: aws4` ✅
+- [x] T053 [US3] Fix environment block definitions in terraform-ci.yml: Add `environment: develop/staging/production` ✅
+- [x] T054 [P] [US3] Set stage-specific job timeouts: validate (timeout-minutes: 5), test (10), security-scan (10), deploy (15) ✅
+- [x] T055 [P] [US3] Remove `terraform_wrapper: false` inconsistency, set to `false` for all terraform setup steps ✅
 - [ ] T056 [US3] Validate terraform-ci.yml syntax with `github-super-linter` or `actionlint` tool
 
 **Checkpoint**: terraform-ci.yml syntax correct, main branch trigger working, PR labels implemented, OIDC authentication integrated

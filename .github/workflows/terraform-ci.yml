@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
       - 'feature/**'
     paths:
       - 'infrastructure/terraform/**'
@@ -12,7 +11,6 @@ on:
   pull_request:
     branches:
       - main
-      - develop
     paths:
       - 'infrastructure/terraform/**'
   workflow_dispatch:
@@ -35,6 +33,7 @@ jobs:
   terraform-validate:
     name: Terraform Validation
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
       pull-requests: write
@@ -129,6 +128,7 @@ jobs:
   tests:
     name: Test Suite
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: terraform-validate
     permissions:
       contents: read
@@ -159,6 +159,7 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: terraform-validate
     permissions:
       contents: read
@@ -202,6 +203,7 @@ jobs:
   plan-summary:
     name: Generate Plan Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [terraform-validate, tests]
     if: github.event_name == 'pull_request'
     permissions:
@@ -255,10 +257,11 @@ jobs:
   deploy-dev:
     name: Deploy to Dev
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [terraform-validate, tests, security-scan]
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
-      name: development
+      name: develop
     permissions:
       contents: read
       id-token: write
@@ -272,11 +275,13 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
           aws-region: ${{ env.AWS_REGION }}
+          token-format: aws4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -304,6 +309,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [terraform-validate, tests, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-staging]')
     environment:
@@ -321,11 +327,13 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_STAGING }}
           aws-region: ${{ env.AWS_REGION }}
+          token-format: aws4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -344,15 +352,6 @@ jobs:
             -var-file="environments/staging.tfvars" \
             -out=tfplan
 
-      - name: Wait for Approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: 'devops-team'
-          minimum-approvals: 1
-          issue-title: 'Staging Deployment Approval'
-          issue-body: 'Please review and approve the staging deployment'
-
       - name: Terraform Apply
         working-directory: infrastructure/terraform
         run: |
@@ -368,6 +367,7 @@ jobs:
   deploy-prod:
     name: Deploy to Prod
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [terraform-validate, tests, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-prod]')
     environment:
@@ -385,11 +385,13 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
           aws-region: ${{ env.AWS_REGION }}
+          token-format: aws4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -407,15 +409,6 @@ jobs:
           terraform plan \
             -var-file="environments/prod.tfvars" \
             -out=tfplan
-
-      - name: Wait for Approval (2 approvers)
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: 'devops-team,security-team'
-          minimum-approvals: 2
-          issue-title: 'Production Deployment Approval'
-          issue-body: 'PROD DEPLOYMENT: Please review and approve'
 
       - name: Terraform Apply
         working-directory: infrastructure/terraform
@@ -439,6 +432,7 @@ jobs:
   notify:
     name: Notify Deployment
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [plan-summary]
     if: always()
     permissions:
