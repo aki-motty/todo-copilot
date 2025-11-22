@@ -189,17 +189,17 @@
 
 ### テスト（TDD: テスト先行）
 
-- [ ] T066 [US4] `tests/unit/application/commands/DeleteTodoCommand.spec.ts`: DeleteCommand テスト
-- [ ] T067 [US4] `tests/integration/TodoApplicationService.spec.ts`: 削除の統合テスト
-- [ ] T068 [US4] `tests/e2e/delete-todo.spec.ts`: E2E テスト「削除ボタンクリック→確認ダイアログ→削除→永続化」
+- [x] T066 [US4] `tests/unit/application/commands/DeleteTodoCommand.spec.ts`: DeleteCommand テスト ✅
+- [x] T067 [US4] `tests/integration/TodoApplicationService.spec.ts`: 削除の統合テスト ✅
+- [x] T068 [US4] `tests/e2e/delete-todo.spec.ts`: E2E テスト「削除ボタンクリック→確認ダイアログ→削除→永続化」 ✅
 
 ### 実装
 
-- [ ] T069 [US4] `src/application/commands/DeleteTodoCommand.ts` 実装
-- [ ] T070 [US4] `src/application/handlers/DeleteTodoCommandHandler.ts` 実装
-- [ ] T071 [US4] `src/presentation/components/TodoItem.tsx` 更新：削除ボタン・確認ダイアログ追加
-- [ ] T072 [US4] 削除ロジック実装：リポジトリから削除、localStorage 更新
-- [ ] T073 [US4] ログ追加：削除操作のstructured ログ
+- [x] T069 [US4] `src/application/commands/DeleteTodoCommand.ts` 実装 ✅
+- [x] T070 [US4] `src/application/handlers/DeleteTodoCommandHandler.ts` 実装 ✅
+- [x] T071 [US4] `src/presentation/components/TodoItem.tsx` 更新：削除ボタン・確認ダイアログ追加 ✅
+- [x] T072 [US4] 削除ロジック実装：リポジトリから削除、localStorage 更新 ✅
+- [x] T073 [US4] ログ追加：削除操作のstructured ログ ✅
 
 **Checkpoint**: Sprint 2 完成
 

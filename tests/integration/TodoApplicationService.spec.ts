@@ -250,4 +250,82 @@ describe("TodoApplicationService - Integration Tests", () => {
       expect(events2).toHaveLength(0);
     });
   });
+
+  describe("deleteTodo", () => {
+    it("should delete an existing todo", () => {
+      const created = service.createTodo({ title: "Delete me" });
+      const retrieved = repository.findById(created.id);
+      expect(retrieved).not.toBeNull();
+
+      service.deleteTodo({ id: created.id });
+
+      const deleted = repository.findById(created.id);
+      expect(deleted).toBeNull();
+    });
+
+    it("should throw NotFoundError when deleting non-existent todo", () => {
+      const fakeId = "00000000-0000-0000-0000-000000000000";
+
+      expect(() => {
+        service.deleteTodo({ id: fakeId });
+      }).toThrow(NotFoundError);
+    });
+
+    it("should remove todo from findAll results after deletion", () => {
+      const todo1 = service.createTodo({ title: "Keep this" });
+      const todo2 = service.createTodo({ title: "Delete this" });
+
+      const before = repository.findAll();
+      expect(before).toHaveLength(2);
+
+      service.deleteTodo({ id: todo2.id });
+
+      const after = repository.findAll();
+      expect(after).toHaveLength(1);
+      if (after[0]) {
+        expect(after[0].id).toEqual(todo1.id);
+      }
+    });
+
+    it("should persist deletion to storage", () => {
+      const created = service.createTodo({ title: "Persist deletion" });
+      service.deleteTodo({ id: created.id });
+
+      // Verify by checking storage directly
+      const stored = mockStorage.getItem("todos");
+      const todos = JSON.parse(stored || "[]");
+
+      expect(todos).toHaveLength(0);
+    });
+
+    it("should delete correct todo when multiple exist", () => {
+      const todo1 = service.createTodo({ title: "First" });
+      const todo2 = service.createTodo({ title: "Second" });
+      const todo3 = service.createTodo({ title: "Third" });
+
+      service.deleteTodo({ id: todo2.id });
+
+      const remaining = repository.findAll();
+      const ids = remaining.map((t: any) => t.id.valueOf());
+
+      expect(remaining).toHaveLength(2);
+      expect(ids).toContain(todo1.id.valueOf());
+      expect(ids).toContain(todo3.id.valueOf());
+      expect(ids).not.toContain(todo2.id.valueOf());
+    });
+
+    it("should not affect other todos when deleting one", () => {
+      const todo1 = service.createTodo({ title: "Todo 1" });
+      const todo2 = service.createTodo({ title: "Todo 2" });
+
+      const beforeDelete = repository.findById(todo1.id);
+      expect(beforeDelete?.title.value).toBe("Todo 1");
+
+      service.deleteTodo({ id: todo2.id });
+
+      const afterDelete = repository.findById(todo1.id);
+      expect(afterDelete?.title.value).toBe("Todo 1");
+      expect(afterDelete?.completed).toBe(false);
+    });
+  });
 });
