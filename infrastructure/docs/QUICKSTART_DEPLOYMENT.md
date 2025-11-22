@@ -1,7 +1,7 @@
 # 本番デプロイ準備ガイド（クイックスタート）
 
 **プロジェクト**: Todo Copilot  
-**ステータス**: Backend モジュール完成 ✅・本番環境デプロイ準備中  
+**ステータス**: 開発環境デプロイ完成 ✅・本番環境デプロイ準備中  
 **作成日**: 2025-11-22  
 **最終更新**: 2025-11-22
 
@@ -18,16 +18,44 @@
 | 設計ドキュメント | ✅ 完成 | DDD/CQRS architecture validated |
 | CI/CD パイプライン | ✅ 準備完了 | GitHub Actions workflow configured |
 | デプロイ手順書 | ✅ 作成済み | 5つの詳細ガイド完成 |
+| Dev 環境デプロイ | ✅ 完成 | Lambda, API Gateway, DynamoDB デプロイ済み |
+| AWS リソース検証 | ✅ 完了 | 全リソース ACTIVE・動作確認済み |
 
 ---
 
-## 🚀 デプロイまでの 3 ステップ
+## ✅ デプロイ完了状況
+
+### 開発環境（dev）デプロイ済み ✅
+
+**デプロイされたリソース:**
+- **API Gateway**: `https://ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com/dev` ✅ ACTIVE
+- **Lambda 関数**: `todo-copilot-api-dev` (nodejs18.x, 256MB, 30sec timeout) ✅ ACTIVE
+- **DynamoDB テーブル**: `todo-copilot-dev` (PAY_PER_REQUEST) ✅ ACTIVE
+- **IAM ロール**: `lambda-execution-dev` (最小権限) ✅ CONFIGURED
+- **CloudWatch Logs**: API Gateway・Lambda ログ配信 ✅ CONFIGURED
+- **S3 Backend**: Terraform State 管理 ✅ CONFIGURED
+
+**環境変数:**
+```
+DYNAMODB_TABLE: todo-copilot-dev
+ENVIRONMENT: dev
+NODE_ENV: production
+LOG_LEVEL: DEBUG
+```
+
+**テスト結果:** ✅ 全テスト PASS (338 tests passed)
+
+---
+
+## 🚀 本番環境デプロイまでの 3 ステップ
 
 > **前提**: AWS CLI が `terraform-dev` プロファイルで認証済みであること
+> **注意**: Dev 環境がすでにデプロイされているため、以下ステップ2以降は本番環境向けです
 
-### **ステップ 1️⃣: 準備段階（15-30 分）**
+### **ステップ 1️⃣: 準備段階（15-30 分）✅ 完了**
 
-**目標**: AWS アカウント・認証・バックエンド（S3 + DynamoDB）を Terraform で作成
+**目標**: AWS アカウント・認証・バックエンド（S3 + DynamoDB）を Terraform で作成  
+**ステータス**: このステップは完了しています
 
 ```bash
 # 1. 認証確認
@@ -75,9 +103,10 @@ EOF
 
 ---
 
-### **ステップ 2️⃣: 検証段階（20-45 分、推奨）**
+### **ステップ 2️⃣: 検証段階（20-45 分、推奨）✅ 完了**
 
-**目標**: ローカル環境での統合テスト・Terraform lint・セキュリティスキャンを実行
+**目標**: ローカル環境での統合テスト・Terraform lint・セキュリティスキャンを実行  
+**ステータス**: このステップは完了しています
 
 ```bash
 # 1. ユニットテスト実行
@@ -106,9 +135,10 @@ terraform show plan-dev.tfplan | head -30
 
 ---
 
-### **ステップ 3️⃣: 本番デプロイ段階（30-60 分、承認必須）**
+### **ステップ 3️⃣: Staging・本番環境デプロイ段階（30-60 分、承認必須）**
 
-**目標**: AWS 本番環境にアプリケーションリソースを作成（Backend 作成後）
+**目標**: AWS Staging・本番環境にアプリケーションリソースを作成（Dev デプロイ後）  
+**ステータス**: Dev 環境デプロイ完了。以下は Staging・本番環境向け手順
 
 ```bash
 # 1. 環境変数設定
@@ -131,23 +161,26 @@ terraform workspace new staging || terraform workspace select staging
 terraform workspace new prod || terraform workspace select prod
 
 # 4. 環境に応じて Plan・Apply（dev → staging → prod の順）
-# 🔹 Dev 環境
+# 🔹 Dev 環境 ✅ ALREADY DEPLOYED
 terraform workspace select dev
-terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
-terraform show plan-dev.tfplan | head -20
-terraform apply plan-dev.tfplan
+# terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
+# terraform apply plan-dev.tfplan
 
 # 🔹 Staging 環境（オプション、本番前のテスト）
-# terraform workspace select staging
-# terraform plan -var-file=environments/staging.tfvars -out=plan-staging.tfplan
-# terraform apply plan-staging.tfplan
+terraform workspace select staging
+terraform plan -var-file=environments/staging.tfvars -out=plan-staging.tfplan
+terraform show plan-staging.tfplan | head -20
+# ☝️ Plan を確認後、以下で Apply
+terraform apply plan-staging.tfplan
 
 # 🔹 本番環境（⚠️ 特に慎重に、人間による review・approval を必須に）
-# terraform workspace select prod
-# terraform plan -var-file=environments/prod.tfvars -out=plan-prod.tfplan
-# terraform show -json plan-prod.tfplan | jq '.resource_changes[] | select(.change.actions[] == "delete")'
-# # ☝️ 削除対象がないか確認
-# terraform apply plan-prod.tfplan
+terraform workspace select prod
+terraform plan -var-file=environments/prod.tfvars -out=plan-prod.tfplan
+terraform show -json plan-prod.tfplan | jq '.resource_changes[] | select(.change.actions[] == "delete")'
+# ☝️ 削除対象がないか確認
+terraform show plan-prod.tfplan | head -20
+# ☝️ Plan を詳細確認後、以下で Apply
+terraform apply plan-prod.tfplan
 
 # 5. Post-Deploy Verification
 bash ../scripts/verify-deployment.sh
@@ -171,22 +204,28 @@ bash ../scripts/constitution-check.sh
 
 ---
 
-## ✅ チェックリスト（実施前の確認）
+## ✅ チェックリスト（Staging・本番デプロイ前の確認）
 
-**デプロイ前に以下を確認してください：**
+### Dev 環境向け（完了済み ✅）
+- [x] AWS CLI が `terraform-dev` プロファイルで認証できる
+- [x] `terraform-bootstrap/` で S3 backend バケット・DynamoDB lock table が作成されている
+- [x] Backend 設定ファイル（`terraform/backend-config.hcl`）が作成・コピーされている
+- [x] `terraform init -backend-config=backend-config.hcl -reconfigure` が成功している
+- [x] `terraform validate` が成功している（構文OK）
+- [x] `terraform fmt -check` が成功している（フォーマットOK）
+- [x] `npm test` が全て PASS している（338+ tests）
+- [x] `terraform plan -var-file=environments/dev.tfvars` が期待通りの変更を表示している
+- [x] Dev 環境へのデプロイが完了している
 
-- [ ] AWS CLI が `terraform-dev` プロファイルで認証できる（`aws sts get-caller-identity --profile terraform-dev`）
-- [ ] `terraform-bootstrap/` で S3 backend バケット・DynamoDB lock table が作成されている
-- [ ] Backend 設定ファイル（`terraform/backend-config.hcl`）が作成・コピーされている
-- [ ] `terraform init -backend-config=backend-config.hcl -reconfigure` が成功している
-- [ ] `terraform validate` が成功している（構文OK）
-- [ ] `terraform fmt -check` が成功している（フォーマットOK）
-- [ ] `npm test` が全て PASS している（338+ tests）
-- [ ] `terraform plan -var-file=environments/dev.tfvars` が期待通りの変更を表示している
-- [ ] Plan 出力に破壊的変更（`destroy`）がないことを確認している
-- [ ] PR レビューが完了している（本番環境）
+### Staging・本番環境向け（実施前に確認）
+- [ ] Dev 環境が安定運用されている期間（最低 7 日間推奨）
+- [ ] PR レビューが完了している（staging・本番環境）
+- [ ] Staging 環境用の variables ファイル確認（`environments/staging.tfvars`）
+- [ ] 本番環境用の variables ファイル確認（`environments/prod.tfvars`）
+- [ ] Terraform Plan 出力で破壊的変更（`destroy`）がないことを確認している
 - [ ] Rollback 手順を理解している（`infrastructure/docs/DISASTER_RECOVERY.md`）
-- [ ] 監視・ログダッシュボードが設定されている
+- [ ] 監視・ログダッシュボードが Staging・本番向けに設定されている
+- [ ] セキュリティ・ネットワーク要件確認済み
 
 ---
 
@@ -271,31 +310,72 @@ bash ../scripts/constitution-check.sh
 
 ## 📊 デプロイメント後の確認事項
 
-デプロイ完了後、以下を確認してください：
+### Dev 環境（完了済み ✅）
+
+**デプロイ完了確認:**
+```bash
+# Terraform State 確認
+cd infrastructure/terraform
+terraform state list       # リソース一覧
+terraform output           # Output 確認
+```
+
+**結果:**
+```
+api_gateway_endpoint: https://ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com/dev
+lambda_function_name: todo-copilot-api-dev
+dynamodb_table_name: todo-copilot-dev
+```
+
+**AWS リソース検証:**
+```bash
+export AWS_PROFILE=terraform-dev
+export AWS_REGION=ap-northeast-1
+
+# Lambda 確認
+aws lambda get-function --function-name todo-copilot-api-dev
+
+# DynamoDB 確認
+aws dynamodb describe-table --table-name todo-copilot-dev
+
+# API Gateway 確認
+aws apigatewayv2 get-apis
+```
+
+**テスト実行:**
+```bash
+# Unit・Integration テスト
+cd /workspaces/todo-copilot
+npm test
+
+# E2E テスト（オプション）
+npm run test:e2e
+```
+
+### Staging・本番環境
+
+デプロイ完了後、上記と同じ確認を実施してください：
 
 ```bash
-# 設定
+# 環境に応じて設定
 export AWS_PROFILE=terraform-dev
 export AWS_REGION=ap-northeast-1
 
 # 1. Terraform State 確認
 cd infrastructure/terraform
-terraform state list  # リソース一覧
-terraform output      # Output 確認
+terraform workspace select staging  # または prod
+terraform state list
+terraform output
 
 # 2. AWS リソース確認
 aws lambda list-functions --profile terraform-dev --region $AWS_REGION --query 'Functions[?contains(FunctionName, `todo`)]'
 aws dynamodb list-tables --profile terraform-dev --region $AWS_REGION
-aws apigateway get-rest-apis --profile terraform-dev --region $AWS_REGION
+aws apigatewayv2 get-apis --region $AWS_REGION
 
 # 3. ログ確認
 aws logs describe-log-groups --profile terraform-dev --region $AWS_REGION | grep todo-copilot
 
-# 4. E2E テスト実行（オプション）
-cd /workspaces/todo-copilot
-npm run test:e2e
-
-# 5. Constitution Check（推奨）
+# 4. Constitution Check（推奨）
 bash infrastructure/scripts/constitution-check.sh
 ```
 
@@ -310,30 +390,14 @@ bash infrastructure/scripts/constitution-check.sh
 
 ---
 
-## 🔧 追加情報
+## 📝 デプロイ履歴
 
-### AWS Profile & 環境変数
-- **ローカル開発**: `AWS_PROFILE=terraform-dev`（ステップ 1 で設定）
-- **本番環境**: 別の IAM ロール / MFA 設定推奨
-
-### Backend モジュール
-- **場所**: `infrastructure/terraform-bootstrap/`
-- **作成物**: S3 bucket（versioning・encryption 有効）、DynamoDB lock table
-- **初期化**: ワンタイムセットアップ用、State は Local で管理
-
-### メイン Terraform
-- **場所**: `infrastructure/terraform/`
-- **Backend**: S3 + DynamoDB（`bootstrap/` で作成）
-- **State**: S3 に保存・管理、DynamoDB による lock 機構
-
-### 次のステップ（本番前）
-- [ ] GitHub Actions OIDC 信頼ポリシー設定（CI から assume する場合）
-- [ ] IAM ロール・ポリシーレビュー（最小権限原則の確認）
-- [ ] KMS キー作成（S3・DynamoDB 暗号化用）
-- [ ] CloudTrail・CloudWatch Logs 設定
-
----
+| 日付 | 環境 | ステータス | 詳細 |
+|------|------|-----------|------|
+| 2025-11-22 | Dev | ✅ 完了 | S3 Backend, Lambda, API Gateway, DynamoDB デプロイ完了 |
+| - | Staging | ⏳ 準備中 | チェックリスト確認後、デプロイ予定 |
+| - | Prod | ⏳ 予定中 | Staging 検証後、本番デプロイ予定 |
 
 **Last Updated**: 2025-11-22  
-**Next Review**: After first production deployment  
+**Next Review**: After Staging deployment  
 **Maintainer**: DevOps / Infrastructure Team
