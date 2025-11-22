@@ -57,8 +57,8 @@ describe("TodoApplicationService - Integration Tests", () => {
 
       expect(events).toHaveLength(1);
       expect(events[0]?.eventType).toBe("TodoCreated");
-      const eventData = events[0]?.data as Record<string, string>;
-      expect(eventData?.title).toBe("Event test");
+      const eventData = events[0]?.data as Record<string, unknown>;
+      expect(eventData?.["title"]).toBe("Event test");
     });
 
     it("should throw error for invalid title", () => {
@@ -166,8 +166,8 @@ describe("TodoApplicationService - Integration Tests", () => {
 
       expect(events).toHaveLength(1);
       expect(events[0]?.eventType).toBe("TodoCompleted");
-      const eventData = events[0]?.data as Record<string, string>;
-      expect(eventData?.status).toBe("Completed");
+      const eventData = events[0]?.data as Record<string, unknown>;
+      expect(eventData?.["status"]).toBe("Completed");
     });
 
     it("should throw NotFoundError for non-existent todo", () => {

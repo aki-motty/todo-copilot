@@ -130,9 +130,9 @@
 
 ### テスト（TDD: テスト先行）
 
-- [ ] T045 [P] [US3] `tests/unit/domain/entities/Todo.spec.ts`: ToDo状態遷移テスト（完了↔未完了）
-- [ ] T046 [P] [US3] `tests/unit/application/commands/ToggleTodoCompletionCommand.spec.ts`: ToggleCommand テスト
-- [ ] T047 [P] [US3] `tests/integration/TodoApplicationService.spec.ts`: 状態遷移の統合テスト
+- [x] T045 [P] [US3] `tests/unit/domain/entities/Todo.spec.ts`: ToDo状態遷移テスト（完了↔未完了）
+- [x] T046 [P] [US3] `tests/unit/application/commands/ToggleTodoCompletionCommand.spec.ts`: ToggleCommand テスト
+- [x] T047 [P] [US3] `tests/integration/TodoApplicationService.spec.ts`: 状態遷移の統合テスト
 - [ ] T048 [US3] `tests/e2e/toggle-completion.spec.ts`: E2E テスト「チェックボッククリック→状態変更→永続化」（Playwright）
 
 ### 実装
