@@ -1,5 +1,5 @@
 import { Todo, TodoTitle } from "../../domain/entities/Todo";
-import { CommandHandler } from "../handlers/base";
+import type { CommandHandler } from "../handlers/base";
 import type { CreateTodoCommand } from "./CreateTodoCommand";
 
 /**

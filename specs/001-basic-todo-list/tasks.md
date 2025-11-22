@@ -102,23 +102,23 @@
 
 ### テスト（TDD: テスト先行）
 
-- [ ] T033 [P] [US2] `tests/unit/application/queries/GetAllTodosQuery.spec.ts`: GetAllTodosQuery テスト
-- [ ] T034 [P] [US2] `tests/unit/infrastructure/persistence/LocalStorageTodoRepository.spec.ts`: localStorage永続化テスト
-- [ ] T035 [P] [US2] `tests/integration/TodoApplicationService.spec.ts`: リスト取得・永続化の統合テスト
+- [x] T033 [P] [US2] `tests/unit/application/queries/GetAllTodosQuery.spec.ts`: GetAllTodosQuery テスト
+- [x] T034 [P] [US2] `tests/unit/infrastructure/persistence/LocalStorageTodoRepository.spec.ts`: localStorage永続化テスト
+- [x] T035 [P] [US2] `tests/integration/TodoApplicationService.spec.ts`: リスト取得・永続化の統合テスト
 - [ ] T036 [US2] `tests/e2e/display-todos.spec.ts`: E2E テスト「ToDoリスト表示・ページリロード後の永続化」（Playwright）
 
 ### 実装
 
-- [ ] T037 [P] [US2] `src/application/queries/GetAllTodosQuery.ts` 実装：クエリ定義
-- [ ] T038 [P] [US2] `src/application/handlers/GetAllTodosQueryHandler.ts` 実装：クエリハンドラー
-- [ ] T039 [P] [US2] `src/presentation/components/TodoList.tsx` 実装：リスト表示コンポーネント
-- [ ] T040 [P] [US2] `src/presentation/components/TodoItem.tsx` 実装：ToDoアイテムコンポーネント
-- [ ] T041 [US2] `src/presentation/hooks/useTodoList.ts` 更新：初期化時にlocalStorage から読み込み（T033-T040に依存）
-- [ ] T042 [US2] localStorage永続化ロジック実装（src/infrastructure/persistence/LocalStorageTodoRepository.ts）
-- [ ] T043 [US2] 空リスト表示メッセージ実装：「ToDoがまだありません」
-- [ ] T044 [US2] ログ追加：リスト表示・永続化操作のstructured ログ
+- [x] T037 [P] [US2] `src/application/queries/GetAllTodosQuery.ts` 実装：クエリ定義
+- [x] T038 [P] [US2] `src/application/handlers/GetAllTodosQueryHandler.ts` 実装：クエリハンドラー
+- [x] T039 [P] [US2] `src/presentation/components/TodoList.tsx` 実装：リスト表示コンポーネント
+- [x] T040 [P] [US2] `src/presentation/components/TodoItem.tsx` 実装：ToDoアイテムコンポーネント
+- [x] T041 [US2] `src/presentation/hooks/useTodoList.ts` 更新：初期化時にlocalStorage から読み込み（T033-T040に依存）
+- [x] T042 [US2] localStorage永続化ロジック実装（src/infrastructure/persistence/LocalStorageTodoRepository.ts）
+- [x] T043 [US2] 空リスト表示メッセージ実装：「ToDoがまだありません」
+- [x] T044 [US2] ログ追加：リスト表示・永続化操作のstructured ログ
 
-**Checkpoint**: User Story 2 完全実装・テスト完成 → US1+US2 でE2E確認可能
+**Checkpoint**: ✅ User Story 2 完全実装・テスト完成 → US1+US2 でE2E確認可能
 
 ---
 
