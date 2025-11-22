@@ -77,9 +77,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
     });
 
     it("should throw error for non-existent todo", () => {
-      expect(() =>
-        service.toggleTodoCompletion({ id: "non-existent-id" })
-      ).toThrow();
+      expect(() => service.toggleTodoCompletion({ id: "non-existent-id" })).toThrow();
     });
 
     it("should maintain todo integrity after toggle", () => {
@@ -100,9 +98,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
       service.toggleTodoCompletion({ id: todo.id });
 
       // Simulate service restart
-      const newService = new TodoApplicationService(
-        new LocalStorageTodoRepository()
-      );
+      const newService = new TodoApplicationService(new LocalStorageTodoRepository());
 
       const retrieved = newService.getAllTodos({}).todos[0];
       expect(retrieved?.completed).toBe(true);
@@ -117,9 +113,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
       // Leave todo2 uncompleted
       service.toggleTodoCompletion({ id: todo3.id });
 
-      const newService = new TodoApplicationService(
-        new LocalStorageTodoRepository()
-      );
+      const newService = new TodoApplicationService(new LocalStorageTodoRepository());
 
       const todos = newService.getAllTodos({}).todos;
 

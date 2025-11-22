@@ -62,11 +62,7 @@ describe("ToggleTodoCompletionCommand - Unit Tests", () => {
     });
 
     it("should create command in batch operations", () => {
-      const todoIds = [
-        "id-1",
-        "id-2",
-        "id-3",
-      ];
+      const todoIds = ["id-1", "id-2", "id-3"];
 
       const commands: ToggleTodoCompletionCommand[] = todoIds.map((id) => ({
         id,

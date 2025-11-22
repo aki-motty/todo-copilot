@@ -1,5 +1,5 @@
 import type { ToggleTodoCompletionCommand } from "../commands";
-import type { TodoApplicationService } from "./TodoApplicationService";
+import type { TodoApplicationService } from "../services/TodoApplicationService";
 
 /**
  * Command handler for toggling todo completion status

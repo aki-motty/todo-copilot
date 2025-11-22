@@ -49,9 +49,7 @@ describe("Todo - Status Toggle Tests (Unit)", () => {
       const toggled = todo.toggleCompletion();
 
       // Timestamps might be the same due to fast execution, so check >= instead of >
-      expect(toggled.updatedAt.getTime()).toBeGreaterThanOrEqual(
-        originalUpdatedAt.getTime()
-      );
+      expect(toggled.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
       // Ensure it's not the exact same instance
       expect(toggled.updatedAt).not.toBe(originalUpdatedAt);
     });
