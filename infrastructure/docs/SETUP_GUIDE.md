@@ -144,28 +144,26 @@ GitHub では環境保護ルールを UI から設定します。
 
 結果: develop にプッシュされたコードは即座にデプロイ
 
-#### 3-2. staging 環境 (1 承認が必要)
+#### 3-2. staging 環境 (デプロイ前の手動確認)
 
 1. **New environment** → 環境名: `staging` → **Configure Environment**
-2. **Required reviewers** チェックボックスにチェック
-3. **Minimum number of reviewers**: `1` を設定
-4. **Restrict deployments to specific branches or environments** にチェック
-5. ブランチ: `main` のみを許可
-6. **Save protection rules** をクリック
+2. **Deployment branches and environments** セクションで **Restrict deployments to specific branches or environments** にチェック
+3. ブランチ: `main` のみを許可
+4. **Required reviewers** チェックボックスには チェック **しない** ✅（自動デプロイのみ）
+5. **Save protection rules** をクリック
 
-結果: staging へのデプロイには 1 つの承認が必要
+結果: staging へのデプロイは main ブランチからのみ実行可能（ワークフロー実行確認後に自動デプロイ）
 
-#### 3-3. production 環境 (2 承認が必要)
+#### 3-3. production 環境 (最小限の安全策 - 自分による確認)
 
 1. **New environment** → 環境名: `production` → **Configure Environment**
-2. **Required reviewers** チェックボックスにチェック
-3. **Minimum number of reviewers**: `2` を設定
-4. **Restrict deployments to specific branches or environments** にチェック
-5. ブランチ: `main` のみを許可
-6. (オプション) **Deployment branches and environments** で環境チームを指定
-7. **Save protection rules** をクリック
+2. **Deployment branches and environments** セクションで **Restrict deployments to specific branches or environments** にチェック
+3. ブランチ: `main` のみを許可
+4. **Required reviewers** チェックボックスに チェック
+5. **Minimum number of reviewers**: `1` を設定（自分による確認）
+6. **Save protection rules** をクリック
 
-結果: production へのデプロイには 2 つの異なる承認が必要
+結果: production へのデプロイには自分による 1 つの承認・確認が必要（完全自動デプロイを防止）
 
 ---
 
