@@ -7,7 +7,10 @@
 - ✅ AWS OIDC プロバイダーを GitHub Actions に登録
 - ✅ GitHub リポジトリに秘密を登録
 - ✅ GitHub 環境 (develop/staging/production) を作成
-- ✅ 環境保護ルール (1 approval / 2 approval) を設定
+- ✅ 環境保護ルール（開発者1人向けの緩い設定）を設定
+  - develop: 自動デプロイ（検証用）
+  - staging: ブランチ制限のみ（自動デプロイ）
+  - production: 自分による1つの承認のみ（完全自動デプロイ防止）
 
 ---
 
@@ -126,6 +129,11 @@ AWS_REGION=ap-northeast-1
 
 GitHub では環境保護ルールを UI から設定します。
 
+**方針**: 開発者が 1 人であるため、完全自動デプロイを避けつつ、過度な承認要件を排除した設定にします：
+- **develop**: 検証用なので保護ルールなし（自動デプロイ）
+- **staging**: ブランチ制限のみ（main からのみ、自動デプロイ）
+- **production**: 自分による 1 つの承認のみ（完全自動化を防止）
+
 #### 3-1. develop 環境 (自動デプロイ - 保護ルールなし)
 
 1. GitHub リポジトリ **Settings** → **Environments** をクリック
@@ -239,9 +247,9 @@ cd /workspaces/todo-copilot
 - [ ] IAM ロール 3 個作成済み (dev/staging/prod)
 - [ ] GitHub 秘密 6 個登録済み
 - [ ] GitHub 環境 3 個作成済み (develop/staging/production)
-- [ ] develop: 保護ルールなし ✅
-- [ ] staging: 1 承認が必要 ✅
-- [ ] production: 2 承認が必要 ✅
+- [ ] develop: 保護ルールなし（自動デプロイ） ✅
+- [ ] staging: ブランチ制限のみ（main のみ、自動デプロイ） ✅
+- [ ] production: 自分による 1 つの承認が必要 ✅
 - [ ] main ブランチに 003-github-actions-deploy ブランチをマージ
 - [ ] terraform-ci.yml ワークフロー実行確認
 
@@ -253,8 +261,10 @@ cd /workspaces/todo-copilot
 
 - **AWS OIDC セットアップ**: `GITHUB_ACTIONS_SETUP.md`
 - **GitHub 秘密・環境**: `SECRETS_AND_ENVIRONMENTS.md`
-- **環境保護ルール**: `ENVIRONMENT_PROTECTION.md`
+- **環境保護ルール**: `ENVIRONMENT_PROTECTION.md`（注: 本ガイドの緩い設定を優先）
 - **トラブルシューティング**: `OIDC_TROUBLESHOOTING.md`
+
+**本ガイドが優先**: 開発者 1 人用のシンプルな承認ルール設定です。チーム拡大時は段階的に承認要件を厳しくしてください。
 
 ---
 
@@ -301,8 +311,20 @@ GitHub UI では以下を確認:
 
 1. ✅ AWS OIDC セットアップ完了
 2. 🔄 GitHub 秘密・環境を自動/手動で登録
-3. 🎛️ GitHub 環境保護ルール設定
+3. 🎛️ GitHub 環境保護ルール設定（本ガイドの緩い設定）
 4. 🚀 main ブランチへのプッシュでデプロイ実行
+
+### デプロイの流れ
+
+```
+Push to main
+    ↓
+develop → 🟢 自動デプロイ（検証用）
+    ↓
+staging → 🟢 自動デプロイ（GitHub Actions 実行確認後）
+    ↓
+production → 🟡 自分による確認・承認後にデプロイ（安全保障）
+```
 
 すべて完了したら、GitHub Actions ワークフローが自動的にトリガーされます！
 
