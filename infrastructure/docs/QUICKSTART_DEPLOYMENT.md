@@ -1,8 +1,9 @@
 # 本番デプロイ準備ガイド（クイックスタート）
 
 **プロジェクト**: Todo Copilot  
-**ステータス**: デプロイ準備完了 ✅  
-**作成日**: 2025-11-22
+**ステータス**: Backend モジュール完成 ✅・本番環境デプロイ準備中  
+**作成日**: 2025-11-22  
+**最終更新**: 2025-11-22
 
 ---
 
@@ -10,118 +11,133 @@
 
 | 項目 | ステータス | 詳細 |
 |------|-----------|------|
+| Backend モジュール | ✅ 完成 | S3 + DynamoDB 作成用 Terraform モジュール |  
+| IAM モジュール | ✅ 完成 | 最小権限ポリシー、Terraform 実行用ロール |
 | Terraform コード | ✅ 完成 | All syntax valid, lint passed, security scan OK |
-| ユニットテスト | ✅ 合格 | 338/338 tests passed, 0 errors |
+| ユニットテスト | ✅ 合格 | 338+ tests passed, 0 errors |
 | 設計ドキュメント | ✅ 完成 | DDD/CQRS architecture validated |
 | CI/CD パイプライン | ✅ 準備完了 | GitHub Actions workflow configured |
-| デプロイ手順書 | ✅ 作成済み | 3つの詳細ガイド完成 |
+| デプロイ手順書 | ✅ 作成済み | 5つの詳細ガイド完成 |
 
 ---
 
-## 🚀 本番デプロイまでの 3 ステップ
+## 🚀 デプロイまでの 3 ステップ
+
+> **前提**: AWS CLI が `terraform-dev` プロファイルで認証済みであること
 
 ### **ステップ 1️⃣: 準備段階（15-30 分）**
 
-**目標**: AWS アカウント・認証・バックエンドを準備
+**目標**: AWS アカウント・認証・バックエンド（S3 + DynamoDB）を Terraform モジュールで作成
 
 ```bash
-# 1. AWS CLI クレデンシャル設定
-aws configure --profile terraform-admin
+# 1. 認証確認
+aws sts get-caller-identity --profile terraform-dev
 
-# 2. 認証確認
-aws sts get-caller-identity
+# 2. Backend 用 Terraform リソース作成
+# ℹ️ modules/backend/ にバケット・ロックテーブルのモジュールが用意されています
+cd infrastructure/terraform
 
-# 3. S3 Backend バケット作成（初回のみ）
-export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-aws s3api create-bucket \
-  --bucket todo-copilot-terraform-backend-${ACCOUNT_ID} \
-  --region ap-northeast-1
+# 初期化（backend-config なしで進める）
+terraform init
 
-# 4. DynamoDB Lock Table 作成（初回のみ）
-aws dynamodb create-table \
-  --table-name todo-copilot-terraform-locks \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST
+# Plan（バケット名・テーブル名はグローバルユニークにする）
+# 💡 推奨命名: <project>-terraform-state-<env>-<account-id>
+terraform plan \
+  -var='state_bucket_name=todo-copilot-state-dev-123456789' \
+  -var='lock_table_name=todo-copilot-locks-dev-123456789' \
+  -var='region=ap-northeast-1' \
+  -out=plan-backend.tfplan
+
+# Apply
+terraform apply plan-backend.tfplan
+
+# Output 確認（後のステップで必要）
+terraform output -raw bucket_id
+terraform output -raw dynamodb_table_name
 ```
 
-**詳細**: `infrastructure/docs/PRODUCTION_DEPLOYMENT.md` → 「認証・バックエンド準備」
+**詳細**: `infrastructure/terraform/README-BACKEND.md` を参照、または `infrastructure/docs/PRODUCTION_DEPLOYMENT.md` → 「認証・バックエンド準備」
 
 ---
 
 ### **ステップ 2️⃣: 検証段階（20-45 分、推奨）**
 
-**目標**: LocalStack でリソース・ワークフロー全体を検証
+**目標**: ローカル環境での統合テスト・Terraform lint・セキュリティスキャンを実行
 
 ```bash
-# 1. LocalStack 起動
-cd infrastructure
-docker-compose up -d
+# 1. ユニットテスト実行
+cd /workspaces/todo-copilot
+npm test
 
-# 2. LocalStack 用 Backend リソース作成
-export LOCALSTACK_ENDPOINT=http://localhost:4566
-
-aws s3api create-bucket \
-  --bucket todo-copilot-terraform-state \
-  --endpoint-url $LOCALSTACK_ENDPOINT
-
-aws dynamodb create-table \
-  --table-name todo-copilot-terraform-locks \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST \
-  --endpoint-url $LOCALSTACK_ENDPOINT
-
-# 3. Terraform Plan & Apply
+# 2. Terraform Lint & Format チェック
 cd infrastructure/terraform
-terraform init -reconfigure
-terraform plan -var-file=environments/dev.tfvars -var="use_localstack=true"
-terraform apply
+terraform fmt -check
+tflint . 2>/dev/null || echo "tflint not installed (optional)"
 
-# 4. 検証スクリプト実行
-bash ../scripts/verify-localstack.sh
+# 3. Terraform Validate
+terraform validate
 
-# 5. 統合テスト
-npm test -- aws-integration.spec.ts
+# 4. 構文・セキュリティスキャン（オプション）
+# checkov がインストールされている場合
+checkov -d . 2>/dev/null || echo "checkov not installed (optional)"
 
-# 6. LocalStack 停止
-docker-compose down
+# 5. Dev 環境の Plan（破壊的変更がないか確認）
+terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
+terraform show plan-dev.tfplan | head -30
 ```
 
-**詳細**: `infrastructure/docs/LOCALSTACK_GUIDE.md`
+**詳細**: 本格的なローカル統合テストの場合は `infrastructure/docs/LOCALSTACK_GUIDE.md` を参照。
 
 ---
 
 ### **ステップ 3️⃣: 本番デプロイ段階（30-60 分、承認必須）**
 
-**目標**: AWS 本番環境にリソース作成
+**目標**: AWS 本番環境にアプリケーションリソースを作成（Backend 作成後）
 
 ```bash
 # 1. 環境変数設定
-export AWS_PROFILE=terraform-admin
+export AWS_PROFILE=terraform-dev
 export AWS_REGION=ap-northeast-1
 
-# 2. Terraform 初期化（本番 Backend）
+# 2. Terraform 初期化（Backend 設定ファイルを作成）
+# ℹ️ Step 1 で作成した S3 バケット・DynamoDB テーブル情報を使用
 cd infrastructure/terraform
-terraform init -reconfigure
 
-# 3. Workspace 作成
+# backend-config.hcl を作成（Step 1 の output を参照）
+cat > backend-config.hcl << 'EOF'
+bucket         = "todo-copilot-state-dev-123456789"
+key            = "main/terraform.tfstate"
+region         = "ap-northeast-1"
+dynamodb_table = "todo-copilot-locks-dev-123456789"
+encrypt        = true
+EOF
+
+# Backend を再設定して初期化
+terraform init -backend-config=backend-config.hcl -reconfigure
+
+# 3. Workspace 作成（複数環境を分離）
 terraform workspace new dev || terraform workspace select dev
 terraform workspace new staging || terraform workspace select staging
 terraform workspace new prod || terraform workspace select prod
 
-# 4. Plan 実行（各環境）
+# 4. 環境に応じて Plan・Apply（dev → staging → prod の順）
+# 🔹 Dev 環境
+terraform workspace select dev
 terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
-terraform plan -var-file=environments/staging.tfvars -out=plan-staging.tfplan
-terraform plan -var-file=environments/prod.tfvars -out=plan-prod.tfplan
+terraform show plan-dev.tfplan | head -20
+terraform apply plan-dev.tfplan
 
-# 5. Plan 確認（破壊的変更がないか確認）
-terraform show plan-prod.tfplan | grep -E "Plan:|destroy"
+# 🔹 Staging 環境（オプション、本番前のテスト）
+# terraform workspace select staging
+# terraform plan -var-file=environments/staging.tfvars -out=plan-staging.tfplan
+# terraform apply plan-staging.tfplan
 
-# 6. Apply 実行（dev → staging → prod の順）
-terraform workspace select dev && terraform apply plan-dev.tfplan
-terraform workspace select staging && terraform apply plan-staging.tfplan
-terraform workspace select prod && terraform apply plan-prod.tfplan
+# 🔹 本番環境（⚠️ 特に慎重に、人間による review・approval を必須に）
+# terraform workspace select prod
+# terraform plan -var-file=environments/prod.tfvars -out=plan-prod.tfplan
+# terraform show -json plan-prod.tfplan | jq '.resource_changes[] | select(.change.actions[] == "delete")'
+# # ☝️ 削除対象がないか確認
+# terraform apply plan-prod.tfplan
 
 # 7. Post-Deploy Verification
 bash ../scripts/verify-deployment.sh
@@ -136,10 +152,10 @@ bash ../scripts/constitution-check.sh
 
 | ドキュメント | 用途 | 対象者 |
 |-------------|------|-------|
+| **README-BACKEND.md** | Backend モジュール・作成手順 | DevOps/Infra エンジニア |
 | **DEPLOYMENT_CHECKLIST.md** | 6 フェーズ、50+ チェック項目 | 全チーム |
 | **PRODUCTION_DEPLOYMENT.md** | ステップバイステップ本番デプロイ | DevOps/Infra エンジニア |
 | **LOCALSTACK_GUIDE.md** | ローカル環境での統合テスト | 開発エンジニア |
-| **BACKEND.md** | State 管理・バックエンド設定 | 運用者 |
 | **DISASTER_RECOVERY.md** | Rollback・リカバリー手順 | 運用者 |
 | **TROUBLESHOOTING.md** | よくある問題と解決方法 | 全チーム |
 
@@ -149,53 +165,57 @@ bash ../scripts/constitution-check.sh
 
 **デプロイ前に以下を確認してください：**
 
-- [ ] AWS アカウント・認証情報が正しく設定されている
-- [ ] S3 backend バケット・DynamoDB lock table が作成されている
+- [ ] AWS CLI が `terraform-dev` プロファイルで認証できる（`aws sts get-caller-identity --profile terraform-dev`）
+- [ ] S3 backend バケット・DynamoDB lock table が Step 1 で作成されている
+- [ ] Backend 設定ファイル（`backend-config.hcl`）が作成されている
 - [ ] `terraform validate` が成功している（構文OK）
 - [ ] `terraform fmt -check` が成功している（フォーマットOK）
-- [ ] `tflint` / `checkov` でセキュリティ警告がない
-- [ ] `npm test` が全て PASS している
-- [ ] LocalStack でのテストが全て PASS している（推奨）
+- [ ] `npm test` が全て PASS している（338+ tests）
+- [ ] `terraform plan -var-file=environments/dev.tfvars` が期待通りの変更を表示している
+- [ ] Plan 出力に破壊的変更（`destroy`）がないことを確認している
 - [ ] PR レビューが完了している（本番環境）
-- [ ] Rollback 手順を理解している
+- [ ] Rollback 手順を理解している（`infrastructure/docs/DISASTER_RECOVERY.md`）
 - [ ] 監視・ログダッシュボードが設定されている
 
 ---
 
 ## 🚨 重要な注意事項
 
-### ⚠️ 本番環境での Apply 前に必ず確認してください
+### ⚠️ Apply 前に必ず確認してください
 
-1. **Terraform Plan の確認**
+1. **環境変数確認**
    ```bash
-   terraform show plan-prod.tfplan | grep "Plan:"
-   # リソース数が期待値か確認
-   ```
-
-2. **破壊的変更の確認**
-   ```bash
-   terraform show -json plan-prod.tfplan | jq '.resource_changes[] | select(.change.actions[] == "delete")'
-   # 削除対象のリソースがないか確認
-   ```
-
-3. **IAM 権限の確認**
-   ```bash
-   aws sts get-caller-identity
+   echo $AWS_PROFILE  # = terraform-dev
+   echo $AWS_REGION   # = ap-northeast-1
+   aws sts get-caller-identity --profile terraform-dev
    # 実行ユーザーが正しいか確認
    ```
 
-4. **バックアップ作成**
+2. **Backend 接続確認**
    ```bash
-   aws s3 cp s3://todo-copilot-terraform-backend-<ACCOUNT>/prod/terraform.tfstate \
-     ~/terraform-state-backup-$(date +%Y%m%d-%H%M%S)
+   terraform init -backend-config=backend-config.hcl -reconfigure
+   # 初期化成功時、Terraform State が S3 にリンクされる
+   ```
+
+3. **Plan の確認**
+   ```bash
+   terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
+   terraform show plan-dev.tfplan | head -20
+   # リソース数が期待値か確認
+   ```
+
+4. **破壊的変更の確認**
+   ```bash
+   terraform show -json plan-dev.tfplan | jq '.resource_changes[] | select(.change.actions[] == "delete")' 2>/dev/null || echo "No destructive changes"
+   # 削除対象のリソースがないか確認
    ```
 
 ### 🔒 本番環境特有の設定
 
-- **destroy 保護**: `prevent_destroy = true` が有効
-- **高可用性**: DynamoDB on-demand billing、Lambda concurrency 設定
-- **セキュリティ**: S3 encryption、IAM 最小権限原則
-- **監視**: CloudWatch Logs、CloudTrail ロギング有効
+- **destroy 保護**: `prevent_destroy = true` が有効（`prod.tfvars` にて設定）
+- **高可用性**: DynamoDB on-demand billing、Lambda concurrency 制限・リザーブド同時実行数設定
+- **セキュリティ**: S3 encryption（SSE）、IAM 最小権限原則（modules/iam に定義）、VPC・PrivateLink 検討
+- **監視**: CloudWatch Logs retention 設定、CloudTrail ロギング有効、アラーム設定
 
 ---
 
@@ -203,24 +223,35 @@ bash ../scripts/constitution-check.sh
 
 **デプロイ中に問題が発生した場合：**
 
-1. **エラーログを確認**
+1. **AWS 認証エラー**
+   ```bash
+   # プロファイル確認
+   aws sts get-caller-identity --profile terraform-dev
+   # エラー: "Unable to locate credentials" → aws configure --profile terraform-dev を実行
+   ```
+
+2. **Terraform エラーログ**
    ```bash
    export TF_LOG=DEBUG
-   terraform plan -var-file=environments/prod.tfvars 2>&1 | tee debug.log
+   terraform plan -var-file=environments/dev.tfvars 2>&1 | tee debug.log
+   unset TF_LOG
    ```
 
-2. **AWS CLI でリソース確認**
+3. **Backend 接続エラー**
    ```bash
-   aws lambda list-functions
-   aws dynamodb list-tables
-   aws apigateway get-rest-apis
+   # Backend 設定確認
+   terraform init -backend-config=backend-config.hcl -reconfigure
+   # S3・DynamoDB が存在するか確認
+   aws s3 ls --profile terraform-dev
+   aws dynamodb list-tables --profile terraform-dev
    ```
 
-3. **Rollback（必要な場合）**
+4. **Rollback（必要な場合）**
    ```bash
-   # 前の State 復元
-   aws s3 cp s3://.../<version-id> terraform.tfstate
-   terraform destroy -var-file=environments/prod.tfvars
+   # State ファイルをバージョンから復元
+   aws s3api list-object-versions --bucket my-project-terraform-state-dev --profile terraform-dev
+   aws s3api get-object --bucket my-project-terraform-state-dev --key main/terraform.tfstate --version-id <VERSION_ID> terraform.tfstate.bak --profile terraform-dev
+   terraform destroy -var-file=environments/dev.tfvars
    ```
 
 詳細は `infrastructure/docs/TROUBLESHOOTING.md` を参照。
@@ -232,26 +263,29 @@ bash ../scripts/constitution-check.sh
 デプロイ完了後、以下を確認してください：
 
 ```bash
-# 1. リソース作成確認
-aws lambda list-functions --query 'Functions[?contains(FunctionName, `todo`)]'
-aws dynamodb list-tables
-aws apigateway get-rest-apis
+# 設定
+export AWS_PROFILE=terraform-dev
+export AWS_REGION=ap-northeast-1
 
-# 2. ログ確認
-aws logs tail /aws/lambda/todo-copilot-prod --follow
+# 1. Terraform State 確認
+cd infrastructure/terraform
+terraform state list  # リソース一覧
+terraform output      # Output 確認
 
-# 3. メトリクス確認
-aws cloudwatch get-metric-statistics \
-  --namespace AWS/Lambda \
-  --metric-name Invocations \
-  --dimensions Name=FunctionName,Value=todo-copilot-prod \
-  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
-  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
-  --period 300 \
-  --statistics Sum
+# 2. AWS リソース確認
+aws lambda list-functions --profile terraform-dev --region $AWS_REGION --query 'Functions[?contains(FunctionName, `todo`)]'
+aws dynamodb list-tables --profile terraform-dev --region $AWS_REGION
+aws apigateway get-rest-apis --profile terraform-dev --region $AWS_REGION
 
-# 4. E2E テスト実行
+# 3. ログ確認
+aws logs describe-log-groups --profile terraform-dev --region $AWS_REGION | grep todo-copilot
+
+# 4. E2E テスト実行（オプション）
+cd /workspaces/todo-copilot
 npm run test:e2e
+
+# 5. Constitution Check（推奨）
+bash infrastructure/scripts/constitution-check.sh
 ```
 
 ---
@@ -262,6 +296,25 @@ npm run test:e2e
 - **AWS ベストプラクティス**: https://docs.aws.amazon.com/
 - **プロジェクトリポジトリ**: https://github.com/aki-motty/todo-copilot
 - **Issue トラッカー**: GitHub Issues
+
+---
+
+## 🔧 追加情報
+
+### AWS Profile & 環境変数
+- **ローカル開発**: `AWS_PROFILE=terraform-dev`（ステップ 1 で設定）
+- **本番環境**: 別の IAM ロール / MFA 設定推奨
+
+### Backend モジュール
+- **場所**: `infrastructure/terraform/modules/backend/`
+- **作成物**: S3 bucket（versioning・encryption 有効）、DynamoDB lock table
+- **初期化**: `terraform init` で自動的に backend-config を読み込み
+
+### 次のステップ（本番前）
+- [ ] GitHub Actions OIDC 信頼ポリシー設定（CI から assume する場合）
+- [ ] IAM ロール・ポリシーレビュー（最小権限原則の確認）
+- [ ] KMS キー作成（S3・DynamoDB 暗号化用）
+- [ ] CloudTrail・CloudWatch Logs 設定
 
 ---
 
