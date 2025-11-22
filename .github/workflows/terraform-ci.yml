@@ -252,6 +252,14 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
+      - name: Create Lambda ZIP
+        run: |
+          mkdir -p infrastructure/terraform/dist
+          cd infrastructure/terraform/dist
+          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
+          zip -q index.zip index.js
+          ls -lh index.zip
+
       - name: Terraform Init
         working-directory: infrastructure/terraform
         run: |
@@ -302,6 +310,14 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
+
+      - name: Create Lambda ZIP
+        run: |
+          mkdir -p infrastructure/terraform/dist
+          cd infrastructure/terraform/dist
+          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
+          zip -q index.zip index.js
+          ls -lh index.zip
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -359,6 +375,14 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
+
+      - name: Create Lambda ZIP
+        run: |
+          mkdir -p infrastructure/terraform/dist
+          cd infrastructure/terraform/dist
+          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
+          zip -q index.zip index.js
+          ls -lh index.zip
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
