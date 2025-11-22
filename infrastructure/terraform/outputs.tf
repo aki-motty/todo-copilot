@@ -25,21 +25,6 @@ output "dynamodb_table_arn" {
   description = "DynamoDB table ARN"
 }
 
-output "state_bucket_name" {
-  value       = module.backend.state_bucket_name
-  description = "S3 bucket for Terraform state"
-}
-
-output "lock_table_name" {
-  value       = module.backend.lock_table_name
-  description = "DynamoDB table for state locking"
-}
-
-output "terraform_executor_role_arn" {
-  value       = module.backend.terraform_executor_role_arn
-  description = "IAM role ARN for Terraform executor"
-}
-
 output "lambda_execution_role_arn" {
   value       = module.iam.lambda_execution_role_arn
   description = "IAM role ARN for Lambda execution"

@@ -16,6 +16,9 @@ terraform {
 
   # Backend configured via -backend-config flag during init
   # Example: terraform init -backend-config=backend-config.hcl
+  backend "s3" {
+    # Configuration is provided via -backend-config=backend-config.hcl
+  }
 }
 
 provider "aws" {
@@ -41,15 +44,6 @@ locals {
     },
     var.common_tags
   )
-}
-
-# Backend Module - S3 + DynamoDB + IAM
-module "backend" {
-  source = "./modules/backend"
-
-  environment = var.environment
-  aws_region  = var.aws_region
-  common_tags = local.common_tags
 }
 
 # Data Module - DynamoDB Table
