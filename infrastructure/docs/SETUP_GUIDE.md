@@ -197,43 +197,24 @@ gh secret list --repo aki-motty/todo-copilot
 # TF_STATE_BUCKET            2025-11-22T16:36:01Z
 ```
 
-### 3. GitHub 環境確認
+### 3. GitHub 環境確認 (手動 UI)
 
-```bash
-# GitHub CLI で環境一覧表示
-gh environment list
+GitHub CLI では環境一覧を表示するコマンドがないため、GitHub UI から直接確認します:
 
-# 出力例:
-# develop
-# staging
-# production
-```
+1. GitHub リポジトリ画面で **Settings** をクリック
+2. 左サイドバーから **Environments** をクリック
+3. 以下の 3 つの環境が表示されていることを確認:
+   - ✅ `develop` (保護ルールなし)
+   - ✅ `staging` (ブランチ制限のみ)
+   - ✅ `production` (1 承認が必要)
+
+各環境をクリックして詳細を確認できます。
 
 ### 4. 環境保護ルール確認
 
 GitHub UI から確認:
 1. **Settings** → **Environments**
 2. 各環境をクリックして Protection rules を確認
-
-### 5. OIDC 認証テスト
-
-```bash
-# OIDC テストスクリプト実行
-cd /workspaces/todo-copilot
-./tests/integration/test-oidc-auth.sh
-```
-
-期待される出力:
-```
-✓ GitHub OIDC provider exists
-✓ github-actions-role-dev exists
-✓ github-actions-role-staging exists
-✓ github-actions-role-prod exists
-✓ Trust relationships configured
-✓ Policies attached
-✓ S3 bucket exists
-✓ DynamoDB table exists
-```
 
 ---
 
