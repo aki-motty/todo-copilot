@@ -3,31 +3,51 @@ import { TodoApplicationService } from "../../application/services/TodoApplicati
 import type { Todo } from "../../domain/entities/Todo";
 import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
+import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { TodoController } from "../controllers/TodoController";
+import { useApiConfig } from "../providers/ApiConfigProvider";
 
-// Initialize services
-const repository = new LocalStorageTodoRepository();
-const applicationService = new TodoApplicationService(repository);
-const todoController = new TodoController(applicationService);
 const logger = createLogger("useTodoList");
 
 /**
  * Custom hook for managing Todo list state and operations
  * Provides CRUD operations and error handling
+ * Automatically uses API or localStorage based on configuration
  */
 export const useTodoList = () => {
+  const { baseUrl, isLocalStorageMode } = useApiConfig();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [backendMode, setBackendMode] = useState<"api" | "localStorage">("localStorage");
 
-  // Initialize todos from localStorage on mount
+  // Create appropriate repository and services based on configuration
+  const { todoController } = useCallback(() => {
+    let repo;
+    if (!isLocalStorageMode && baseUrl) {
+      repo = new AsyncApiTodoRepository(baseUrl);
+      setBackendMode("api");
+      logger.info("Using API backend", { baseUrl });
+    } else {
+      repo = new LocalStorageTodoRepository();
+      setBackendMode("localStorage");
+      logger.info("Using localStorage backend");
+    }
+
+    const appService = new TodoApplicationService(repo as any);
+    const controller = new TodoController(appService);
+
+    return { todoController: controller };
+  }, [isLocalStorageMode, baseUrl])();
+
+  // Initialize todos on mount
   useEffect(() => {
     const loadTodos = async () => {
       try {
         setLoading(true);
         const allTodos = await todoController.getAllTodos();
         setTodos(allTodos);
-        logger.debug("TodoList initialized", { count: allTodos.length });
+        logger.debug("TodoList initialized", { count: allTodos.length, mode: backendMode });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load todos";
         setError(message);
@@ -38,7 +58,7 @@ export const useTodoList = () => {
     };
 
     loadTodos();
-  }, []);
+  }, [todoController, backendMode]);
 
   // Create new todo
   const createTodo = useCallback(async (title: string) => {
@@ -54,7 +74,7 @@ export const useTodoList = () => {
       logger.error("Failed to create todo", { error: message, title });
       throw err;
     }
-  }, []);
+  }, [todoController]);
 
   // Toggle todo completion
   const toggleTodoCompletion = useCallback(async (id: string) => {
@@ -72,7 +92,7 @@ export const useTodoList = () => {
       logger.error("Failed to toggle todo", { error: message, id });
       throw err;
     }
-  }, []);
+  }, [todoController]);
 
   // Delete todo
   const deleteTodo = useCallback(async (id: string) => {
@@ -87,7 +107,7 @@ export const useTodoList = () => {
       logger.error("Failed to delete todo", { error: message, id });
       throw err;
     }
-  }, []);
+  }, [todoController]);
 
   // Clear error message
   const clearError = useCallback(() => {
@@ -102,5 +122,6 @@ export const useTodoList = () => {
     toggleTodoCompletion,
     deleteTodo,
     clearError,
+    backendMode,
   };
 };

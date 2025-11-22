@@ -46,31 +46,30 @@ variable "common_tags" {
 }
 
 # CloudWatch Log Group for Lambda
-# NOTE: Pre-created or auto-created by Lambda execution role
-# Commenting out resource creation to avoid conflicts with existing logs
-# resource "aws_cloudwatch_log_group" "lambda_logs" {
-#   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
-#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-#
-#   tags = merge(
-#     var.common_tags,
-#     {
-#       Name      = "${var.project_name}-lambda-logs"
-#       Component = "Compute"
-#     }
-#   )
-# }
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
+  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
 
-# Placeholder Lambda function (actual implementation in Phase 2)
+  tags = merge(
+    var.common_tags,
+    {
+      Name      = "${var.project_name}-lambda-logs"
+      Component = "Compute"
+    }
+  )
+}
+
+# Lambda function with built handler
 resource "aws_lambda_function" "main" {
-  filename      = "dist/index.zip"
+  filename      = "${path.root}/../../dist-lambda/index.js"
   function_name = "${var.project_name}-api-${var.environment}"
   role          = var.lambda_execution_role_arn
-  handler       = "dist/index.handler"
+  handler       = "index.handler"
   runtime       = "nodejs18.x"
-  architectures = ["arm64"]
+  architectures = ["x86_64"]
   timeout       = var.lambda_timeout
   memory_size   = var.lambda_memory_size
+  source_code_hash = filebase64sha256("${path.root}/../../dist-lambda/index.js")
 
   environment {
     variables = {
@@ -78,6 +77,7 @@ resource "aws_lambda_function" "main" {
       DYNAMODB_TABLE = var.dynamodb_table_name
       LOG_LEVEL      = var.environment == "prod" ? "INFO" : "DEBUG"
       NODE_ENV       = "production"
+      AWS_REGION     = var.aws_region
     }
   }
 
@@ -94,8 +94,9 @@ resource "aws_lambda_function" "main" {
     }
   )
 
-  # Note: Lambda code must be provided before applying
-  # For now, using a placeholder that will fail if code is not present
+  depends_on = [
+    aws_cloudwatch_log_group.lambda_logs
+  ]
 }
 
 # API Gateway HTTP API
