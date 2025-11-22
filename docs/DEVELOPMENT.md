@@ -16,6 +16,8 @@
 - **Node.js** 18.x or higher
 - **npm** 9.x or higher
 - **Git** 2.37+
+- **GitHub CLI** (`gh`) - for GitHub environment and secrets management
+- **AWS CLI** - for AWS infrastructure management
 - **VS Code** (recommended) with TypeScript support
 
 ### Verify Installation
@@ -23,6 +25,39 @@
 node --version    # Should be v18.x or higher
 npm --version     # Should be 9.x or higher
 git --version     # Should be 2.37+
+gh --version      # Should be v2.x or higher
+aws --version     # Should be aws-cli/2.x
+```
+
+### Setup GitHub CLI Authentication
+```bash
+# Login to GitHub (interactive)
+gh auth login
+
+# Follow prompts:
+# 1. Choose protocol: HTTPS (recommended)
+# 2. Authenticate Git with your GitHub credentials: Y
+# 3. How would you like to authenticate GitHub CLI?: Paste an authentication token
+#    - Get a token at: https://github.com/settings/tokens/new
+#    - Minimum scopes: repo, workflow, read:org
+
+# Verify authentication
+gh auth status
+```
+
+### Setup AWS CLI Authentication
+```bash
+# Configure AWS credentials
+aws configure
+
+# Follow prompts:
+# 1. AWS Access Key ID
+# 2. AWS Secret Access Key
+# 3. Default region: ap-northeast-1
+# 4. Default output format: json
+
+# Verify authentication
+aws sts get-caller-identity
 ```
 
 ### Initial Setup

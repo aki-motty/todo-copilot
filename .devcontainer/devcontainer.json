@@ -12,5 +12,5 @@
         "ms-vscode.vscode-typescript-next",
         "amazonwebservices.aws-toolkit-vscode"
     ],
-    "postCreateCommand": "sudo npm install -g typescript && terraform -install-autocomplete && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git"
+    "postCreateCommand": "sudo npm install -g typescript && terraform -install-autocomplete && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git && gh --version"
 }
