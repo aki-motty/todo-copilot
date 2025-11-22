@@ -83,7 +83,7 @@ gh auth login
 cd /workspaces/todo-copilot
 
 # GitHub CLI を使用して秘密と環境を自動作成
-./infrastructure/scripts/setup-github-env.sh \
+./infrastructure/scripts/setup-secrets-and-envs.sh \
   aki-motty \
   todo-copilot \
   446713282258 \
@@ -92,8 +92,8 @@ cd /workspaces/todo-copilot
 
 スクリプトが実施する内容:
 - ✅ 6 個のリポジトリ秘密を登録 (AWS_ROLE_*, TF_STATE_BUCKET, TF_LOCK_TABLE, AWS_REGION)
-- ✅ 3 個の環境を作成 (develop, staging, production)
 - ✅ 秘密の登録を検証
+- ℹ️ GitHub 環境は GitHub UI で手動作成（以下の Step 3 を参照）
 
 #### Option B: 手動登録
 
@@ -186,15 +186,15 @@ aws iam get-role --role-name github-actions-role-prod
 
 ```bash
 # GitHub CLI で秘密一覧表示
-gh secret list
+gh secret list --repo aki-motty/todo-copilot
 
 # 出力例:
-# AWS_REGION                 Updated 2025-11-22
-# AWS_ROLE_TO_ASSUME_DEV     Updated 2025-11-22
-# AWS_ROLE_TO_ASSUME_PROD    Updated 2025-11-22
-# AWS_ROLE_TO_ASSUME_STAGING Updated 2025-11-22
-# TF_LOCK_TABLE              Updated 2025-11-22
-# TF_STATE_BUCKET            Updated 2025-11-22
+# AWS_REGION                 2025-11-22T16:36:02Z
+# AWS_ROLE_TO_ASSUME_DEV     2025-11-22T16:35:59Z
+# AWS_ROLE_TO_ASSUME_PROD    2025-11-22T16:36:00Z
+# AWS_ROLE_TO_ASSUME_STAGING 2025-11-22T16:36:00Z
+# TF_LOCK_TABLE              2025-11-22T16:36:01Z
+# TF_STATE_BUCKET            2025-11-22T16:36:01Z
 ```
 
 ### 3. GitHub 環境確認
