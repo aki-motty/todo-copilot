@@ -22,7 +22,6 @@ function createE2ETodo(title: string, completed: boolean = false): Todo {
   const todoId = `e2e-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` as any;
   const todoTitle = TodoTitle.create(title);
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
-  };
 }
 
 describe('E2E Tests - AWS Deployment Verification', () => {

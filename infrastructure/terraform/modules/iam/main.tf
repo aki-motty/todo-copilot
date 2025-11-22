@@ -1,32 +1,5 @@
 # IAM Module - Lambda Execution Role
 
-variable "environment" {
-  type        = string
-  description = "Environment name"
-}
-
-variable "aws_region" {
-  type        = string
-  description = "AWS region"
-  default     = "ap-northeast-1"
-}
-
-variable "dynamodb_table_arn" {
-  type        = string
-  description = "DynamoDB table ARN for Lambda access"
-}
-
-variable "cloudwatch_log_group_arn" {
-  type        = string
-  description = "CloudWatch log group ARN"
-}
-
-variable "common_tags" {
-  type        = map(string)
-  description = "Common tags"
-  default     = {}
-}
-
 data "aws_caller_identity" "current" {}
 
 # Lambda execution role
@@ -118,14 +91,4 @@ resource "aws_iam_role_policy" "lambda_xray" {
       }
     ]
   })
-}
-
-output "lambda_execution_role_arn" {
-  value       = aws_iam_role.lambda_execution.arn
-  description = "ARN of the Lambda execution role"
-}
-
-output "lambda_execution_role_name" {
-  value       = aws_iam_role.lambda_execution.name
-  description = "Name of the Lambda execution role"
 }
