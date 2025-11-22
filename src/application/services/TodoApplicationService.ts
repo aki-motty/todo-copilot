@@ -8,7 +8,11 @@ import {
 } from "../../domain/events/TodoEvents";
 import { NotFoundError } from "../../shared/types";
 import { createLogger } from "../../infrastructure/config/logger";
-import type { CreateTodoCommand, ToggleTodoCompletionCommand, DeleteTodoCommand } from "../commands";
+import type {
+  CreateTodoCommand,
+  ToggleTodoCompletionCommand,
+  DeleteTodoCommand,
+} from "../commands";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
 /**

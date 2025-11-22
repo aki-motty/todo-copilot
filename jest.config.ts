@@ -8,6 +8,7 @@ export default {
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/index.tsx',
+    '!src/index.html',
     '!src/presentation/**',
   ],
   coverageThreshold: {
@@ -36,10 +37,7 @@ export default {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: {
-          jsx: 'react-jsx',
-          esModuleInterop: true,
-        },
+        tsconfig: '<rootDir>/tsconfig.test.json',
       },
     ],
   },

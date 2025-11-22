@@ -15,9 +15,9 @@ class Logger {
   private logLevel: "debug" | "info" | "warn" | "error" = "info";
 
   constructor(private moduleName?: string) {
-    const envLogLevel = import.meta.env.VITE_LOG_LEVEL;
-    if (envLogLevel) {
-      this.logLevel = envLogLevel as "debug" | "info" | "warn" | "error";
+    // Only try to access import.meta in browser/vite environment
+    if (typeof window !== "undefined" && (window as any).import?.meta?.env?.VITE_LOG_LEVEL) {
+      this.logLevel = (window as any).import.meta.env.VITE_LOG_LEVEL;
     }
   }
 

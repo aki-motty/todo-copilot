@@ -32,7 +32,7 @@
 
 ---
 
-## Phase 2: Foundational（ブロッキング前提条件）🚀 IN PROGRESS
+## Phase 2: Foundational（ブロッキング前提条件）✅ COMPLETED
 
 **目的**: すべてのユーザーストーリーの実装前に完成させるべき基盤
 
@@ -40,34 +40,34 @@
 
 ### ドメイン層基盤
 
-- [ ] T009 [P] `src/domain/entities/Todo.ts` 作成：不変値オブジェクト（id, title, completed, createdAt, updatedAt）
-- [ ] T010 [P] `src/domain/value-objects/TodoStatus.ts` 作成：Status型（Completed | Pending）
-- [ ] T011 [P] `src/domain/repositories/TodoRepository.ts` 作成：リポジトリインターフェース（抽象化）
-- [ ] T012 [P] `src/domain/events/` 作成：ドメインイベント（TodoCreated, TodoCompleted, TodoDeleted）
+- [x] T009 [P] `src/domain/entities/Todo.ts` 作成：不変値オブジェクト（id, title, completed, createdAt, updatedAt）
+- [x] T010 [P] `src/domain/value-objects/TodoStatus.ts` 作成：Status型（Completed | Pending）
+- [x] T011 [P] `src/domain/repositories/TodoRepository.ts` 作成：リポジトリインターフェース（抽象化）
+- [x] T012 [P] `src/domain/events/` 作成：ドメインイベント（TodoCreated, TodoCompleted, TodoDeleted）
 
 ### アプリケーション層基盤
 
-- [ ] T013 [P] `src/application/handlers/CommandHandler.ts` 作成：コマンドハンドラー基底クラス
-- [ ] T014 [P] `src/application/handlers/QueryHandler.ts` 作成：クエリハンドラー基底クラス
-- [ ] T015 `src/application/services/TodoApplicationService.ts` 作成：アプリケーションサービス（T009-T014に依存）
+- [x] T013 [P] `src/application/handlers/CommandHandler.ts` 作成：コマンドハンドラー基底クラス
+- [x] T014 [P] `src/application/handlers/QueryHandler.ts` 作成：クエリハンドラー基底クラス
+- [x] T015 `src/application/services/TodoApplicationService.ts` 作成：アプリケーションサービス（T009-T014に依存）
 
 ### インフラストラクチャ層基盤
 
-- [ ] T016 [P] `src/infrastructure/persistence/LocalStorageTodoRepository.ts` 作成：localStorage実装
-- [ ] T017 [P] `src/infrastructure/config/logger.ts` 作成：Pino構造化ログ設定
+- [x] T016 [P] `src/infrastructure/persistence/LocalStorageTodoRepository.ts` 作成：localStorage実装
+- [x] T017 [P] `src/infrastructure/config/logger.ts` 作成：Pino構造化ログ設定
 
 ### プレゼンテーション層基盤
 
-- [ ] T018 [P] `src/presentation/controllers/TodoController.ts` 作成：UseCase⇔UI連携層
-- [ ] T019 [P] `src/presentation/App.tsx` 作成：ルートコンポーネント
-- [ ] T020 [P] `src/shared/types.ts` 作成：共通型定義
-- [ ] T021 [P] `src/index.html` 作成：HTML エントリポイント
+- [x] T018 [P] `src/presentation/controllers/TodoController.ts` 作成：UseCase⇔UI連携層
+- [x] T019 [P] `src/presentation/App.tsx` 作成：ルートコンポーネント
+- [x] T020 [P] `src/shared/types.ts` 作成：共通型定義
+- [x] T021 [P] `src/index.html` 作成：HTML エントリポイント
 
-**Checkpoint**: 基盤レイヤー完成 → ユーザーストーリー並列実装可能
+**Checkpoint**: ✅ 基盤レイヤー完成 → Phase 3 User Story 1 実装開始可能
 
 ---
 
-## Phase 3: User Story 1 - ToDoの新規作成 (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - ToDoの新規作成 (Priority: P1) 🎯 MVP 🚀 IN PROGRESS
 
 **Goal**: ユーザーが新しいToDoを素早く作成し、リストに表示されることを確認
 
