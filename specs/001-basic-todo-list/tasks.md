@@ -137,14 +137,14 @@
 
 ### 実装
 
-- [ ] T049 [P] [US3] `src/application/commands/ToggleTodoCompletionCommand.ts` 実装：コマンド定義
-- [ ] T050 [P] [US3] `src/application/handlers/ToggleTodoCompletionCommandHandler.ts` 実装：コマンドハンドラー
-- [ ] T051 [P] [US3] `src/presentation/components/TodoItem.tsx` 更新：チェックボックス実装
-- [ ] T052 [US3] ToDo.ts に状態遷移ロジック追加（完了状態トグル、updatedAt 更新）（T049-T051に依存）
-- [ ] T053 [US3] UI フィードバック実装：取り消し線表示（完了時）、100ms 以内の視覚的反応
-- [ ] T054 [US3] ログ追加：状態遷移操作のstructured ログ
+- [x] T049 [P] [US3] `src/application/commands/ToggleTodoCompletionCommand.ts` 実装：コマンド定義
+- [x] T050 [P] [US3] `src/application/handlers/ToggleTodoCompletionCommandHandler.ts` 実装：コマンドハンドラー
+- [x] T051 [P] [US3] `src/presentation/components/TodoItem.tsx` 更新：チェックボックス実装
+- [x] T052 [US3] ToDo.ts に状態遷移ロジック追加（完了状態トグル、updatedAt 更新）（T049-T051に依存）
+- [x] T053 [US3] UI フィードバック実装：取り消し線表示（完了時）、100ms 以内の視覚的反応
+- [x] T054 [US3] ログ追加：状態遷移操作のstructured ログ
 
-**Checkpoint**: User Story 3 完全実装 → Sprint 1 MVP 完成（US1+US2+US3 全E2E確認）
+**Checkpoint**: ✅ User Story 3 完全実装 → Sprint 1 MVP 完成（US1+US2+US3 全E2E確認）
 
 ---
 
