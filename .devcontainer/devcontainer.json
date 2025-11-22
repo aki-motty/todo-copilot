@@ -1,0 +1,16 @@
+{
+    "name": "AWS Lambda Rust/TypeScript DevContainer",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+        "ms-azuretools.vscode-docker",
+        "hashicorp.terraform",
+        "ms-vscode.vscode-typescript-next",
+        "amazonwebservices.aws-toolkit-vscode"
+    ],
+    "postCreateCommand": "sudo npm install -g typescript && terraform -install-autocomplete && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git"
+}
