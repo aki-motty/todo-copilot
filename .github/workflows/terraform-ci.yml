@@ -441,6 +441,7 @@ jobs:
     steps:
       - name: Notify Slack
         if: failure()
+        continue-on-error: true
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
@@ -457,11 +458,12 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Notify Slack Success
         if: success()
+        continue-on-error: true
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
@@ -478,5 +480,6 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL || '' }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
