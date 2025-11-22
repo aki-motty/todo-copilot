@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('User Story 4: Delete Todo', () => {
   test.beforeEach(async ({ page }) => {
