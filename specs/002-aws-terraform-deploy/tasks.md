@@ -26,32 +26,32 @@
 
 ### Research Tasks
 
-- [ ] T001 Terraform Backend Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
+- [x] T001 Terraform Backend Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
   - S3 + DynamoDB バックエンド最適化方法を研究
   - 状態ロック戦略、リカバリ手順、コスト最適化を記録
   - 見積もり時間：2-3時間
 
-- [ ] T002 Lambda TypeScript Runtime Best Practices 調査 `specs/002-aws-terraform-deploy/research.md`
+- [x] T002 Lambda TypeScript Runtime Best Practices 調査 `specs/002-aws-terraform-deploy/research.md`
   - Node.js Lambdaのコールドスタート最小化方法を研究
   - 依存関係管理、バンドリング戦略を記録
   - 見積もり時間：2-3時間
 
-- [ ] T003 Terraform Modules Design Patterns 調査 `specs/002-aws-terraform-deploy/research.md`
+- [x] T003 Terraform Modules Design Patterns 調査 `specs/002-aws-terraform-deploy/research.md`
   - 環境別設定管理、変数命名規則、出力公開範囲を研究
   - 再利用可能モジュール設計パターンを記録
   - 見積もり時間：3-4時間
 
-- [ ] T004 Multi-Environment Terraform Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
+- [x] T004 Multi-Environment Terraform Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
   - Workspaces vs. tfvars の比較
   - 環境固有化の粒度、CI/CD統合戦略を研究
   - 見積もり時間：2-3時間
 
-- [ ] T005 AWS IAM Role & Policy Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
+- [x] T005 AWS IAM Role & Policy Strategy 調査 `specs/002-aws-terraform-deploy/research.md`
   - 最小権限原則の実装方法を研究
   - チーム別ロール設計、Terraform管理ロールを記録
   - 見積もり時間：2-3時間
 
-- [ ] T006 研究成果のまとめ `specs/002-aws-terraform-deploy/research.md`
+- [x] T006 研究成果のまとめ `specs/002-aws-terraform-deploy/research.md`
   - 5つの研究トピックを1つの統合ドキュメントにまとめる
   - 各トピックのdecision/rationale/alternativesを記録
   - 見積もり時間：1-2時間
