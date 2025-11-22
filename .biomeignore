@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.config.js
+*.config.ts
+jest.config.ts
+vite.config.ts
+playwright.config.ts

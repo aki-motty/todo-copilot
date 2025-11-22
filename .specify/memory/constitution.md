@@ -1,50 +1,224 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- 
+  同期インパクトレポート (v1.0.0)
+  
+  バージョン変更：新規 → 1.0.0（初版憲法）
+  日付：2025-11-22
+  言語：日本語に翻訳
+  
+  ## 確立された原則（全 7 個）
+  - I. テスト駆動開発（TDD）
+  - II. ドメイン駆動設計（DDD）
+  - III. 関数型ドメインモデリング
+  - IV. クリーンアーキテクチャ
+  - V. CQRS アーキテクチャ
+  - VI. インフラストラクチャ・アズ・コード（IaC）- Terraform
+  - VII. サーバーレス AWS アーキテクチャ
+  - VIII. Google ToDo 連携
+  
+  ## 追加セクション
+  - 技術的制約（技術スタック、開発環境、コード品質、パフォーマンス）
+  - 開発ワークフロー（機能サイクル、コードレビュー、デプロイ、ドキュメント）
+  - ガバナンス（修正プロセス、コンプライアンス、バージョン戦略）
+  
+  ## 依存テンプレート状態
+  - ✅ plan-template.md：変更不要（既に原則をサポート）
+  - ✅ spec-template.md：変更不要（ユーザーストーリー構造が適合）
+  - ✅ tasks-template.md：変更不要（タスク分類は十分）
+  - ⚠️ README.md：作成待ち（推奨：プロジェクト概要）
+  - ⚠️ commands/*.md：原則への適合を確認
+  
+  ## 技術仕様の更新
+  - ✅ コード品質：ESLint + Prettier → Biome に変更
+  - ✅ CI/CD：GitHub Actions で構築
+  - ✅ テスト：Jest + Playwright（E2E）追加
+  - ✅ プロジェクト構成：フルスタック（フロントエンド + バックエンド）
+  
+  ## フォローアップ TODO
+  1. README.md をプロジェクト概要とローカルセットアップで作成
+  2. .specify/templates/commands/*.md をレビュー・更新
+  3. pre-commit フック設定（Biome、TypeScript）
+  4. docs/ に ADR（アーキテクチャ判断レコード）テンプレート作成
+-->
 
-## Core Principles
+# todo-copilot 憲法
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## コア原則
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### I. テスト駆動開発（TDD）
+全機能は TDD の規律に従って実装**しなければならない**。要件フロー：
+- ユーザーストーリーに基づいて、先ずテストを失敗させる
+- テスト**は**実装開始前にユーザーの承認を得**なければならない**
+- Red-Green-Refactor サイクルを厳密に実施
+- 最小カバレッジ閾値：ビジネスロジック 80%、インフラストラクチャ 70%
+- ドメイン契約の新規追加とサービス間通信は統合テスト必須
+- テスト実行**は**決定的かつ再現可能**でなければならない**
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+根拠：TDD は正確性を保証し、リファクタリングの自信を生み出し、生きたドキュメントを作成します。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. ドメイン駆動設計（DDD）
+ドメインロジック**は**インフラストラクチャとフレームワークの関心から隔離**されなければならない**。
+- ユビキタス言語はプロジェクト用語集に明確に定義
+- 集約ルートはトランザクションと一貫性の境界を定義
+- サービス**は**ドメインモデルを直接公開してはいけません。API 境界には DTO を使用
+- データアクセス抽象化のためのリポジトリパターン
+- 監査証跡と統合ポイントのためのイベントソーシング
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+根拠：DDD は複雑性を低減し、保守性を向上させ、ビジネス意図とコードを整合します。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### III. 関数型ドメインモデリング
+ドメインモデル**は**可能な限りイミュータビリティと純粋関数を優先**しなければならない**。
+- 集約は可能な限り不変値オブジェクトとして設計
+- 副作用は明示的に管理され、分離される
+- 関数型コンポジションは継承より優先
+- 派生状態はキャッシュではなくソース・トゥルースから計算
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+根拠：関数型パターンはバグを減らし、テスト容易性を向上させ、予測可能性を改善します。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### IV. クリーンアーキテクチャ
+すべてのレイヤーは責任の分離と依存関係の逆転に従**わなければならない**。
+- **エンティティ層**：ビジネスルール、ドメインモデル（最も変わらない）
+- **ユースケース層**：アプリケーション固有のビジネスルール、インターフェース
+- **インターフェース層**：コントローラー、プレゼンター、ゲートウェイ
+- **フレームワーク層**：Web フレームワーク、DB、外部ライブラリ（最も変わりやすい）
+- 依存関係は常に内側に向かう。内側は外側を知らない
+- 外側の変更は内側に影響しない
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+根拠：クリーンアーキテクチャは独立性、テスト容易性、および長期的な保守性を実現します。
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+### V. CQRS アーキテクチャ
+読み取りおよび書き込み操作**は**ドメインレベルで分離**されなければならない**。
+- コマンドハンドラー**は**ドメインイベントを生成**しなければならない**
+- クエリハンドラー**は**最適化された読み取りモデルから読み取る**しなければならない**
+- イベント一貫性は最終一貫性戦略で実現
+- コマンド（正規化）とクエリ（非正規化）の別のストレージ層
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+根拠：CQRS はスケーラビリティ、パフォーマンス最適化、読み取り/書き込みパスの独立スケーリングを実現します。
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+### VI. インフラストラクチャ・アズ・コード（IaC）- Terraform
+**すべて**のインフラストラクチャ**は** Terraform で定義・バージョニング**されなければならない**。
+- 手動インフラストラクチャ変更は禁止。すべて Terraform 経由
+- Terraform 状態は AWS S3 + DynamoDB のリモートバックエンドに安全に保存
+- Terraform 構成**は**デプロイ前に確認・テスト**されなければならない**
+- AWS Secrets Manager で秘密を管理。ハードコード禁止
+
+根拠：IaC は再現性、監査可能性、災害復旧能力を保証します。
+
+### VII. サーバーレス AWS アーキテクチャ
+アーキテクチャ**は** AWS サーバーレスサービスのみを活用**しなければならない**。
+- HTTP エンドポイント用の API Gateway
+- 計算用の Lambda（TypeScript ランタイム優先）
+- NoSQL 永続化用の DynamoDB
+- 非同期イベントルーティング用の EventBridge
+- キューイングと通知用の SNS/SQS
+- 観測可能性とロギング用の CloudWatch
+
+根拠：サーバーレスは運用オーバーヘッドを削減し、自動スケーリングを実現し、コストを最適化します。
+
+### VIII. Google ToDo 連携
+Google ToDo API との統合**は**データ同期と一貫性を維持**しなければならない**。
+- 双方向同期：ローカル変更は Google ToDo に反映、逆も同様
+- 同期競合は最終書き込み勝ち戦略で解決（ユーザーオーバーライド可能）
+- Google サービスとのユーザー認証に OAuth 2.0 を使用
+- API レジリエンスのためのレート制限とバックオフ戦略を実装
+- すべての同期操作の監査ログを維持
+
+根拠：シームレスな統合はユーザー価値を最大化し、ロックインコストを削減します。
+
+## 技術的制約
+
+### 技術スタック
+- **言語**: TypeScript（主要言語）
+- **ランタイム**: Node.js (Lambda)
+- **パッケージマネージャー**: npm
+- **ビルドツール**: Vite（フロントエンド使用時）
+- **テスト（ユニット・統合）**: Jest（最小 80% カバレッジ）
+- **テスト（E2E）**: Playwright（ブラウザ自動化、UI フロー検証）
+- **コード品質**: Biome（リント、フォーマット、型チェック統合）
+- **型チェック**: TypeScript strict モード
+
+### 開発環境
+- Node.js 18+、Terraform CLI を含む開発コンテナ（devcontainer）
+- ローカルテスト用の AWS CLI v2
+- リント・フォーマッティング強制用の pre-commit フック
+- CI/CD：GitHub Actions で構築
+
+### コード品質標準
+- TypeScript strict モード**は**有効化**されなければならない**
+- すべての公開 API**は** JSDoc コメントを持つ**しなければならない**
+- `any` 型使用禁止。`unknown` を型ガードで使用
+- 循環的複雑度**は**どのファンクションでも ≤ 10
+- 本番コードでの console.log 禁止。構造化ログ（Winston/Pino）を使用
+
+### テスト戦略
+- **ユニットテスト（Jest）**：ビジネスロジック、ユーティリティ関数
+- **統合テスト（Jest）**：API エンドポイント、データベース操作、サービス間通信
+- **E2E テスト（Playwright）**：ユーザーシナリオ、UI インタラクション、Google ToDo 連携フロー
+- テストカバレッジ目標：
+  - ビジネスロジック：≥ 80%
+  - インフラストラクチャ層：≥ 70%
+  - E2E テスト：主要ユーザーストーリーの 100% カバー
+
+### パフォーマンス要件
+- API レイテンシ目標：P99 < 500ms（コールドスタート除外）
+- Lambda コールドスタート許容値：≤ 5 秒（初回リクエスト）
+- DynamoDB クエリパフォーマンス：P99 < 100ms（プライマリクエリ）
+- フロントエンド Lighthouse スコア：≥ 90（Performance、Accessibility、Best Practices）
+- 同時ユーザー目標：1,000+ 同時接続サポート
+- E2E テスト実行時間：主要フローは 5 秒以内
+
+## 開発ワークフロー
+
+### 機能開発サイクル
+1. **仕様フェーズ**：ユーザーストーリーの受け入れ基準を定義・承認
+2. **テスト記述**：すべての受け入れ基準の失敗テストを記述
+3. **実装**：テストを通すための機能コードを記述
+4. **リファクター**：テストスイートの健全性を保ちながらコードをリファクター
+5. **レビュー**：コードレビューはアーキテクチャ準拠、テストカバレッジ、原則遵守を検証
+6. **デプロイ**：Terraform と CloudFormation 経由で機能をデプロイ
+
+### コードレビュー要件
+- マージ前の最小承認数：1（重要パスは 2）
+- レビュー**は**以下を検証**しなければならない**：
+  - すべての原則が遵守されている
+  - テストカバレッジが閾値を維持している
+  - 秘密や機密データが公開されていない
+  - アーキテクチャが CQRS と DDD ガイドラインに準拠している
+  - Terraform 変更が `terraform plan` で検証されている
+- 自動チェック**は**すべてパス**しなければならない**（Biome、型チェック、Jest、Playwright）
+
+### デプロイ戦略
+- インフラストラクチャ変更は Terraform で、計画確認後にデプロイ
+- アプリケーションデプロイはゼロダウンタイムの Blue-Green 戦略を使用
+- ユーザー向け変更にはフィーチャーフラグが必須（段階的ロールアウト有効化）
+- すべてのデプロイはタイムスタンプ、オペレーター、変更概要でログ記録
+
+### ドキュメント
+- README.md**は**プロジェクト目標、アーキテクチャ概要、ローカルセットアップを記述**しなければならない**
+- API ドキュメントは OpenAPI/TypeDoc コメントから自動生成
+- フロントエンド Storybook または TypeDoc でコンポーネント・フック仕様を文書化
+- 重要な設計判断については ADR（アーキテクチャ判断レコード）に記録
+- E2E テストスイート用のテスト計画書と実行ガイド提供
+- 一般的な問題のトラブルシューティング用ランブック提供
+
+## ガバナンス
+
+### 修正プロセス
+本憲法はすべての他の開発慣行とガイドラインに優先します。修正には以下が必須：
+1. 根拠付き正式な提案（Issue または Discussion）
+2. チームコンセンサスまたはリードアーキテクトの承認
+3. バージョン変更と根拠のドキュメント化
+4. 破壊的変更のマイグレーション計画
+5. 依存テンプレート更新（plan-template.md、spec-template.md、tasks-template.md）
+
+### コンプライアンス検証
+- pre-commit フックと CI/CD パイプラインで自動チェック実施
+- コードレビュー時にアーキテクチャを手動確認
+- 本番コードの原則遵守について四半期ごとの監査
+- 非準拠問題をスプリント内で追跡・改善
+
+### バージョン戦略
+- **MAJOR**：原則の破壊的削除または根本的な再定義
+- **MINOR**：新原則の追加または重要なガイダンス拡張
+- **PATCH**：語句改善、タイプ修正、非セマンティック改良
+
+**バージョン**: 1.0.0 | **批准日**: 2025-11-22 | **最終修正日**: 2025-11-22

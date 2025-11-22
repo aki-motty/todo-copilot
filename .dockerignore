@@ -1,0 +1,41 @@
+# Build output
+node_modules/
+dist/
+build/
+.out/
+
+# Development
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Source files and config not needed in images
+.git/
+.gitignore
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.spec.ts
+*.test.ts
+.vscode/
+.idea/
+README.md
+jest.config.js
+tsconfig.json
+
+# Cache and temporary files
+.eslintcache
+coverage/
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Package lock files (optional)
+# package-lock.json
