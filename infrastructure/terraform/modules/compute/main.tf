@@ -46,18 +46,20 @@ variable "common_tags" {
 }
 
 # CloudWatch Log Group for Lambda
-resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
-  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name      = "${var.project_name}-lambda-logs"
-      Component = "Compute"
-    }
-  )
-}
+# NOTE: Pre-created or auto-created by Lambda execution role
+# Commenting out resource creation to avoid conflicts with existing logs
+# resource "aws_cloudwatch_log_group" "lambda_logs" {
+#   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
+#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+#
+#   tags = merge(
+#     var.common_tags,
+#     {
+#       Name      = "${var.project_name}-lambda-logs"
+#       Component = "Compute"
+#     }
+#   )
+# }
 
 # Placeholder Lambda function (actual implementation in Phase 2)
 resource "aws_lambda_function" "main" {
@@ -186,18 +188,20 @@ resource "aws_apigatewayv2_stage" "prod" {
 }
 
 # CloudWatch Log Group for API Gateway
-resource "aws_cloudwatch_log_group" "api_logs" {
-  name              = "/aws/apigateway/${var.project_name}-${var.environment}"
-  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name      = "${var.project_name}-api-logs"
-      Component = "Compute"
-    }
-  )
-}
+# NOTE: Pre-created or auto-created by API Gateway service role
+# Commenting out resource creation to avoid conflicts with existing logs
+# resource "aws_cloudwatch_log_group" "api_logs" {
+#   name              = "/aws/apigateway/${var.project_name}-${var.environment}"
+#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+#
+#   tags = merge(
+#     var.common_tags,
+#     {
+#       Name      = "${var.project_name}-api-logs"
+#       Component = "Compute"
+#     }
+#   )
+# }
 
 # Lambda permission for API Gateway to invoke
 resource "aws_lambda_permission" "api_gateway" {

@@ -17,61 +17,22 @@ variable "common_tags" {
   default     = {}
 }
 
-# DynamoDB table for Todos
-resource "aws_dynamodb_table" "todos" {
-  name         = "${var.project_name}-${var.environment}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-
-  attribute {
-    name = "userId"
-    type = "S"
-  }
-
-  attribute {
-    name = "createdAt"
-    type = "S"
-  }
-
-  # Global Secondary Index for querying by userId
-  global_secondary_index {
-    name            = "UserIdIndex"
-    hash_key        = "userId"
-    range_key       = "createdAt"
-    projection_type = "ALL"
-  }
-
-  # TTL for automatic deletion
-  ttl {
-    attribute_name = "expiresAt"
-    enabled        = true
-  }
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name      = "${var.project_name}-table"
-      Component = "Data"
-    }
-  )
+# Reference existing DynamoDB table (pre-created)
+data "aws_dynamodb_table" "todos" {
+  name = "${var.project_name}-${var.environment}"
 }
 
 output "dynamodb_table_name" {
-  value       = aws_dynamodb_table.todos.name
+  value       = data.aws_dynamodb_table.todos.name
   description = "DynamoDB table name"
 }
 
 output "dynamodb_table_arn" {
-  value       = aws_dynamodb_table.todos.arn
+  value       = data.aws_dynamodb_table.todos.arn
   description = "DynamoDB table ARN"
 }
 
 output "dynamodb_stream_arn" {
-  value       = aws_dynamodb_table.todos.stream_arn
+  value       = data.aws_dynamodb_table.todos.stream_arn
   description = "DynamoDB stream ARN"
 }
