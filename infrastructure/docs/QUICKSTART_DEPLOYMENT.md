@@ -27,36 +27,51 @@
 
 ### **ステップ 1️⃣: 準備段階（15-30 分）**
 
-**目標**: AWS アカウント・認証・バックエンド（S3 + DynamoDB）を Terraform モジュールで作成
+**目標**: AWS アカウント・認証・バックエンド（S3 + DynamoDB）を Terraform で作成
 
 ```bash
 # 1. 認証確認
 aws sts get-caller-identity --profile terraform-dev
 
-# 2. Backend 用 Terraform リソース作成
-# ℹ️ modules/backend/ にバケット・ロックテーブルのモジュールが用意されています
-cd infrastructure/terraform
+# 2. Bootstrap ディレクトリで S3・DynamoDB リソース作成
+cd infrastructure/terraform-bootstrap
 
-# 初期化（backend-config なしで進める）
+# 変数ファイル作成（バケット名・テーブル名はグローバルユニークにする）
+cat > terraform.tfvars << 'EOF'
+aws_region        = "ap-northeast-1"
+project_name      = "todo-copilot"
+state_bucket_name = "todo-copilot-terraform-state-dev-123456789"
+lock_table_name   = "todo-copilot-terraform-locks-dev"
+
+common_tags = {
+  Environment = "dev"
+}
+EOF
+
+# 初期化
 terraform init
 
-# Plan（バケット名・テーブル名はグローバルユニークにする）
-# 💡 推奨命名: <project>-terraform-state-<env>-<account-id>
-terraform plan \
-  -var='state_bucket_name=todo-copilot-state-dev-123456789' \
-  -var='lock_table_name=todo-copilot-locks-dev-123456789' \
-  -var='region=ap-northeast-1' \
-  -out=plan-backend.tfplan
+# Plan・Apply
+terraform plan -out=plan.tfplan
+terraform apply plan.tfplan
 
-# Apply
-terraform apply plan-backend.tfplan
+# Output 確認（Backend 設定用）
+terraform output -raw state_bucket_id
+terraform output -raw lock_table_name
 
-# Output 確認（後のステップで必要）
-terraform output -raw bucket_id
-terraform output -raw dynamodb_table_name
+# 3. Backend Config ファイル作成（メイン Terraform 用）
+cd ../terraform
+
+cat > backend-config.hcl << 'EOF'
+bucket         = "todo-copilot-terraform-state-dev-123456789"
+key            = "main/terraform.tfstate"
+region         = "ap-northeast-1"
+dynamodb_table = "todo-copilot-terraform-locks-dev"
+encrypt        = true
+EOF
 ```
 
-**詳細**: `infrastructure/terraform/README-BACKEND.md` を参照、または `infrastructure/docs/PRODUCTION_DEPLOYMENT.md` → 「認証・バックエンド準備」
+**詳細**: `infrastructure/terraform-bootstrap/README.md` を参照
 
 ---
 
@@ -77,9 +92,10 @@ tflint . 2>/dev/null || echo "tflint not installed (optional)"
 # 3. Terraform Validate
 terraform validate
 
-# 4. 構文・セキュリティスキャン（オプション）
-# checkov がインストールされている場合
-checkov -d . 2>/dev/null || echo "checkov not installed (optional)"
+# 4. Terraform State 確認（Backend が S3 に接続したか）
+# ℹ️ Step 1 で backend-config.hcl が作成されている前提
+terraform state list
+# 何も表示されない（初回）か、既存リソースが表示される
 
 # 5. Dev 環境の Plan（破壊的変更がないか確認）
 terraform plan -var-file=environments/dev.tfvars -out=plan-dev.tfplan
@@ -99,21 +115,15 @@ terraform show plan-dev.tfplan | head -30
 export AWS_PROFILE=terraform-dev
 export AWS_REGION=ap-northeast-1
 
-# 2. Terraform 初期化（Backend 設定ファイルを作成）
-# ℹ️ Step 1 で作成した S3 バケット・DynamoDB テーブル情報を使用
+# 2. Terraform 初期化（Backend 設定ファイルを使用）
+# ℹ️ Step 1 で作成した backend-config.hcl を使用
 cd infrastructure/terraform
 
-# backend-config.hcl を作成（Step 1 の output を参照）
-cat > backend-config.hcl << 'EOF'
-bucket         = "todo-copilot-state-dev-123456789"
-key            = "main/terraform.tfstate"
-region         = "ap-northeast-1"
-dynamodb_table = "todo-copilot-locks-dev-123456789"
-encrypt        = true
-EOF
-
-# Backend を再設定して初期化
+# Backend を設定して初期化
 terraform init -backend-config=backend-config.hcl -reconfigure
+
+# State が S3 に接続されたか確認
+terraform state list
 
 # 3. Workspace 作成（複数環境を分離）
 terraform workspace new dev || terraform workspace select dev
@@ -139,7 +149,7 @@ terraform apply plan-dev.tfplan
 # # ☝️ 削除対象がないか確認
 # terraform apply plan-prod.tfplan
 
-# 7. Post-Deploy Verification
+# 5. Post-Deploy Verification
 bash ../scripts/verify-deployment.sh
 bash ../scripts/constitution-check.sh
 ```
@@ -152,7 +162,7 @@ bash ../scripts/constitution-check.sh
 
 | ドキュメント | 用途 | 対象者 |
 |-------------|------|-------|
-| **README-BACKEND.md** | Backend モジュール・作成手順 | DevOps/Infra エンジニア |
+| **terraform-bootstrap/README.md** | Backend リソース作成手順 | DevOps/Infra エンジニア |
 | **DEPLOYMENT_CHECKLIST.md** | 6 フェーズ、50+ チェック項目 | 全チーム |
 | **PRODUCTION_DEPLOYMENT.md** | ステップバイステップ本番デプロイ | DevOps/Infra エンジニア |
 | **LOCALSTACK_GUIDE.md** | ローカル環境での統合テスト | 開発エンジニア |
@@ -166,8 +176,9 @@ bash ../scripts/constitution-check.sh
 **デプロイ前に以下を確認してください：**
 
 - [ ] AWS CLI が `terraform-dev` プロファイルで認証できる（`aws sts get-caller-identity --profile terraform-dev`）
-- [ ] S3 backend バケット・DynamoDB lock table が Step 1 で作成されている
-- [ ] Backend 設定ファイル（`backend-config.hcl`）が作成されている
+- [ ] `terraform-bootstrap/` で S3 backend バケット・DynamoDB lock table が作成されている
+- [ ] Backend 設定ファイル（`terraform/backend-config.hcl`）が作成・コピーされている
+- [ ] `terraform init -backend-config=backend-config.hcl -reconfigure` が成功している
 - [ ] `terraform validate` が成功している（構文OK）
 - [ ] `terraform fmt -check` が成功している（フォーマットOK）
 - [ ] `npm test` が全て PASS している（338+ tests）
@@ -306,9 +317,14 @@ bash infrastructure/scripts/constitution-check.sh
 - **本番環境**: 別の IAM ロール / MFA 設定推奨
 
 ### Backend モジュール
-- **場所**: `infrastructure/terraform/modules/backend/`
+- **場所**: `infrastructure/terraform-bootstrap/`
 - **作成物**: S3 bucket（versioning・encryption 有効）、DynamoDB lock table
-- **初期化**: `terraform init` で自動的に backend-config を読み込み
+- **初期化**: ワンタイムセットアップ用、State は Local で管理
+
+### メイン Terraform
+- **場所**: `infrastructure/terraform/`
+- **Backend**: S3 + DynamoDB（`bootstrap/` で作成）
+- **State**: S3 に保存・管理、DynamoDB による lock 機構
 
 ### 次のステップ（本番前）
 - [ ] GitHub Actions OIDC 信頼ポリシー設定（CI から assume する場合）

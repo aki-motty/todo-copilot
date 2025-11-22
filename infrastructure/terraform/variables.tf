@@ -1,3 +1,36 @@
+variable "region" {
+  description = "AWS region to create backend resources in"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "state_bucket_name" {
+  description = "S3 bucket name to create for Terraform state"
+  type        = string
+}
+
+variable "lock_table_name" {
+  description = "DynamoDB table name to create for Terraform state locking"
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to apply to created resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "terraform_role_name" {
+  description = "Name of the IAM role to create for running Terraform"
+  type        = string
+  default     = "terraform-exec-role"
+}
+
+variable "terraform_assume_role_policy" {
+  description = "JSON trust policy for the terraform execution role (provide GitHub OIDC or AWS principals)"
+  type        = string
+  default     = ""
+}
 # Terraform Configuration - Variables
 
 variable "environment" {
