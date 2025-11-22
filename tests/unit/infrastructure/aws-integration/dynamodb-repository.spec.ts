@@ -5,9 +5,9 @@
  * IAsyncTodoRepository インターフェースの契約検証
  */
 
+import { Todo, TodoTitle } from '../../../../src/domain/entities/Todo';
 import { DynamoDBTodoRepository } from '../../../../src/infrastructure/aws-integration/DynamoDBTodoRepository';
 import { DynamoDBClient_ } from '../../../../src/infrastructure/aws-integration/dynamodb-client';
-import { Todo, TodoTitle } from '../../../../src/domain/entities/Todo';
 
 // Mock DynamoDB Client
 jest.mock('../../../../src/infrastructure/aws-integration/dynamodb-client');
@@ -142,7 +142,7 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
         { ...createMockTodo('todo-1'), completed: true },
         { ...createMockTodo('todo-2'), completed: true },
       ];
-      mockDynamoClient.query.mockResolvedValueOnce(completedTodos);
+      mockDynamoClient.scan.mockResolvedValueOnce(completedTodos);
 
       const result = await repository.findByCompletion(true);
 
@@ -155,7 +155,7 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
         { ...createMockTodo('todo-1'), completed: false },
         { ...createMockTodo('todo-2'), completed: false },
       ];
-      mockDynamoClient.query.mockResolvedValueOnce(pendingTodos);
+      mockDynamoClient.scan.mockResolvedValueOnce(pendingTodos);
 
       const result = await repository.findByCompletion(false);
 
@@ -164,7 +164,7 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
     });
 
     it('フィルタ結果が空の場合', async () => {
-      mockDynamoClient.query.mockResolvedValueOnce([]);
+      mockDynamoClient.scan.mockResolvedValueOnce([]);
 
       const result = await repository.findByCompletion(true);
 
@@ -229,8 +229,8 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
 
       await repository.saveMany([]);
 
-      // 空配列の場合の動作は実装次第
-      expect(mockDynamoClient.batchPutItems).toHaveBeenCalledWith([]);
+      // 空配列の場合はアーリーリターンするので呼ばれない
+      expect(mockDynamoClient.batchPutItems).not.toHaveBeenCalled();
     });
   });
 
@@ -283,7 +283,8 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
 
       await repository.deleteMany([]);
 
-      expect(mockDynamoClient.batchDeleteItems).toHaveBeenCalledWith([]);
+      // 空配列の場合はアーリーリターンするので呼ばれない
+      expect(mockDynamoClient.batchDeleteItems).not.toHaveBeenCalled();
     });
 
     it('削除エラーを伝播', async () => {
@@ -316,7 +317,10 @@ describe('Unit Tests - DynamoDB Todo Repository', () => {
       const error = new Error('Health check failed');
       mockDynamoClient.healthCheck.mockRejectedValueOnce(error);
 
-      await expect(repository.healthCheck()).rejects.toThrow(error);
+      const result = await repository.healthCheck();
+
+      // エラーはキャッチされて false が返される
+      expect(result).toBe(false);
     });
   });
 

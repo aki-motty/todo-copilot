@@ -8,9 +8,9 @@
  * - Output 値検証
  */
 
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
 
 describe('T064: Terraform Module & Configuration Tests', () => {
   const terraformDir = path.resolve(__dirname, '../../infrastructure/terraform');

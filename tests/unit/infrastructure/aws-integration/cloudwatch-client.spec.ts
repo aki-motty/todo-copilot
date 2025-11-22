@@ -5,16 +5,23 @@
  * ログ出力とログレベル管理の検証
  */
 
-import { CloudWatchLogsClientService, getCloudWatchLogsClient, getLogger } from '../../../../src/infrastructure/aws-integration/cloudwatch-client';
+import { CloudWatchLogsClientService, getCloudWatchLogsClient, getLogger, initializeGlobalLogger, resetCloudWatchLogsClient } from '../../../../src/infrastructure/aws-integration/cloudwatch-client';
 
 // Mock AWS SDK
-jest.mock('@aws-sdk/client-cloudwatch-logs', () => ({
-  CloudWatchLogsClient: jest.fn(),
-  CreateLogGroupCommand: jest.fn((params) => ({ params, commandName: 'CreateLogGroupCommand' })),
-  CreateLogStreamCommand: jest.fn((params) => ({ params, commandName: 'CreateLogStreamCommand' })),
-  PutLogEventsCommand: jest.fn((params) => ({ params, commandName: 'PutLogEventsCommand' })),
-  DescribeLogGroupsCommand: jest.fn((params) => ({ params, commandName: 'DescribeLogGroupsCommand' })),
-}));
+jest.mock('@aws-sdk/client-cloudwatch-logs', () => {
+  const mockSend = jest.fn().mockResolvedValue({ logGroups: [], logStreams: [] });
+  return {
+    CloudWatchLogsClient: jest.fn(function() {
+      this.send = mockSend;
+      return this;
+    }),
+    CreateLogGroupCommand: jest.fn((params) => ({ params, commandName: 'CreateLogGroupCommand' })),
+    CreateLogStreamCommand: jest.fn((params) => ({ params, commandName: 'CreateLogStreamCommand' })),
+    PutLogEventsCommand: jest.fn((params) => ({ params, commandName: 'PutLogEventsCommand' })),
+    DescribeLogGroupsCommand: jest.fn((params) => ({ params, commandName: 'DescribeLogGroupsCommand' })),
+    DescribeLogStreamsCommand: jest.fn((params) => ({ params, commandName: 'DescribeLogStreamsCommand' })),
+  };
+});
 
 describe('Unit Tests - CloudWatch Logs Client', () => {
   let logsClient: CloudWatchLogsClientService;
@@ -165,8 +172,11 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
 });
 
 describe('Unit Tests - CloudWatch Logs Global Logger', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    resetCloudWatchLogsClient();
+    // グローバルロガーを初期化
+    await initializeGlobalLogger();
   });
 
   it('getLogger でグローバルロガーを取得可能', async () => {

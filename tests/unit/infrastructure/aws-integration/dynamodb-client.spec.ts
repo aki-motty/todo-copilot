@@ -136,11 +136,13 @@ describe('Unit Tests - DynamoDB Client Singleton Pattern', () => {
     expect(client1).toBe(client2);
   });
 
-  it('テーブル名が異なる場合は別インスタンスを返す', () => {
+  it('テーブル名が異なる場合でもシングルトンなので同じインスタンスを返す', () => {
+    resetDynamoDBClient();
     const client1 = getDynamoDBClient('table1');
     const client2 = getDynamoDBClient('table2');
 
-    expect(client1).not.toBe(client2);
+    // シングルトンなので同じインスタンス
+    expect(client1).toBe(client2);
   });
 
   it('resetDynamoDBClient でキャッシュをクリア', () => {

@@ -6,12 +6,14 @@
  * - DynamoDB クライアントの CRUD 操作
  * - Lambda クライアントの呼び出し
  * - CloudWatch Logs への出力
+ * 
+ * ⚠️ NOTE: LocalStack または実 AWS が必要なため、開発環境ではスキップされます
  */
 
+import { Todo, TodoTitle } from '../../src/domain/entities/Todo';
 import { DynamoDBClient_ } from '../../src/infrastructure/aws-integration/dynamodb-client';
 import { DynamoDBTodoRepository } from '../../src/infrastructure/aws-integration/DynamoDBTodoRepository';
 import { LambdaClientService, getLambdaClient, resetLambdaClient } from '../../src/infrastructure/aws-integration/lambda-client';
-import { Todo, TodoTitle } from '../../src/domain/entities/Todo';
 
 /**
  * テスト用の Todo エンティティ作成ヘルパー
@@ -22,7 +24,17 @@ function createTestTodo(title: string, completed: boolean = false): Todo {
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
 }
 
-describe('AWS Integration Tests - DynamoDB', () => {
+// AWS 環境が利用可能かどうかを判定
+const hasAWSEnvironment = () => {
+  const hasLocalStack = !!process.env['LOCALSTACK_ENDPOINT'];
+  const hasAWSCredentials = !!process.env['AWS_ACCESS_KEY_ID'] && !!process.env['AWS_SECRET_ACCESS_KEY'];
+  return hasLocalStack || hasAWSCredentials;
+};
+
+// AWS環境が利用不可の場合はスキップ
+const describeIfAWSAvailable = hasAWSEnvironment() ? describe : describe.skip;
+
+describeIfAWSAvailable('AWS Integration Tests - DynamoDB', () => {
   let dynamoClient: DynamoDBClient_;
   const testTableName = process.env['DYNAMODB_TABLE_NAME'] || 'todos-test';
 
@@ -189,7 +201,7 @@ describe('AWS Integration Tests - DynamoDB', () => {
   });
 });
 
-describe('AWS Integration Tests - DynamoDB Repository', () => {
+describeIfAWSAvailable('AWS Integration Tests - DynamoDB Repository', () => {
   let repository: DynamoDBTodoRepository;
   let dynamoClient: DynamoDBClient_;
   const testTableName = process.env['DYNAMODB_TABLE_NAME'] || 'todos-test';
@@ -330,7 +342,7 @@ describe('AWS Integration Tests - DynamoDB Repository', () => {
   });
 });
 
-describe('AWS Integration Tests - Lambda Client', () => {
+describeIfAWSAvailable('AWS Integration Tests - Lambda Client', () => {
   let lambdaClient: LambdaClientService;
 
   beforeAll(() => {
@@ -390,7 +402,7 @@ describe('AWS Integration Tests - Lambda Client', () => {
   });
 });
 
-describe('AWS Integration Tests - 環境検出', () => {
+describeIfAWSAvailable('AWS Integration Tests - 環境検出', () => {
   it('AWS_REGION 環境変数が検出可能', () => {
     // 環境変数の存在を確認（テスト環境では設定されていなくても良い）
     const region = process.env['AWS_REGION'];

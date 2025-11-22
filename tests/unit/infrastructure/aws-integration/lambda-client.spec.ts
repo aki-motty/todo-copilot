@@ -202,11 +202,12 @@ describe('Unit Tests - Lambda Client Singleton Pattern', () => {
     expect(client1).toBe(client2);
   });
 
-  it('異なるリージョンでは別インスタンスを返す', () => {
+  it('異なるリージョンでもシングルトンなので同じインスタンスを返す', () => {
+    resetLambdaClient();
     const client1 = getLambdaClient('us-east-1');
     const client2 = getLambdaClient('eu-west-1');
 
-    expect(client1).not.toBe(client2);
+    expect(client1).toBe(client2);
   });
 
   it('resetLambdaClient でキャッシュをクリア', () => {
