@@ -1,0 +1,124 @@
+{
+  "github-actions-terraform-state-access": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::todo-copilot-terraform-state-*",
+          "arn:aws:s3:::todo-copilot-terraform-state-*/*"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:DescribeTable",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
+        ],
+        "Resource": "arn:aws:dynamodb:*:*:table/todo-copilot-terraform-lock"
+      }
+    ]
+  },
+  "github-actions-lambda-deploy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "lambda:CreateFunction",
+          "lambda:UpdateFunction",
+          "lambda:DeleteFunction",
+          "lambda:GetFunction",
+          "lambda:ListFunctions",
+          "lambda:CreateAlias",
+          "lambda:UpdateAlias",
+          "lambda:DeleteAlias",
+          "lambda:GetAlias",
+          "lambda:ListAliases"
+        ],
+        "Resource": "arn:aws:lambda:*:*:function:todo-copilot-*"
+      }
+    ]
+  },
+  "github-actions-api-gateway-deploy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "apigateway:*",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:PutRetentionPolicy"
+        ],
+        "Resource": "*"
+      }
+    ]
+  },
+  "github-actions-dynamodb-manage": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:CreateTable",
+          "dynamodb:DeleteTable",
+          "dynamodb:DescribeTable",
+          "dynamodb:UpdateTable",
+          "dynamodb:ListTables",
+          "dynamodb:CreateGlobalSecondaryIndex",
+          "dynamodb:UpdateGlobalSecondaryIndex",
+          "dynamodb:DeleteGlobalSecondaryIndex",
+          "dynamodb:TagResource",
+          "dynamodb:UntagResource",
+          "dynamodb:ListTagsOfResource"
+        ],
+        "Resource": "arn:aws:dynamodb:*:*:table/todo-copilot-*"
+      }
+    ]
+  },
+  "github-actions-iam-role-management": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:UpdateAssumeRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:CreatePolicy",
+          "iam:DeletePolicy",
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListPolicyVersions",
+          "iam:CreatePolicyVersion",
+          "iam:DeletePolicyVersion",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:ListAttachedRolePolicies",
+          "iam:PassRole",
+          "iam:TagRole"
+        ],
+        "Resource": [
+          "arn:aws:iam::*:role/lambda-execution-*",
+          "arn:aws:iam::*:role/github-actions-*",
+          "arn:aws:iam::*:policy/github-actions-*"
+        ]
+      }
+    ]
+  }
+}
