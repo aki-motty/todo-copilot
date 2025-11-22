@@ -122,37 +122,37 @@
 
 ### 2.1 Infrastructure Setup & Backend
 
-- [ ] T018 [P] AWS IAM ロール定義 `infrastructure/terraform/modules/backend/main.tf`
+- [x] T018 [P] AWS IAM ロール定義 `infrastructure/terraform/modules/backend/main.tf`
   - Terraform 実行用 IAM ロール、ポリシー作成
   - 見積もり時間：1-2時間
 
-- [ ] T019 [P] S3 Backend 構成 `infrastructure/terraform/modules/backend/main.tf`
+- [x] T019 [P] S3 Backend 構成 `infrastructure/terraform/modules/backend/main.tf`
   - S3 バケット作成（暗号化、バージョニング有効）
   - 見積もり時間：1時間
 
-- [ ] T020 [P] DynamoDB Lock Table 構成 `infrastructure/terraform/modules/backend/main.tf`
+- [x] T020 [P] DynamoDB Lock Table 構成 `infrastructure/terraform/modules/backend/main.tf`
   - DynamoDB テーブル作成（状態ロック用）
   - 見積もり時間：1時間
 
-- [ ] T021 Backend Terraform Module 完成 `infrastructure/terraform/modules/backend/`
+- [x] T021 Backend Terraform Module 完成 `infrastructure/terraform/modules/backend/`
   - variables.tf、outputs.tf の作成
   - 見積もり時間：1時間
 
 ### 2.2 Terraform Base Configuration
 
-- [ ] T022 [P] Terraform Provider 設定 `infrastructure/terraform/main.tf`
+- [x] T022 [P] Terraform Provider 設定 `infrastructure/terraform/main.tf`
   - AWS Provider 設定、リージョン設定
   - 見積もり時間：0.5時間
 
-- [ ] T023 [P] Backend Configuration 統合 `infrastructure/terraform/backend.tf`
+- [x] T023 [P] Backend Configuration 統合 `infrastructure/terraform/backend.tf`
   - S3 + DynamoDB バックエンド参照設定
   - 見積もり時間：0.5時間
 
-- [ ] T024 [P] Variables Schema 定義 `infrastructure/terraform/variables.tf`
+- [x] T024 [P] Variables Schema 定義 `infrastructure/terraform/variables.tf`
   - environment, aws_region, resource_prefix 等のグローバル変数
   - 見積もり時間：1時間
 
-- [ ] T025 [P] Outputs 定義 `infrastructure/terraform/outputs.tf`
+- [x] T025 [P] Outputs 定義 `infrastructure/terraform/outputs.tf`
   - Lambda ARNs、API Gateway endpoints、DynamoDB table names
   - 見積もり時間：1時間
 
@@ -162,33 +162,33 @@
 
 ### 2.3 Compute Layer (Lambda & API Gateway)
 
-- [ ] T027 [P] Compute Module 構造作成 `infrastructure/terraform/modules/compute/`
+- [x] T027 [P] Compute Module 構造作成 `infrastructure/terraform/modules/compute/`
   - ディレクトリ、main.tf、variables.tf、outputs.tf テンプレート
   - 見積もり時間：1時間
 
-- [ ] T028 [P] Lambda IAM Role 定義 `infrastructure/terraform/modules/compute/main.tf`
+- [x] T028 [P] Lambda IAM Role 定義 `infrastructure/terraform/modules/compute/main.tf`
   - Execution Role with DynamoDB、CloudWatch Logs アクセス権限
   - 見積もり時間：1-2時間
 
-- [ ] T029 [P] Lambda Function Base 定義 `infrastructure/terraform/modules/compute/main.tf`
+- [x] T029 [P] Lambda Function Base 定義 `infrastructure/terraform/modules/compute/main.tf`
   - ハンドラー、環境変数、タイムアウト設定
   - 見積もり時間：1-2時間
 
-- [ ] T030 [P] API Gateway Base 定義 `infrastructure/terraform/modules/compute/main.tf`
+- [x] T030 [P] API Gateway Base 定義 `infrastructure/terraform/modules/compute/main.tf`
   - REST API、ステージ、ロギング設定
   - 見積もり時間：1-2時間
 
-- [ ] T031 Lambda<->API Gateway Integration `infrastructure/terraform/modules/compute/main.tf`
+- [x] T031 Lambda<->API Gateway Integration `infrastructure/terraform/modules/compute/main.tf`
   - Lambda プロキシ統合設定
   - 見積もり時間：1時間
 
 ### 2.4 Data Layer (DynamoDB)
 
-- [ ] T032 [P] Data Module 構造作成 `infrastructure/terraform/modules/data/`
+- [x] T032 [P] Data Module 構造作成 `infrastructure/terraform/modules/data/`
   - ディレクトリ、main.tf、variables.tf、outputs.tf テンプレート
   - 見積もり時間：1時間
 
-- [ ] T033 [P] DynamoDB Todo Table 定義 `infrastructure/terraform/modules/data/main.tf`
+- [x] T033 [P] DynamoDB Todo Table 定義 `infrastructure/terraform/modules/data/main.tf`
   - テーブル名、主キー (id)、ソートキー (createdAt)
   - 見積もり時間：1時間
 
@@ -220,15 +220,15 @@
 
 ### 2.6 Environment Configuration
 
-- [ ] T040 [P] Development Environment Variables `infrastructure/terraform/environments/dev.tfvars`
+- [x] T040 [P] Development Environment Variables `infrastructure/terraform/environments/dev.tfvars`
   - dev 環境用の tfvars （低スペック設定）
   - 見積もり時間：0.5時間
 
-- [ ] T041 [P] Staging Environment Variables `infrastructure/terraform/environments/staging.tfvars`
+- [x] T041 [P] Staging Environment Variables `infrastructure/terraform/environments/staging.tfvars`
   - staging 環境用の tfvars （中程度スペック設定）
   - 見積もり時間：0.5時間
 
-- [ ] T042 [P] Production Environment Variables `infrastructure/terraform/environments/prod.tfvars`
+- [x] T042 [P] Production Environment Variables `infrastructure/terraform/environments/prod.tfvars`
   - prod 環境用の tfvars （高スペック設定、保護機能）
   - 見積もり時間：0.5時間
 
