@@ -67,7 +67,7 @@
 
 ---
 
-## Phase 3: User Story 1 - ToDoの新規作成 (Priority: P1) 🎯 MVP 🚀 IN PROGRESS
+## Phase 3: User Story 1 - ToDoの新規作成 (Priority: P1) 🎯 MVP ✅ COMPLETED
 
 **Goal**: ユーザーが新しいToDoを素早く作成し、リストに表示されることを確認
 
@@ -75,22 +75,22 @@
 
 ### テスト（TDD: テスト先行）
 
-- [ ] T022 [P] [US1] `tests/unit/domain/entities/Todo.spec.ts`: 新規ToDo作成の単体テスト（FAIL状態から開始）
-- [ ] T023 [P] [US1] `tests/unit/application/commands/CreateTodoCommand.spec.ts`: CreateTodoCommand テスト
-- [ ] T024 [P] [US1] `tests/integration/TodoApplicationService.spec.ts`: 新規作成の統合テスト
-- [ ] T025 [US1] `tests/e2e/create-todo.spec.ts`: E2E テスト「新しいToDoを作成してリストに表示」（Playwright）
+- [x] T022 [P] [US1] `tests/unit/domain/entities/Todo.spec.ts`: 新規ToDo作成の単体テスト（FAIL状態から開始）
+- [x] T023 [P] [US1] `tests/unit/application/commands/CreateTodoCommand.spec.ts`: CreateTodoCommand テスト
+- [x] T024 [P] [US1] `tests/integration/TodoApplicationService.spec.ts`: 新規作成の統合テスト
+- [x] T025 [US1] `tests/e2e/create-todo.spec.ts`: E2E テスト「新しいToDoを作成してリストに表示」（Playwright）
 
 ### 実装
 
-- [ ] T026 [P] [US1] `src/application/commands/CreateTodoCommand.ts` 実装：コマンド定義
-- [ ] T027 [P] [US1] `src/application/handlers/CreateTodoCommandHandler.ts` 実装：コマンドハンドラー
-- [ ] T028 [P] [US1] `src/presentation/components/CreateTodoInput.tsx` 実装：入力フォームコンポーネント
-- [ ] T029 [US1] `src/presentation/hooks/useTodoList.ts` 実装：ToDoリスト管理フック（T026-T028に依存）
-- [ ] T030 [US1] 検証ロジック追加：空タイトル判定、500文字制限（src/domain/entities/Todo.ts）
-- [ ] T031 [US1] エラーハンドリング追加：検証失敗時のユーザーメッセージ
-- [ ] T032 [US1] ログ追加：新規作成操作のstructured ログ
+- [x] T026 [P] [US1] `src/application/commands/CreateTodoCommand.ts` 実装：コマンド定義
+- [x] T027 [P] [US1] `src/application/handlers/CreateTodoCommandHandler.ts` 実装：コマンドハンドラー
+- [x] T028 [P] [US1] `src/presentation/components/CreateTodoInput.tsx` 実装：入力フォームコンポーネント
+- [x] T029 [US1] `src/presentation/hooks/useTodoList.ts` 実装：ToDoリスト管理フック（T026-T028に依存）
+- [x] T030 [US1] 検証ロジック追加：空タイトル判定、500文字制限（src/domain/entities/Todo.ts）
+- [x] T031 [US1] エラーハンドリング追加：検証失敗時のユーザーメッセージ
+- [x] T032 [US1] ログ追加：新規作成操作のstructured ログ
 
-**Checkpoint**: User Story 1 完全実装・テスト・ドキュメント完成 → 単独でE2E確認可能
+**Checkpoint**: ✅ User Story 1 完全実装・テスト・ドキュメント完成 → 単独でE2E確認可能
 
 ---
 
