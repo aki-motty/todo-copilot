@@ -264,23 +264,23 @@
 
 ### 2.8 Documentation
 
-- [ ] T050 SETUP.md 作成 `infrastructure/docs/SETUP.md`
+- [x] T050 SETUP.md 作成 `infrastructure/docs/SETUP.md`
   - AWS アカウント初期設定、IAM設定詳細
   - 見積もり時間：1-2時間
 
-- [ ] T051 ENVIRONMENTS.md 作成 `infrastructure/docs/ENVIRONMENTS.md`
+- [x] T051 ENVIRONMENTS.md 作成 `infrastructure/docs/ENVIRONMENTS.md`
   - 環境別設定の詳細説明
   - 見積もり時間：1時間
 
-- [ ] T052 BACKEND.md 作成 `infrastructure/docs/BACKEND.md`
+- [x] T052 BACKEND.md 作成 `infrastructure/docs/BACKEND.md`
   - 状態バックエンド管理、トラブルシューティング
   - 見積もり時間：1時間
 
-- [ ] T053 DISASTER_RECOVERY.md 作成 `infrastructure/docs/DISASTER_RECOVERY.md`
+- [x] T053 DISASTER_RECOVERY.md 作成 `infrastructure/docs/DISASTER_RECOVERY.md`
   - リカバリ手順、 rollback 方法
   - 見積もり時間：1-2時間
 
-- [ ] T054 TROUBLESHOOTING.md 作成 `infrastructure/docs/TROUBLESHOOTING.md`
+- [x] T054 TROUBLESHOOTING.md 作成 `infrastructure/docs/TROUBLESHOOTING.md`
   - よくある問題と解決方法
   - 見積もり時間：1時間
 
