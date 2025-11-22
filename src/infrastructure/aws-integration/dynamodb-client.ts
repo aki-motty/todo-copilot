@@ -1,13 +1,13 @@
 import {
-  DynamoDBClient,
-  GetCommand,
-  PutCommand,
-  UpdateCommand,
-  DeleteCommand,
-  QueryCommand,
-  ScanCommand,
-  BatchGetCommand,
-  BatchWriteCommand,
+    BatchGetItemCommand,
+    BatchWriteItemCommand,
+    DeleteItemCommand,
+    DynamoDBClient,
+    GetItemCommand,
+    PutItemCommand,
+    QueryCommand,
+    ScanCommand,
+    UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
@@ -20,16 +20,17 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 export class DynamoDBClient_ {
   private client: DynamoDBClient;
   private tableName: string;
-  private region: string;
 
   /**
    * コンストラクタ
    * @param tableName DynamoDB テーブル名
    * @param region AWS リージョン
    */
-  constructor(tableName: string, region: string = process.env.AWS_REGION || 'ap-northeast-1') {
+  constructor(
+    tableName: string,
+    region: string = process.env['AWS_REGION'] || 'ap-northeast-1'
+  ) {
     this.tableName = tableName;
-    this.region = region;
     this.client = new DynamoDBClient({ region });
   }
 
@@ -40,7 +41,7 @@ export class DynamoDBClient_ {
    */
   async getItem<T>(id: string): Promise<T | null> {
     try {
-      const command = new GetCommand({
+      const command = new GetItemCommand({
         TableName: this.tableName,
         Key: marshall({ id }),
       });
@@ -60,7 +61,7 @@ export class DynamoDBClient_ {
    */
   async putItem<T extends { id: string }>(item: T): Promise<T> {
     try {
-      const command = new PutCommand({
+      const command = new PutItemCommand({
         TableName: this.tableName,
         Item: marshall(item),
       });
@@ -88,7 +89,7 @@ export class DynamoDBClient_ {
 
     for (const chunk of chunks) {
       try {
-        const command = new BatchWriteCommand({
+        const command = new BatchWriteItemCommand({
           RequestItems: {
             [this.tableName]: chunk.map((item) => ({
               PutRequest: {
@@ -100,7 +101,7 @@ export class DynamoDBClient_ {
 
         await this.client.send(command);
       } catch (error) {
-        console.error(`DynamoDB BatchWriteItem error:`, error);
+        console.error(`DynamoDB BatchPutItems error:`, error);
         throw error;
       }
     }
@@ -109,25 +110,25 @@ export class DynamoDBClient_ {
   /**
    * 項目を更新
    * @param id 項目 ID
-   * @param updates 更新内容（キーと値のマップ）
-   * @returns 更新後の項目
+   * @param updates 更新内容
+   * @returns 更新された項目
    */
   async updateItem<T>(id: string, updates: Record<string, any>): Promise<T> {
     try {
-      // UpdateExpression と ExpressionAttributeValues を構築
-      const updateParts: string[] = [];
-      const expressionAttributeValues: Record<string, any> = {};
+      // UpdateExpression を動的に生成
+      const updateExpression = Object.keys(updates)
+        .map((key) => `${key} = :${key}`)
+        .join(', ');
 
-      Object.entries(updates).forEach(([key, value], index) => {
-        const placeholder = `:val${index}`;
-        updateParts.push(`${key} = ${placeholder}`);
-        expressionAttributeValues[placeholder] = value;
+      const expressionAttributeValues: Record<string, any> = {};
+      Object.entries(updates).forEach(([key, value]) => {
+        expressionAttributeValues[`:${key}`] = value;
       });
 
-      const command = new UpdateCommand({
+      const command = new UpdateItemCommand({
         TableName: this.tableName,
         Key: marshall({ id }),
-        UpdateExpression: `SET ${updateParts.join(', ')}`,
+        UpdateExpression: `SET ${updateExpression}`,
         ExpressionAttributeValues: marshall(expressionAttributeValues),
         ReturnValues: 'ALL_NEW',
       });
@@ -146,7 +147,7 @@ export class DynamoDBClient_ {
    */
   async deleteItem(id: string): Promise<void> {
     try {
-      const command = new DeleteCommand({
+      const command = new DeleteItemCommand({
         TableName: this.tableName,
         Key: marshall({ id }),
       });
@@ -160,7 +161,7 @@ export class DynamoDBClient_ {
 
   /**
    * 複数項目を一括削除
-   * @param ids 削除する項目の ID 配列
+   * @param ids 削除する項目 ID の配列
    */
   async batchDeleteItems(ids: string[]): Promise<void> {
     if (ids.length === 0) {
@@ -172,7 +173,7 @@ export class DynamoDBClient_ {
 
     for (const chunk of chunks) {
       try {
-        const command = new BatchWriteCommand({
+        const command = new BatchWriteItemCommand({
           RequestItems: {
             [this.tableName]: chunk.map((id) => ({
               DeleteRequest: {
@@ -184,43 +185,56 @@ export class DynamoDBClient_ {
 
         await this.client.send(command);
       } catch (error) {
-        console.error(`DynamoDB BatchDeleteItem error:`, error);
+        console.error(`DynamoDB BatchDeleteItems error:`, error);
         throw error;
       }
     }
   }
 
   /**
-   * クエリを実行（パーティションキーで検索）
-   * @param partitionKey パーティションキーの値
+   * クエリを実行
+   * @param partitionKey パーティションキー値
    * @param options クエリオプション
-   * @returns 検索結果
+   * @returns クエリ結果
    */
   async query<T>(
     partitionKey: string,
     options?: {
-      indexName?: string;
-      keyConditionExpression?: string;
+      sortKey?: string;
+      filterExpression?: string;
       expressionAttributeValues?: Record<string, any>;
+      indexName?: string;
       limit?: number;
-      descending?: boolean;
     }
   ): Promise<T[]> {
     try {
+      const keyConditionExpression = options?.sortKey
+        ? 'pk = :pk AND sk = :sk'
+        : 'pk = :pk';
+
+      const expressionAttributeValues: Record<string, any> = {
+        ':pk': partitionKey,
+      };
+
+      if (options?.sortKey) {
+        expressionAttributeValues[':sk'] = options.sortKey;
+      }
+
+      if (options?.expressionAttributeValues) {
+        Object.assign(expressionAttributeValues, options.expressionAttributeValues);
+      }
+
       const command = new QueryCommand({
         TableName: this.tableName,
+        KeyConditionExpression: keyConditionExpression,
+        ExpressionAttributeValues: marshall(expressionAttributeValues),
+        FilterExpression: options?.filterExpression,
         IndexName: options?.indexName,
-        KeyConditionExpression:
-          options?.keyConditionExpression || 'pk = :pk',
-        ExpressionAttributeValues: marshall(
-          options?.expressionAttributeValues || { ':pk': partitionKey }
-        ),
         Limit: options?.limit,
-        ScanIndexForward: !options?.descending,
       });
 
       const response = await this.client.send(command);
-      return (response.Items || []).map((item) => unmarshall(item) as T);
+      return (response.Items || []).map((item: any) => unmarshall(item) as T);
     } catch (error) {
       console.error(`DynamoDB Query error:`, error);
       throw error;
@@ -228,7 +242,7 @@ export class DynamoDBClient_ {
   }
 
   /**
-   * テーブル全体をスキャン
+   * スキャンを実行
    * @param options スキャンオプション
    * @returns スキャン結果
    */
@@ -238,17 +252,19 @@ export class DynamoDBClient_ {
     limit?: number;
   }): Promise<T[]> {
     try {
+      const expressionAttributeValues = options?.expressionAttributeValues
+        ? marshall(options.expressionAttributeValues)
+        : undefined;
+
       const command = new ScanCommand({
         TableName: this.tableName,
         FilterExpression: options?.filterExpression,
-        ExpressionAttributeValues: options?.expressionAttributeValues
-          ? marshall(options.expressionAttributeValues)
-          : undefined,
+        ExpressionAttributeValues: expressionAttributeValues,
         Limit: options?.limit,
       });
 
       const response = await this.client.send(command);
-      return (response.Items || []).map((item) => unmarshall(item) as T);
+      return (response.Items || []).map((item: any) => unmarshall(item) as T);
     } catch (error) {
       console.error(`DynamoDB Scan error:`, error);
       throw error;
@@ -257,20 +273,21 @@ export class DynamoDBClient_ {
 
   /**
    * 複数項目を一括取得
-   * @param ids 取得する項目の ID 配列
-   * @returns 取得結果
+   * @param ids 取得する項目 ID の配列
+   * @returns 取得した項目の配列
    */
   async batchGetItems<T>(ids: string[]): Promise<T[]> {
     if (ids.length === 0) {
       return [];
     }
 
-    const chunks = this.chunkArray(ids, 100); // BatchGetItem は最大 100 キー
     const results: T[] = [];
+    // DynamoDB では最大 100 キーまでバッチ処理できる
+    const chunks = this.chunkArray(ids, 100);
 
     for (const chunk of chunks) {
       try {
-        const command = new BatchGetCommand({
+        const command = new BatchGetItemCommand({
           RequestItems: {
             [this.tableName]: {
               Keys: chunk.map((id) => marshall({ id })),
@@ -280,9 +297,9 @@ export class DynamoDBClient_ {
 
         const response = await this.client.send(command);
         const items = response.Responses?.[this.tableName] || [];
-        results.push(...items.map((item) => unmarshall(item) as T));
+        results.push(...items.map((item: any) => unmarshall(item) as T));
       } catch (error) {
-        console.error(`DynamoDB BatchGetItem error:`, error);
+        console.error(`DynamoDB BatchGetItems error:`, error);
         throw error;
       }
     }
@@ -292,17 +309,10 @@ export class DynamoDBClient_ {
 
   /**
    * ヘルスチェック
-   * @returns ヘルスチェック結果
    */
   async healthCheck(): Promise<boolean> {
     try {
-      // テーブル情報を取得してヘルスチェック
-      const command = new ScanCommand({
-        TableName: this.tableName,
-        Limit: 1,
-      });
-
-      await this.client.send(command);
+      await this.scan<any>({ limit: 1 });
       return true;
     } catch (error) {
       console.error('DynamoDB health check failed:', error);
@@ -318,10 +328,10 @@ export class DynamoDBClient_ {
   }
 
   /**
-   * 配列をチャンクに分割（ヘルパーメソッド）
+   * 配列をチャンク分割
    * @param array 分割する配列
    * @param chunkSize チャンクサイズ
-   * @returns チャンク化された配列
+   * @returns チャンク分割された配列の配列
    */
   private chunkArray<T>(array: T[], chunkSize: number): T[][] {
     const chunks: T[][] = [];
@@ -337,16 +347,18 @@ let instance: DynamoDBClient_ | null = null;
 
 /**
  * DynamoDB クライアントのシングルトンインスタンスを取得
- * @param tableName テーブル名（デフォルト: 環境変数から取得）
+ * @param tableName DynamoDB テーブル名
  * @returns DynamoDBClient インスタンス
  */
-export function getDynamoDBClient(tableName?: string): DynamoDBClient_ {
-  const table = tableName || process.env.DYNAMODB_TABLE || 'todo-copilot-dev';
-  
+export function getDynamoDBClient(
+  tableName?: string
+): DynamoDBClient_ {
+  const table = tableName || process.env['DYNAMODB_TABLE'] || 'todo-copilot-dev';
+
   if (!instance) {
     instance = new DynamoDBClient_(table);
   }
-  
+
   return instance;
 }
 
