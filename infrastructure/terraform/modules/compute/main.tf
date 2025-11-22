@@ -75,7 +75,6 @@ resource "aws_lambda_function" "main" {
       ENVIRONMENT    = var.environment
       DYNAMODB_TABLE = var.dynamodb_table_name
       LOG_LEVEL      = var.environment == "prod" ? "INFO" : "DEBUG"
-      AWS_REGION     = var.aws_region
       NODE_ENV       = "production"
     }
   }
@@ -140,6 +139,7 @@ resource "aws_apigatewayv2_integration" "lambda" {
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
   payload_format_version = "2.0"
+  integration_uri        = aws_lambda_function.main.invoke_arn
 }
 
 # Default route ($default)
