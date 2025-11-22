@@ -258,7 +258,13 @@ jobs:
           cd infrastructure/terraform/dist
           echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
           zip -q index.zip index.js
+          pwd
           ls -lh index.zip
+
+      - name: Verify Lambda ZIP location
+        working-directory: infrastructure/terraform
+        run: |
+          ls -la dist/
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -317,7 +323,13 @@ jobs:
           cd infrastructure/terraform/dist
           echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
           zip -q index.zip index.js
+          pwd
           ls -lh index.zip
+
+      - name: Verify Lambda ZIP location
+        working-directory: infrastructure/terraform
+        run: |
+          ls -la dist/
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -382,7 +394,13 @@ jobs:
           cd infrastructure/terraform/dist
           echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
           zip -q index.zip index.js
+          pwd
           ls -lh index.zip
+
+      - name: Verify Lambda ZIP location
+        working-directory: infrastructure/terraform
+        run: |
+          ls -la dist/
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
