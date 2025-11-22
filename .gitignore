@@ -47,6 +47,21 @@ tmp/
 temp/
 *.tmp
 
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.tfvars
+!environment/*.tfvars
+crash.log
+crash.*.log
+
 # OS
 .DS_Store
 Thumbs.db
