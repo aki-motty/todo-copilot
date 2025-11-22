@@ -64,53 +64,53 @@
 
 ### 1.1 Data Model Definition
 
-- [ ] T007 Terraform State Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
+- [x] T007 Terraform State Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
   - Resource Catalog、Environment State、Variable Registry の構造を定義
   - 見積もり時間：1-2時間
 
-- [ ] T008 DynamoDB Application Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
+- [x] T008 DynamoDB Application Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
   - Todo Entity、User Entity、Indexes の仕様を定義
   - 見積もり時間：1-2時間
 
-- [ ] T009 Configuration Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
+- [x] T009 Configuration Model 設計 `specs/002-aws-terraform-deploy/data-model.md`
   - Backend Config、Provider Config、Tag Strategy を定義
   - 見積もり時間：1時間
 
 ### 1.2 API Contracts
 
-- [ ] T010 Terraform API Contract 定義 `specs/002-aws-terraform-deploy/contracts/terraform-api.md`
+- [x] T010 Terraform API Contract 定義 `specs/002-aws-terraform-deploy/contracts/terraform-api.md`
   - Input (tfvars スキーマ)、Output (リソース情報)、Commands (init/plan/apply/destroy) を定義
   - 見積もり時間：2時間
 
-- [ ] T011 Lambda API Contract 定義 `specs/002-aws-terraform-deploy/contracts/lambda-api.md`
+- [x] T011 Lambda API Contract 定義 `specs/002-aws-terraform-deploy/contracts/lambda-api.md`
   - Lambda関数署名、HTTP API Gateway統合、環境変数を定義
   - 見積もり時間：1-2時間
 
-- [ ] T012 AWS Resource Specification 定義 `specs/002-aws-terraform-deploy/contracts/aws-resource-spec.md`
+- [x] T012 AWS Resource Specification 定義 `specs/002-aws-terraform-deploy/contracts/aws-resource-spec.md`
   - Lambda、API Gateway、DynamoDB のリソース定義スペックを作成
   - 見積もり時間：1-2時間
 
 ### 1.3 Quick Start Guide
 
-- [ ] T013 前提条件セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
+- [x] T013 前提条件セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
   - AWS CLI、Terraform CLI インストール手順
   - 見積もり時間：1時間
 
-- [ ] T014 初期設定セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
+- [x] T014 初期設定セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
   - AWS アカウント初期設定、IAM ユーザー作成、ロール設定
   - 見積もり時間：1-2時間
 
-- [ ] T015 Terraform初期化セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
+- [x] T015 Terraform初期化セクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
   - バックエンド作成、ワークスペース設定
   - 見積もり時間：1時間
 
-- [ ] T016 デプロイメントセクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
+- [x] T016 デプロイメントセクション作成 `specs/002-aws-terraform-deploy/quickstart.md`
   - dev環境デプロイ、staging/prod環境への昇格、トラブルシューティング
   - 見積もり時間：1-2時間
 
 ### 1.4 Agent Context Update
 
-- [ ] T017 Copilot Agent Context 更新確認 `.github/agents/copilot-instructions.md`
+- [x] T017 Copilot Agent Context 更新確認 `.github/agents/copilot-instructions.md`
   - Terraform、AWS Lambda、DynamoDB の技術情報が正しく追加されたか確認
   - 見積もり時間：0.5時間
 
