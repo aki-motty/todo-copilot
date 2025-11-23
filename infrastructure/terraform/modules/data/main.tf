@@ -39,10 +39,10 @@ resource "aws_dynamodb_table" "todos" {
   }
 
   global_secondary_index {
-    name               = "UserIdIndex"
-    hash_key           = "userId"
-    range_key          = "createdAt"
-    projection_type    = "ALL"
+    name            = "UserIdIndex"
+    hash_key        = "userId"
+    range_key       = "createdAt"
+    projection_type = "ALL"
   }
 
   ttl {
