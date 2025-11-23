@@ -24,7 +24,6 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
   metric_name         = "Duration"
   namespace           = "AWS/Lambda"
   period              = "60"
-  statistic           = "p99" # Requires Extended Statistics, but standard alarm supports p99 if available
   extended_statistic  = "p99"
   threshold           = "2000" # 2 seconds
   alarm_description   = "Alarm when Lambda P99 duration > 2 seconds"
