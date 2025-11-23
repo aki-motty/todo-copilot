@@ -6,14 +6,26 @@ on:
       - main
       - 'feature/**'
     paths:
+      - 'src/**'
+      - 'tests/**'
       - 'infrastructure/terraform/**'
       - '.github/workflows/terraform-ci.yml'
+      - 'package.json'
+      - 'vite.config.ts'
+      - 'vite.config.lambda.ts'
+      - 'tsconfig.json'
   pull_request:
     branches:
       - main
     paths:
+      - 'src/**'
+      - 'tests/**'
       - 'infrastructure/terraform/**'
       - '.github/workflows/terraform-ci.yml'
+      - 'package.json'
+      - 'vite.config.ts'
+      - 'vite.config.lambda.ts'
+      - 'tsconfig.json'
   workflow_dispatch:
     inputs:
       environment:
