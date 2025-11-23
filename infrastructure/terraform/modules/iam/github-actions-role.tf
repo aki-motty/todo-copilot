@@ -265,7 +265,10 @@ resource "aws_iam_policy" "cloudwatch_manage" {
           "cloudwatch:ListMetrics",
           "cloudwatch:TagResource",
           "cloudwatch:UntagResource",
-          "cloudwatch:ListTagsForResource"
+          "cloudwatch:ListTagsForResource",
+          "logs:ListTagsForResource",
+          "logs:TagResource",
+          "logs:UntagResource"
         ]
         Resource = "*"
       }
@@ -289,6 +292,7 @@ resource "aws_iam_policy" "iam_role_management" {
           "iam:CreateRole",
           "iam:DeleteRole",
           "iam:GetRole",
+          "iam:GetRolePolicy",
           "iam:UpdateAssumeRolePolicy",
           "iam:ListRolePolicies",
           "iam:PutRolePolicy",
@@ -304,13 +308,89 @@ resource "aws_iam_policy" "iam_role_management" {
           "iam:DetachRolePolicy",
           "iam:ListAttachedRolePolicies",
           "iam:PassRole",
-          "iam:TagRole"
+          "iam:TagRole",
+          "iam:UntagRole",
+          "iam:ListTagsForRole",
+          "iam:GetOpenIDConnectProvider"
         ]
         Resource = [
           "arn:aws:iam::*:role/lambda-execution-*",
           "arn:aws:iam::*:role/github-actions-*",
-          "arn:aws:iam::*:policy/github-actions-*"
+          "arn:aws:iam::*:policy/github-actions-*",
+          "arn:aws:iam::*:oidc-provider/*"
         ]
+      }
+    ]
+  })
+
+  tags = var.common_tags
+}
+
+# Policy for Frontend (S3 & CloudFront) management
+resource "aws_iam_policy" "frontend_manage" {
+  name        = "github-actions-frontend-manage"
+  description = "Policy for GitHub Actions to manage Frontend S3 and CloudFront"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket",
+          "s3:DeleteBucket",
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:GetBucketPolicy",
+          "s3:PutBucketPolicy",
+          "s3:DeleteBucketPolicy",
+          "s3:GetBucketVersioning",
+          "s3:PutBucketVersioning",
+          "s3:GetBucketWebsite",
+          "s3:PutBucketWebsite",
+          "s3:DeleteBucketWebsite",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketAcl",
+          "s3:PutBucketAcl",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucketMultipartUploads",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts",
+          "s3:GetBucketTagging",
+          "s3:PutBucketTagging",
+          "s3:GetBucketCors",
+          "s3:PutBucketCors"
+        ]
+        Resource = [
+          "arn:aws:s3:::todo-copilot-*-frontend",
+          "arn:aws:s3:::todo-copilot-*-frontend/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateDistribution",
+          "cloudfront:UpdateDistribution",
+          "cloudfront:DeleteDistribution",
+          "cloudfront:GetDistribution",
+          "cloudfront:GetDistributionConfig",
+          "cloudfront:ListDistributions",
+          "cloudfront:TagResource",
+          "cloudfront:UntagResource",
+          "cloudfront:ListTagsForResource",
+          "cloudfront:CreateOriginAccessControl",
+          "cloudfront:GetOriginAccessControl",
+          "cloudfront:DeleteOriginAccessControl",
+          "cloudfront:UpdateOriginAccessControl",
+          "cloudfront:ListOriginAccessControls",
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation",
+          "cloudfront:ListInvalidations"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -349,6 +429,11 @@ resource "aws_iam_role_policy_attachment" "dev_iam_role_mgmt" {
   policy_arn = aws_iam_policy.iam_role_management.arn
 }
 
+resource "aws_iam_role_policy_attachment" "dev_frontend_manage" {
+  role       = aws_iam_role.github_actions_dev.name
+  policy_arn = aws_iam_policy.frontend_manage.arn
+}
+
 # Attach policies to staging role
 resource "aws_iam_role_policy_attachment" "staging_terraform_state" {
   role       = aws_iam_role.github_actions_staging.name
@@ -380,6 +465,11 @@ resource "aws_iam_role_policy_attachment" "staging_iam_role_mgmt" {
   policy_arn = aws_iam_policy.iam_role_management.arn
 }
 
+resource "aws_iam_role_policy_attachment" "staging_frontend_manage" {
+  role       = aws_iam_role.github_actions_staging.name
+  policy_arn = aws_iam_policy.frontend_manage.arn
+}
+
 # Attach policies to production role
 resource "aws_iam_role_policy_attachment" "prod_terraform_state" {
   role       = aws_iam_role.github_actions_prod.name
@@ -409,4 +499,9 @@ resource "aws_iam_role_policy_attachment" "prod_cloudwatch" {
 resource "aws_iam_role_policy_attachment" "prod_iam_role_mgmt" {
   role       = aws_iam_role.github_actions_prod.name
   policy_arn = aws_iam_policy.iam_role_management.arn
+}
+
+resource "aws_iam_role_policy_attachment" "prod_frontend_manage" {
+  role       = aws_iam_role.github_actions_prod.name
+  policy_arn = aws_iam_policy.frontend_manage.arn
 }
