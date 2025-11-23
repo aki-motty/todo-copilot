@@ -15,7 +15,25 @@ export class LocalStorageTodoRepository implements ITodoRepository {
   private readonly storagePrefix = "todo_app:version";
   private readonly version = 1;
 
-  constructor(private readonly storage: Storage = window.localStorage) {
+  private readonly storage: Storage;
+
+  constructor(storage?: Storage) {
+    if (storage) {
+      this.storage = storage;
+    } else if (typeof window !== "undefined") {
+      this.storage = window.localStorage;
+    } else {
+      // Fallback for non-browser environments or when window is not available
+      // This allows the class to be imported in Node.js environments without crashing
+      this.storage = {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+        clear: () => {},
+        key: () => null,
+        length: 0
+      } as unknown as Storage;
+    }
     this.initializeStorage();
   }
 
