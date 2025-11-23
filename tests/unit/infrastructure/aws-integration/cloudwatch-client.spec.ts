@@ -6,11 +6,11 @@
  */
 
 import {
-    type CloudWatchLogsClientService,
-    getCloudWatchLogsClient,
-    getLogger,
-    initializeGlobalLogger,
-    resetCloudWatchLogsClient,
+  type CloudWatchLogsClientService,
+  getCloudWatchLogsClient,
+  getLogger,
+  initializeGlobalLogger,
+  resetCloudWatchLogsClient,
 } from "../../../../src/infrastructure/aws-integration/cloudwatch-client";
 
 // Mock AWS SDK

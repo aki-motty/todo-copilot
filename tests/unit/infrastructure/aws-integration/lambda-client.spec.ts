@@ -6,9 +6,9 @@
  */
 
 import {
-    type LambdaClientService,
-    getLambdaClient,
-    resetLambdaClient,
+  type LambdaClientService,
+  getLambdaClient,
+  resetLambdaClient,
 } from "../../../../src/infrastructure/aws-integration/lambda-client";
 
 // Mock AWS SDK

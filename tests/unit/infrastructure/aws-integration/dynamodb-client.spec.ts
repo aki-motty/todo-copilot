@@ -6,9 +6,9 @@
  */
 
 import {
-    DynamoDBClient_,
-    getDynamoDBClient,
-    resetDynamoDBClient,
+  DynamoDBClient_,
+  getDynamoDBClient,
+  resetDynamoDBClient,
 } from "../../../../src/infrastructure/aws-integration/dynamodb-client";
 
 // Mock AWS SDK

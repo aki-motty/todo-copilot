@@ -14,9 +14,9 @@ import { Todo, TodoTitle } from "../../src/domain/entities/Todo";
 import { DynamoDBTodoRepository } from "../../src/infrastructure/aws-integration/DynamoDBTodoRepository";
 import { DynamoDBClient_ } from "../../src/infrastructure/aws-integration/dynamodb-client";
 import {
-    type LambdaClientService,
-    getLambdaClient,
-    resetLambdaClient,
+  type LambdaClientService,
+  getLambdaClient,
+  resetLambdaClient,
 } from "../../src/infrastructure/aws-integration/lambda-client";
 
 /**

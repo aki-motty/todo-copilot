@@ -1,9 +1,9 @@
 import {
-    GetFunctionCommand,
-    InvokeCommand,
-    type InvokeCommandInput,
-    LambdaClient,
-    ListFunctionsCommand,
+  GetFunctionCommand,
+  InvokeCommand,
+  type InvokeCommandInput,
+  LambdaClient,
+  ListFunctionsCommand,
 } from "@aws-sdk/client-lambda";
 
 /**
