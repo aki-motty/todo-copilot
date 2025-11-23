@@ -242,8 +242,6 @@ jobs:
     timeout-minutes: 15
     needs: terraform-validate
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: develop
     permissions:
       contents: read
       id-token: write
