@@ -81,7 +81,8 @@ resource "aws_lambda_function" "main" {
       DYNAMODB_TABLE = var.dynamodb_table_name
       LOG_LEVEL      = var.environment == "prod" ? "INFO" : "DEBUG"
       NODE_ENV       = "production"
-      AWS_REGION     = var.aws_region
+      # NOTE: AWS_REGION is a reserved environment variable and cannot be set by Lambda users
+      # Use AWS_REGION environment variable directly from Lambda runtime
     }
   }
 
