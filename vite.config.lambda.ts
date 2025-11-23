@@ -15,7 +15,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.lambda.ts"),
       name: "TodoLambdaHandler",
-      fileName: () => "index.js",
+      fileName: () => "index.cjs",
       formats: ["cjs"],
     },
     // Ensure dependencies are bundled
@@ -24,6 +24,7 @@ export default defineConfig({
       output: {
         format: "cjs",
         strict: true,
+        entryFileNames: "index.cjs",
       },
     },
     // Enable source maps for debugging
@@ -32,6 +33,8 @@ export default defineConfig({
     minify: "terser",
     // Target Node.js 18+ (Lambda runtime)
     target: "node18",
+    // Build for Server-Side Rendering (Node.js environment)
+    ssr: true,
   },
   resolve: {
     alias: {
