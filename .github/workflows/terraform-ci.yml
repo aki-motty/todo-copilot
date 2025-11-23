@@ -325,7 +325,7 @@ jobs:
         run: |
           API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
           echo "Building frontend with API_URL=$API_URL"
-          VITE_API_URL=$API_URL npm run build
+          VITE_API_URL=$API_URL VITE_API_BASE_URL=$API_URL npm run build
 
       - name: Deploy Frontend to S3
         run: |
@@ -427,7 +427,7 @@ jobs:
         run: |
           API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
           echo "Building frontend with API_URL=$API_URL"
-          VITE_API_URL=$API_URL npm run build
+          VITE_API_URL=$API_URL VITE_API_BASE_URL=$API_URL npm run build
 
       - name: Deploy Frontend to S3
         run: |
@@ -529,7 +529,7 @@ jobs:
         run: |
           API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
           echo "Building frontend with API_URL=$API_URL"
-          VITE_API_URL=$API_URL npm run build
+          VITE_API_URL=$API_URL VITE_API_BASE_URL=$API_URL npm run build
 
       - name: Deploy Frontend to S3
         run: |
