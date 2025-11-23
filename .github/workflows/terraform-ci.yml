@@ -287,6 +287,19 @@ jobs:
             -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
             -backend-config="region=${{ env.AWS_REGION }}"
 
+      - name: Import existing CloudWatch Log Group (if exists)
+        working-directory: infrastructure/terraform
+        run: |
+          # Check if log group exists
+          if aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/todo-copilot-api-dev" --region ${{ env.AWS_REGION }} --query 'logGroups[0].logGroupName' --output text | grep -q "todo-copilot-api-dev"; then
+            echo "Log group exists, attempting to import..."
+            terraform import -auto-approve \
+              module.compute.aws_cloudwatch_log_group.lambda_logs \
+              /aws/lambda/todo-copilot-api-dev || echo "Import failed or already in state"
+          else
+            echo "Log group does not exist, will be created by terraform"
+          fi
+
       - name: Terraform Apply
         working-directory: infrastructure/terraform
         run: |
@@ -351,6 +364,19 @@ jobs:
             -backend-config="key=staging/terraform.tfstate" \
             -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
             -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Import existing CloudWatch Log Group (if exists)
+        working-directory: infrastructure/terraform
+        run: |
+          # Check if log group exists
+          if aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/todo-copilot-api-staging" --region ${{ env.AWS_REGION }} --query 'logGroups[0].logGroupName' --output text | grep -q "todo-copilot-api-staging"; then
+            echo "Log group exists, attempting to import..."
+            terraform import -auto-approve \
+              module.compute.aws_cloudwatch_log_group.lambda_logs \
+              /aws/lambda/todo-copilot-api-staging || echo "Import failed or already in state"
+          else
+            echo "Log group does not exist, will be created by terraform"
+          fi
 
       - name: Terraform Plan
         id: plan
@@ -422,6 +448,19 @@ jobs:
             -backend-config="key=prod/terraform.tfstate" \
             -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
             -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Import existing CloudWatch Log Group (if exists)
+        working-directory: infrastructure/terraform
+        run: |
+          # Check if log group exists
+          if aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/todo-copilot-api-prod" --region ${{ env.AWS_REGION }} --query 'logGroups[0].logGroupName' --output text | grep -q "todo-copilot-api-prod"; then
+            echo "Log group exists, attempting to import..."
+            terraform import -auto-approve \
+              module.compute.aws_cloudwatch_log_group.lambda_logs \
+              /aws/lambda/todo-copilot-api-prod || echo "Import failed or already in state"
+          else
+            echo "Log group does not exist, will be created by terraform"
+          fi
 
       - name: Terraform Plan
         id: plan

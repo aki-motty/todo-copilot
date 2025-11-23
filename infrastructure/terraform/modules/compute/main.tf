@@ -49,6 +49,7 @@ variable "common_tags" {
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+  skip_destroy      = true
 
   tags = merge(
     var.common_tags,
