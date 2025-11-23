@@ -11,6 +11,11 @@ build/
 .out/
 *.tsbuildinfo
 
+# Lambda build output
+dist-lambda/
+infrastructure/terraform/dist/
+*.zip
+
 # Development
 .env
 .env.local

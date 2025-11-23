@@ -1,7 +1,7 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "module": "esnext",
+        "module": "es2020",
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "baseUrl": ".",

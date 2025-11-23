@@ -15,9 +15,19 @@ class Logger {
   private logLevel: "debug" | "info" | "warn" | "error" = "info";
 
   constructor(private moduleName?: string) {
-    // Only try to access import.meta in browser/vite environment
-    if (typeof window !== "undefined" && (window as any).import?.meta?.env?.VITE_LOG_LEVEL) {
-      this.logLevel = (window as any).import.meta.env.VITE_LOG_LEVEL;
+    // Check for process.env first (Node.js/Lambda)
+    if (typeof process !== "undefined" && process.env && process.env["LOG_LEVEL"]) {
+      this.logLevel = process.env["LOG_LEVEL"] as any;
+    } 
+    // Then check for window (Browser)
+    else {
+      try {
+        if (typeof window !== "undefined" && (window as any).import?.meta?.env?.VITE_LOG_LEVEL) {
+          this.logLevel = (window as any).import.meta.env.VITE_LOG_LEVEL;
+        }
+      } catch (e) {
+        // Ignore error if window is not defined
+      }
     }
   }
 

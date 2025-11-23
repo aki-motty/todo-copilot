@@ -1,0 +1,383 @@
+openapi: 3.0.0
+info:
+  title: Todo Copilot Lambda API
+  version: '1.0.0'
+  description: AWS Lambda-powered REST API for todo operations
+  contact:
+    name: DevOps Team
+  license:
+    name: MIT
+
+servers:
+  - url: https://ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com/dev
+    description: Development environment
+  - url: https://[staging-api-id].execute-api.ap-northeast-1.amazonaws.com/staging
+    description: Staging environment
+  - url: https://[prod-api-id].execute-api.ap-northeast-1.amazonaws.com/prod
+    description: Production environment
+
+paths:
+  /todos:
+    post:
+      summary: Create a new todo
+      operationId: createTodo
+      tags:
+        - Todos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTodoRequest'
+            examples:
+              valid:
+                value:
+                  title: "Buy milk"
+              edge_case_max_length:
+                value:
+                  title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse."
+      responses:
+        '200':
+          description: Todo created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              examples:
+                success:
+                  value:
+                    status: success
+                    data:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      title: "Buy milk"
+                      completed: false
+                      createdAt: "2025-11-23T12:34:56Z"
+                      updatedAt: "2025-11-23T12:34:56Z"
+                    meta:
+                      timestamp: "2025-11-23T12:34:56Z"
+                      requestId: "req-uuid-here"
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                empty_title:
+                  value:
+                    status: error
+                    error: "Title must be between 1 and 500 characters"
+                    meta:
+                      timestamp: "2025-11-23T12:34:56Z"
+                      requestId: "req-uuid-here"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+
+    get:
+      summary: List all todos
+      operationId: listTodos
+      tags:
+        - Todos
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Maximum number of todos to return
+        - name: after
+          in: query
+          schema:
+            type: string
+          description: Last todo ID from previous page (pagination cursor)
+      responses:
+        '200':
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTodosResponse'
+              examples:
+                success:
+                  value:
+                    status: success
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440001"
+                        title: "Buy milk"
+                        completed: false
+                        createdAt: "2025-11-23T12:34:56Z"
+                        updatedAt: "2025-11-23T12:34:56Z"
+                      - id: "550e8400-e29b-41d4-a716-446655440002"
+                        title: "Clean house"
+                        completed: true
+                        createdAt: "2025-11-23T11:00:00Z"
+                        updatedAt: "2025-11-23T11:30:00Z"
+                        completedAt: "2025-11-23T11:30:00Z"
+                    meta:
+                      timestamp: "2025-11-23T12:34:56Z"
+                      requestId: "req-uuid-here"
+                      total: 2
+                      hasMore: false
+
+  /todos/{id}:
+    get:
+      summary: Get a specific todo by ID
+      operationId: getTodo
+      tags:
+        - Todos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Todo ID
+      responses:
+        '200':
+          description: Todo found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+
+    put:
+      summary: Update todo (toggle completion status)
+      operationId: updateTodo
+      tags:
+        - Todos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodoRequest'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Todo not found
+        '500':
+          description: Server error
+
+  /todos/{id}/toggle:
+    put:
+      summary: Toggle todo completion status
+      operationId: toggleTodo
+      tags:
+        - Todos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Todo toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              examples:
+                toggled_to_complete:
+                  value:
+                    status: success
+                    data:
+                      id: "550e8400-e29b-41d4-a716-446655440001"
+                      title: "Buy milk"
+                      completed: true
+                      createdAt: "2025-11-23T12:34:56Z"
+                      updatedAt: "2025-11-23T12:45:00Z"
+                      completedAt: "2025-11-23T12:45:00Z"
+        '404':
+          description: Todo not found
+
+    delete:
+      summary: Delete a todo
+      operationId: deleteTodo
+      tags:
+        - Todos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Todo deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success, error]
+                  meta:
+                    $ref: '#/components/schemas/Metadata'
+        '404':
+          description: Todo not found
+
+components:
+  schemas:
+    Todo:
+      type: object
+      required:
+        - id
+        - title
+        - completed
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        title:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Todo title
+        completed:
+          type: boolean
+          description: Completion status
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp (ISO 8601)
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp (ISO 8601)
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Completion timestamp (ISO 8601), null if not completed
+
+    CreateTodoRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Todo title
+
+    UpdateTodoRequest:
+      type: object
+      properties:
+        completed:
+          type: boolean
+          description: New completion status
+        title:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Updated title (optional)
+
+    Metadata:
+      type: object
+      required:
+        - timestamp
+        - requestId
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+        requestId:
+          type: string
+          format: uuid
+          description: Unique request identifier (for debugging)
+        total:
+          type: integer
+          description: Total count (for list operations)
+        hasMore:
+          type: boolean
+          description: Whether more results available (for pagination)
+
+    ApiResponse:
+      type: object
+      required:
+        - status
+        - meta
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+        data:
+          $ref: '#/components/schemas/Todo'
+        meta:
+          $ref: '#/components/schemas/Metadata'
+
+    ListTodosResponse:
+      type: object
+      required:
+        - status
+        - data
+        - meta
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Todo'
+        meta:
+          $ref: '#/components/schemas/Metadata'
+
+    ApiErrorResponse:
+      type: object
+      required:
+        - status
+        - error
+        - meta
+      properties:
+        status:
+          type: string
+          enum: [error]
+        error:
+          type: string
+          description: Error message
+        meta:
+          $ref: '#/components/schemas/Metadata'
+
+  securitySchemes:
+    ApiGatewayAuth:
+      type: http
+      scheme: bearer
+      description: API Gateway authorization (CORS headers)
+
+security: []
+

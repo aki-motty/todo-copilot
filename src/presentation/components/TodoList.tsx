@@ -1,9 +1,9 @@
-import type { Todo } from "../../domain/entities/Todo";
+import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import { TodoItem } from "./TodoItem";
 import "./TodoList.css";
 
 interface TodoListProps {
-  todos: Todo[];
+  todos: TodoResponseDTO[];
   isLoading?: boolean;
   onToggleCompletion?: (id: string) => Promise<any>;
   onDelete?: (id: string) => Promise<void>;

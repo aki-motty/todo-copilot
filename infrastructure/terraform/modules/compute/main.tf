@@ -45,12 +45,14 @@ variable "common_tags" {
   default     = {}
 }
 
-# CloudWatch Log Group for Lambda
-# NOTE: Pre-created or auto-created by Lambda execution role
-# Commenting out resource creation to avoid conflicts with existing logs
+# NOTE: CloudWatch Log Group is automatically created by Lambda.
+# If you need to control retention policy, uncomment this resource.
+# However, if Lambda has already created the log group, Terraform import may be needed.
+#
 # resource "aws_cloudwatch_log_group" "lambda_logs" {
 #   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
 #   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+#   skip_destroy      = true
 #
 #   tags = merge(
 #     var.common_tags,
@@ -61,23 +63,31 @@ variable "common_tags" {
 #   )
 # }
 
-# Placeholder Lambda function (actual implementation in Phase 2)
+# Lambda function with built handler
 resource "aws_lambda_function" "main" {
-  filename      = "dist/index.zip"
+  filename      = "${path.root}/../../infrastructure/terraform/dist/index.zip"
   function_name = "${var.project_name}-api-${var.environment}"
   role          = var.lambda_execution_role_arn
-  handler       = "dist/index.handler"
+  handler       = "index.handler"
   runtime       = "nodejs18.x"
-  architectures = ["arm64"]
+  architectures = ["x86_64"]
   timeout       = var.lambda_timeout
   memory_size   = var.lambda_memory_size
+  # Note: source_code_hash is computed from the ZIP file during apply
+  # During validation with -backend=false, the file may not exist
+  source_code_hash = try(
+    base64sha256(file("${path.root}/../../infrastructure/terraform/dist/index.zip")),
+    "placeholder-for-validation"
+  )
 
   environment {
     variables = {
-      ENVIRONMENT    = var.environment
-      DYNAMODB_TABLE = var.dynamodb_table_name
-      LOG_LEVEL      = var.environment == "prod" ? "INFO" : "DEBUG"
+      ENVIRONMENT         = var.environment
+      DYNAMODB_TABLE_NAME = var.dynamodb_table_name
+      LOG_LEVEL           = var.environment == "prod" ? "INFO" : "DEBUG"
       NODE_ENV       = "production"
+      # NOTE: AWS_REGION is a reserved environment variable and cannot be set by Lambda users
+      # Use AWS_REGION environment variable directly from Lambda runtime
     }
   }
 
@@ -94,8 +104,7 @@ resource "aws_lambda_function" "main" {
     }
   )
 
-  # Note: Lambda code must be provided before applying
-  # For now, using a placeholder that will fail if code is not present
+  # Note: CloudWatch Log Group is auto-created by Lambda, so no explicit dependency needed
 }
 
 # API Gateway HTTP API
@@ -107,7 +116,8 @@ resource "aws_apigatewayv2_api" "main" {
   cors_configuration {
     allow_origins = [
       "https://todo-copilot.example.com",
-      var.environment != "prod" ? "http://localhost:3000" : ""
+      var.environment != "prod" ? "http://localhost:3000" : "",
+      var.environment != "prod" ? "http://localhost:5173" : ""
     ]
     allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     allow_headers = [
@@ -172,8 +182,10 @@ resource "aws_apigatewayv2_stage" "prod" {
   # }
 
   default_route_settings {
-    logging_level      = var.environment == "prod" ? "ERROR" : "INFO"
-    data_trace_enabled = var.environment == "prod" ? false : true
+    logging_level          = var.environment == "prod" ? "ERROR" : "INFO"
+    data_trace_enabled     = var.environment == "prod" ? false : true
+    throttling_burst_limit = 5000
+    throttling_rate_limit  = 10000
   }
 
   tags = merge(
