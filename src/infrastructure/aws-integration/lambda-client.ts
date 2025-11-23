@@ -1,14 +1,14 @@
 import {
-    GetFunctionCommand,
-    InvokeCommand,
-    LambdaClient,
-    ListFunctionsCommand,
-    type InvokeCommandInput,
-} from '@aws-sdk/client-lambda';
+  GetFunctionCommand,
+  InvokeCommand,
+  type InvokeCommandInput,
+  LambdaClient,
+  ListFunctionsCommand,
+} from "@aws-sdk/client-lambda";
 
 /**
  * Lambda クライアント
- * 
+ *
  * Lambda 関数の呼び出しと管理を行います
  */
 export class LambdaClientService {
@@ -18,7 +18,7 @@ export class LambdaClientService {
    * コンストラクタ
    * @param region AWS リージョン
    */
-  constructor(region: string = process.env.AWS_REGION || 'ap-northeast-1') {
+  constructor(region: string = process.env["AWS_REGION"] || "ap-northeast-1") {
     this.client = new LambdaClient({ region });
   }
 
@@ -28,14 +28,11 @@ export class LambdaClientService {
    * @param payload ペイロード
    * @returns 実行結果
    */
-  async invokeSync<T = any>(
-    functionName: string,
-    payload?: Record<string, any>
-  ): Promise<T> {
+  async invokeSync<T = any>(functionName: string, payload?: Record<string, any>): Promise<T> {
     try {
       const command = new InvokeCommand({
         FunctionName: functionName,
-        InvocationType: 'RequestResponse',
+        InvocationType: "RequestResponse",
         Payload: payload ? JSON.stringify(payload) : undefined,
       } as InvokeCommandInput);
 
@@ -55,7 +52,7 @@ export class LambdaClientService {
       const payloadStr =
         response.Payload instanceof Uint8Array
           ? new TextDecoder().decode(response.Payload)
-          : (response.Payload as any)?.toString() || '{}';
+          : (response.Payload as any)?.toString() || "{}";
 
       return JSON.parse(payloadStr) as T;
     } catch (error) {
@@ -69,23 +66,17 @@ export class LambdaClientService {
    * @param functionName 関数名
    * @param payload ペイロード
    */
-  async invokeAsync(
-    functionName: string,
-    payload?: Record<string, any>
-  ): Promise<void> {
+  async invokeAsync(functionName: string, payload?: Record<string, any>): Promise<void> {
     try {
       const command = new InvokeCommand({
         FunctionName: functionName,
-        InvocationType: 'Event',
+        InvocationType: "Event",
         Payload: payload ? JSON.stringify(payload) : undefined,
       } as InvokeCommandInput);
 
       await this.client.send(command);
     } catch (error) {
-      console.error(
-        `Failed to invoke Lambda function ${functionName} asynchronously:`,
-        error
-      );
+      console.error(`Failed to invoke Lambda function ${functionName} asynchronously:`, error);
       throw error;
     }
   }
@@ -96,31 +87,23 @@ export class LambdaClientService {
    * @param payload ペイロード
    * @returns 検証結果
    */
-  async invokeDryRun<T = any>(
-    functionName: string,
-    payload?: Record<string, any>
-  ): Promise<T> {
+  async invokeDryRun<T = any>(functionName: string, payload?: Record<string, any>): Promise<T> {
     try {
       const command = new InvokeCommand({
         FunctionName: functionName,
-        InvocationType: 'DryRun',
+        InvocationType: "DryRun",
         Payload: payload ? JSON.stringify(payload) : undefined,
       } as InvokeCommandInput);
 
       const response = await this.client.send(command);
 
       if (response.FunctionError) {
-        throw new Error(
-          `Lambda function validation error: ${response.FunctionError}`
-        );
+        throw new Error(`Lambda function validation error: ${response.FunctionError}`);
       }
 
       return { success: true } as T;
     } catch (error) {
-      console.error(
-        `Failed to validate Lambda function ${functionName}:`,
-        error
-      );
+      console.error(`Failed to validate Lambda function ${functionName}:`, error);
       throw error;
     }
   }
@@ -185,7 +168,7 @@ export class LambdaClientService {
         version: func.Version,
       }));
     } catch (error) {
-      console.error('Failed to list Lambda functions:', error);
+      console.error("Failed to list Lambda functions:", error);
       throw error;
     }
   }
@@ -204,7 +187,7 @@ export class LambdaClientService {
       }
       return true;
     } catch (error) {
-      console.error('Lambda health check failed:', error);
+      console.error("Lambda health check failed:", error);
       return false;
     }
   }
@@ -225,9 +208,7 @@ let instance: LambdaClientService | null = null;
  * @param region AWS リージョン
  * @returns LambdaClientService インスタンス
  */
-export function getLambdaClient(
-  region?: string
-): LambdaClientService {
+export function getLambdaClient(region?: string): LambdaClientService {
   if (!instance) {
     instance = new LambdaClientService(region);
   }

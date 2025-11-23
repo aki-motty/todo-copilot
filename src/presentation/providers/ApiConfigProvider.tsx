@@ -38,7 +38,8 @@ export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
 
     // Check for localStorage override (useful for testing)
-    const forceLocalStorage = typeof window !== 'undefined' && window.localStorage.getItem('forceLocalStorage') === 'true';
+    const forceLocalStorage =
+      typeof window !== "undefined" && window.localStorage.getItem("forceLocalStorage") === "true";
 
     const isEnabled = Boolean(apiBaseUrl) && !forceLocalStorage;
     const isLocalStorageMode = !isEnabled;
@@ -51,14 +52,14 @@ export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }
         baseUrl: apiBaseUrl,
       });
     } else {
-      logMessage = forceLocalStorage 
+      logMessage = forceLocalStorage
         ? "Using localStorage backend (forced via localStorage)"
         : "Using localStorage backend (no VITE_API_BASE_URL configured)";
-      
+
       logger.info("API Configuration", {
         backend: "localStorage",
         baseUrl: null,
-        forced: forceLocalStorage
+        forced: forceLocalStorage,
       });
     }
 
@@ -70,11 +71,7 @@ export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }
     };
   }, []);
 
-  return (
-    <ApiConfigContext.Provider value={config}>
-      {children}
-    </ApiConfigContext.Provider>
-  );
+  return <ApiConfigContext.Provider value={config}>{children}</ApiConfigContext.Provider>;
 };
 
 /**

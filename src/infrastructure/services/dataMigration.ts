@@ -1,6 +1,6 @@
 /**
  * Data Migration Script: localStorage → Lambda API (DynamoDB)
- * 
+ *
  * This script migrates todos from browser localStorage to the Lambda API backend
  * Run this during initialization to preserve existing todos
  */
@@ -126,10 +126,10 @@ export async function performFullMigration(
       clearLocalStorageTodos();
       return true;
     }
-      console.warn(
-        `Migration completed with errors: ${stats.failed} failed. Keeping localStorage backup.`
-      );
-      return false;
+    console.warn(
+      `Migration completed with errors: ${stats.failed} failed. Keeping localStorage backup.`
+    );
+    return false;
   } catch (error) {
     console.error("Migration failed:", error);
     return false;

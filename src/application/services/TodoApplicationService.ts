@@ -1,17 +1,17 @@
 import { Todo, type TodoId } from "../../domain/entities/Todo";
 import {
-    createTodoCompletedEvent,
-    createTodoCreatedEvent,
-    createTodoDeletedEvent,
-    type DomainEvent,
+  type DomainEvent,
+  createTodoCompletedEvent,
+  createTodoCreatedEvent,
+  createTodoDeletedEvent,
 } from "../../domain/events/TodoEvents";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
 import { NotFoundError } from "../../shared/types";
 import type {
-    CreateTodoCommand,
-    DeleteTodoCommand,
-    ToggleTodoCompletionCommand,
+  CreateTodoCommand,
+  DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../commands";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
@@ -102,11 +102,9 @@ export class TodoApplicationService {
     this.logger.debug("Getting all todos");
 
     const todos = await this.todoRepository.findAll();
-    
+
     // Sort by createdAt descending (newest first)
-    const sortedTodos = [...todos].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    const sortedTodos = [...todos].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     this.logger.debug("Retrieved todos", { count: sortedTodos.length });
 

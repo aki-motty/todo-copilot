@@ -1,6 +1,6 @@
 /**
  * API Configuration Validation and Utilities
- * 
+ *
  * Validates environment variables for Lambda API integration
  * Provides utilities for API endpoint configuration
  */
@@ -85,9 +85,5 @@ export function getApiEndpoint(path: string): string {
  */
 export function isProduction(): boolean {
   const baseUrl = import.meta.env.VITE_API_URL;
-  return (
-    baseUrl !== undefined &&
-    !baseUrl.includes("localhost") &&
-    !baseUrl.includes("127.0.0.1")
-  );
+  return baseUrl !== undefined && !baseUrl.includes("localhost") && !baseUrl.includes("127.0.0.1");
 }

@@ -104,7 +104,9 @@ export function parseBody<T>(body: string | undefined): T {
   try {
     return JSON.parse(body) as T;
   } catch (error) {
-    throw new Error(`Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -124,7 +126,11 @@ export function createSuccessResponse<T>(statusCode: number, data: T): ApiRespon
 /**
  * Create an error API response
  */
-export function createErrorResponse(statusCode: number, error: string, message?: string): ApiResponse {
+export function createErrorResponse(
+  statusCode: number,
+  error: string,
+  message?: string
+): ApiResponse {
   return {
     statusCode,
     body: {

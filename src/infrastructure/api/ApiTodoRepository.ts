@@ -45,7 +45,10 @@ export class AsyncApiTodoRepository {
         return null;
       }
 
-      this.logger.error("Error finding todo by id", error instanceof Error ? error : new Error(String(error)));
+      this.logger.error(
+        "Error finding todo by id",
+        error instanceof Error ? error : new Error(String(error))
+      );
       throw this.mapApiError(error);
     }
   }
@@ -70,7 +73,7 @@ export class AsyncApiTodoRepository {
     } catch (error) {
       this.logger.error(
         "Error finding all todos",
-        error instanceof Error ? error : new Error(String(error)),
+        error instanceof Error ? error : new Error(String(error))
       );
       throw this.mapApiError(error);
     }
@@ -106,7 +109,7 @@ export class AsyncApiTodoRepository {
     } catch (error) {
       this.logger.error(
         "Error saving todo",
-        error instanceof Error ? error : new Error(String(error)),
+        error instanceof Error ? error : new Error(String(error))
       );
       throw this.mapApiError(error);
     }
@@ -126,7 +129,10 @@ export class AsyncApiTodoRepository {
         throw new NotFoundError(`Todo with id ${id} not found`);
       }
 
-      this.logger.error("Error removing todo", error instanceof Error ? error : new Error(String(error)));
+      this.logger.error(
+        "Error removing todo",
+        error instanceof Error ? error : new Error(String(error))
+      );
       throw this.mapApiError(error);
     }
   }
@@ -141,7 +147,10 @@ export class AsyncApiTodoRepository {
       await this.httpClient.delete("/todos");
       this.logger.info("All todos cleared");
     } catch (error) {
-      this.logger.error("Error clearing todos", error instanceof Error ? error : new Error(String(error)));
+      this.logger.error(
+        "Error clearing todos",
+        error instanceof Error ? error : new Error(String(error))
+      );
       throw this.mapApiError(error);
     }
   }
@@ -157,7 +166,10 @@ export class AsyncApiTodoRepository {
       this.logger.debug("Todo count retrieved", { count: response.count });
       return response.count;
     } catch (error) {
-      this.logger.error("Error getting todo count", error instanceof Error ? error : new Error(String(error)));
+      this.logger.error(
+        "Error getting todo count",
+        error instanceof Error ? error : new Error(String(error))
+      );
       throw this.mapApiError(error);
     }
   }
@@ -166,13 +178,7 @@ export class AsyncApiTodoRepository {
    * Map TodoDTO from API to domain Todo entity
    */
   private mapTodoFromDTO(dto: TodoDTO): Todo {
-    return Todo.fromPersistence(
-      dto.id,
-      dto.title,
-      dto.completed,
-      dto.createdAt,
-      dto.updatedAt,
-    );
+    return Todo.fromPersistence(dto.id, dto.title, dto.completed, dto.createdAt, dto.updatedAt);
   }
 
   /**

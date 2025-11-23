@@ -1,15 +1,15 @@
 import {
-    CloudWatchLogsClient,
-    CreateLogGroupCommand,
-    CreateLogStreamCommand,
-    DescribeLogGroupsCommand,
-    DescribeLogStreamsCommand,
-    PutLogEventsCommand,
-} from '@aws-sdk/client-cloudwatch-logs';
+  CloudWatchLogsClient,
+  CreateLogGroupCommand,
+  CreateLogStreamCommand,
+  DescribeLogGroupsCommand,
+  DescribeLogStreamsCommand,
+  PutLogEventsCommand,
+} from "@aws-sdk/client-cloudwatch-logs";
 
 /**
  * CloudWatch Logs クライアント
- * 
+ *
  * Lambda 関数のロギングと監視を行います
  */
 export class CloudWatchLogsClientService {
@@ -26,8 +26,8 @@ export class CloudWatchLogsClientService {
    */
   constructor(
     logGroupName: string,
-    logStreamName = 'default',
-    region: string = process.env.AWS_REGION || 'ap-northeast-1'
+    logStreamName = "default",
+    region: string = process.env["AWS_REGION"] || "ap-northeast-1"
   ) {
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
@@ -83,7 +83,7 @@ export class CloudWatchLogsClientService {
         console.log(`Created log stream: ${this.logStreamName}`);
       }
     } catch (error) {
-      console.error('Failed to initialize CloudWatch Logs:', error);
+      console.error("Failed to initialize CloudWatch Logs:", error);
       throw error;
     }
   }
@@ -96,7 +96,7 @@ export class CloudWatchLogsClientService {
    */
   async log(
     message: string,
-    level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG' = 'INFO',
+    level: "INFO" | "WARN" | "ERROR" | "DEBUG" = "INFO",
     metadata?: Record<string, any>
   ): Promise<void> {
     try {
@@ -124,7 +124,7 @@ export class CloudWatchLogsClientService {
       this.sequenceToken = response.nextSequenceToken;
     } catch (error) {
       // ロギングエラーは致命的ではない（警告レベル）
-      console.warn('Failed to put log events:', error);
+      console.warn("Failed to put log events:", error);
     }
   }
 
@@ -132,29 +132,29 @@ export class CloudWatchLogsClientService {
    * 情報ログを出力
    */
   async info(message: string, metadata?: Record<string, any>): Promise<void> {
-    await this.log(message, 'INFO', metadata);
+    await this.log(message, "INFO", metadata);
   }
 
   /**
    * 警告ログを出力
    */
   async warn(message: string, metadata?: Record<string, any>): Promise<void> {
-    await this.log(message, 'WARN', metadata);
+    await this.log(message, "WARN", metadata);
   }
 
   /**
    * エラーログを出力
    */
   async error(message: string, metadata?: Record<string, any>): Promise<void> {
-    await this.log(message, 'ERROR', metadata);
+    await this.log(message, "ERROR", metadata);
   }
 
   /**
    * デバッグログを出力
    */
   async debug(message: string, metadata?: Record<string, any>): Promise<void> {
-    if (process.env.LOG_LEVEL === 'DEBUG') {
-      await this.log(message, 'DEBUG', metadata);
+    if (process.env["LOG_LEVEL"] === "DEBUG") {
+      await this.log(message, "DEBUG", metadata);
     }
   }
 
@@ -171,7 +171,7 @@ export class CloudWatchLogsClientService {
       );
       return true;
     } catch (error) {
-      console.error('CloudWatch health check failed:', error);
+      console.error("CloudWatch health check failed:", error);
       return false;
     }
   }
@@ -197,8 +197,9 @@ export async function getCloudWatchLogsClient(
   logGroupName?: string,
   logStreamName?: string
 ): Promise<CloudWatchLogsClientService> {
-  const groupName = logGroupName || process.env.LOG_GROUP_NAME || '/aws/lambda/todo-copilot';
-  const streamName = logStreamName || process.env.LOG_STREAM_NAME || process.env.ENVIRONMENT || 'default';
+  const groupName = logGroupName || process.env["LOG_GROUP_NAME"] || "/aws/lambda/todo-copilot";
+  const streamName =
+    logStreamName || process.env["LOG_STREAM_NAME"] || process.env["ENVIRONMENT"] || "default";
 
   if (!instance) {
     instance = new CloudWatchLogsClientService(groupName, streamName);
@@ -234,7 +235,7 @@ export async function initializeGlobalLogger(): Promise<void> {
  */
 export function getLogger(): CloudWatchLogsClientService {
   if (!globalLogger) {
-    throw new Error('Logger not initialized. Call initializeGlobalLogger() first.');
+    throw new Error("Logger not initialized. Call initializeGlobalLogger() first.");
   }
   return globalLogger;
 }

@@ -23,9 +23,9 @@ describe("GetAllTodosQuery - Integration Tests", () => {
 
     it("should retrieve todos created through service", async () => {
       await service.createTodo({ title: "Service Todo 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Service Todo 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Service Todo 3" });
 
       const query: GetAllTodosQuery = {};
@@ -71,11 +71,11 @@ describe("GetAllTodosQuery - Integration Tests", () => {
 
     it("should maintain todo order after multiple operations", async () => {
       const created1 = await service.createTodo({ title: "Order 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const created2 = await service.createTodo({ title: "Order 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Order 3" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Perform various operations
       await service.toggleTodoCompletion({ id: created2.id });
@@ -110,9 +110,9 @@ describe("GetAllTodosQuery - Integration Tests", () => {
     it("should handle mixed CRUD operations sequence", async () => {
       // Create
       const todo1 = await service.createTodo({ title: "CRUD Test 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "CRUD Test 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo3 = await service.createTodo({ title: "CRUD Test 3" });
 
       // Read
@@ -141,7 +141,7 @@ describe("GetAllTodosQuery - Integration Tests", () => {
     it("should retrieve persisted todos after service restart", async () => {
       // First service session
       await service.createTodo({ title: "Persisted 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Persisted 2" });
 
       const response1 = await service.getAllTodos({});

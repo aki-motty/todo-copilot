@@ -20,9 +20,9 @@ describe("ListTodosHandler", () => {
   it("should list all todos", async () => {
     // Create some todos
     await createHandler.handle({ title: "First Todo" });
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
     await createHandler.handle({ title: "Second Todo" });
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
     await createHandler.handle({ title: "Third Todo" });
 
     const result = await handler.execute({});

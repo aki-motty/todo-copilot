@@ -1,19 +1,19 @@
 import {
-    BatchGetItemCommand,
-    BatchWriteItemCommand,
-    DeleteItemCommand,
-    DynamoDBClient,
-    GetItemCommand,
-    PutItemCommand,
-    QueryCommand,
-    ScanCommand,
-    UpdateItemCommand,
-} from '@aws-sdk/client-dynamodb';
-import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+  BatchGetItemCommand,
+  BatchWriteItemCommand,
+  DeleteItemCommand,
+  DynamoDBClient,
+  GetItemCommand,
+  PutItemCommand,
+  QueryCommand,
+  ScanCommand,
+  UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 /**
  * DynamoDB クライアント
- * 
+ *
  * Todo アプリケーション用の DynamoDB 操作をラップします
  * AWS SDK v3 を使用した型安全な操作を提供します
  */
@@ -26,10 +26,7 @@ export class DynamoDBClient_ {
    * @param tableName DynamoDB テーブル名
    * @param region AWS リージョン
    */
-  constructor(
-    tableName: string,
-    region: string = process.env.AWS_REGION || 'ap-northeast-1'
-  ) {
+  constructor(tableName: string, region: string = process.env["AWS_REGION"] || "ap-northeast-1") {
     this.tableName = tableName;
     this.client = new DynamoDBClient({ region });
   }
@@ -118,7 +115,7 @@ export class DynamoDBClient_ {
       // UpdateExpression を動的に生成
       const updateExpression = Object.keys(updates)
         .map((key) => `${key} = :${key}`)
-        .join(', ');
+        .join(", ");
 
       const expressionAttributeValues: Record<string, any> = {};
       for (const [key, value] of Object.entries(updates)) {
@@ -130,7 +127,7 @@ export class DynamoDBClient_ {
         Key: marshall({ id }),
         UpdateExpression: `SET ${updateExpression}`,
         ExpressionAttributeValues: marshall(expressionAttributeValues),
-        ReturnValues: 'ALL_NEW',
+        ReturnValues: "ALL_NEW",
       });
 
       const response = await this.client.send(command);
@@ -208,16 +205,14 @@ export class DynamoDBClient_ {
     }
   ): Promise<T[]> {
     try {
-      const keyConditionExpression = options?.sortKey
-        ? 'pk = :pk AND sk = :sk'
-        : 'pk = :pk';
+      const keyConditionExpression = options?.sortKey ? "pk = :pk AND sk = :sk" : "pk = :pk";
 
       const expressionAttributeValues: Record<string, any> = {
-        ':pk': partitionKey,
+        ":pk": partitionKey,
       };
 
       if (options?.sortKey) {
-        expressionAttributeValues[':sk'] = options.sortKey;
+        expressionAttributeValues[":sk"] = options.sortKey;
       }
 
       if (options?.expressionAttributeValues) {
@@ -315,7 +310,7 @@ export class DynamoDBClient_ {
       await this.scan<any>({ limit: 1 });
       return true;
     } catch (error) {
-      console.error('DynamoDB health check failed:', error);
+      console.error("DynamoDB health check failed:", error);
       return false;
     }
   }
@@ -350,10 +345,8 @@ let instance: DynamoDBClient_ | null = null;
  * @param tableName DynamoDB テーブル名
  * @returns DynamoDBClient インスタンス
  */
-export function getDynamoDBClient(
-  tableName?: string
-): DynamoDBClient_ {
-  const table = tableName || process.env.DYNAMODB_TABLE || 'todo-copilot-dev';
+export function getDynamoDBClient(tableName?: string): DynamoDBClient_ {
+  const table = tableName || process.env["DYNAMODB_TABLE"] || "todo-copilot-dev";
 
   if (!instance) {
     instance = new DynamoDBClient_(table);
