@@ -12,7 +12,7 @@ jest.mock("@infrastructure/config/logger", () => ({
   }),
 }));
 
-import { HttpClient, HttpError, NetworkError, TimeoutError } from "@infrastructure/api/HttpClient";
+import { HttpClient, HttpError, NetworkError } from "@infrastructure/api/HttpClient";
 
 describe("HttpClient", () => {
   let client: HttpClient;

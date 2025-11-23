@@ -1,6 +1,6 @@
 import { Todo, type TodoId } from "../../domain/entities/Todo";
-import { NotFoundError } from "../../shared/types";
 import type { TodoDTO } from "../../shared/api/types";
+import { NotFoundError } from "../../shared/types";
 import { createLogger } from "../config/logger";
 import { HttpClient, HttpError, NetworkError, TimeoutError } from "./HttpClient";
 

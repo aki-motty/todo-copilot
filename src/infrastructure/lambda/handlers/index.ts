@@ -3,23 +3,22 @@
  * Main entry point for AWS Lambda function handling HTTP requests from API Gateway
  */
 
-import { createLogger } from "../../../infrastructure/config/logger";
-import type { ITodoRepository } from "../../../domain/repositories/TodoRepository";
-import { LocalStorageTodoRepository } from "../../../infrastructure/persistence/LocalStorageTodoRepository";
-import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
-import type { LambdaContext, LambdaEvent, LambdaResponse } from "../../../shared/api/types";
-import {
-  createSuccessResponse,
-  createErrorResponse,
-  getPathParameter,
-  parseBody,
-  getQueryParameter,
-} from "../../../shared/api/types";
-import type { CreateTodoRequest, UpdateTodoRequest, TodoDTO } from "../../../shared/api/types";
 import type { CreateTodoCommand } from "../../../application/commands/CreateTodoCommand";
-import type { ToggleTodoCompletionCommand } from "../../../application/commands/ToggleTodoCompletionCommand";
 import type { DeleteTodoCommand } from "../../../application/commands/DeleteTodoCommand";
+import type { ToggleTodoCompletionCommand } from "../../../application/commands/ToggleTodoCompletionCommand";
+import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
 import type { TodoId } from "../../../domain/entities/Todo";
+import type { ITodoRepository } from "../../../domain/repositories/TodoRepository";
+import { createLogger } from "../../../infrastructure/config/logger";
+import { LocalStorageTodoRepository } from "../../../infrastructure/persistence/LocalStorageTodoRepository";
+import type { CreateTodoRequest, LambdaContext, LambdaEvent, LambdaResponse, TodoDTO, UpdateTodoRequest } from "../../../shared/api/types";
+import {
+    createErrorResponse,
+    createSuccessResponse,
+    getPathParameter,
+    getQueryParameter,
+    parseBody,
+} from "../../../shared/api/types";
 
 const logger = createLogger("LambdaHandler");
 let todoRepository: ITodoRepository;

@@ -16,7 +16,7 @@ jest.mock("@infrastructure/config/logger", () => ({
 }));
 
 import { handler } from "@infrastructure/lambda/handlers/index";
-import type { LambdaEvent, LambdaContext, LambdaResponse } from "@shared/api/types";
+import type { LambdaContext, LambdaEvent, LambdaResponse } from "@shared/api/types";
 
 const parseResponse = (response: LambdaResponse) => {
   const res = response as any;

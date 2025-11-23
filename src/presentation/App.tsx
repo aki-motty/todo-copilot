@@ -1,8 +1,8 @@
 import "./App.css";
-import { ApiConfigProvider } from "./providers/ApiConfigProvider";
 import { CreateTodoInput } from "./components/CreateTodoInput";
 import { TodoList } from "./components/TodoList";
 import { useTodoList } from "./hooks/useTodoList";
+import { ApiConfigProvider } from "./providers/ApiConfigProvider";
 
 /**
  * Inner app component

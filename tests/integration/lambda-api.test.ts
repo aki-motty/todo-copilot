@@ -4,7 +4,7 @@
  */
 
 import { TodoApplicationService } from "@application/services/TodoApplicationService";
-import { Todo, TodoTitle } from "@domain/entities/Todo";
+import { Todo } from "@domain/entities/Todo";
 import type { ITodoRepository } from "@domain/repositories/TodoRepository";
 
 // Mock repository for integration tests

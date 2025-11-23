@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { TodoApplicationService } from "../../application/services/TodoApplicationService";
 import type { Todo } from "../../domain/entities/Todo";
+import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
-import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { TodoController } from "../controllers/TodoController";
 import { useApiConfig } from "../providers/ApiConfigProvider";
 
