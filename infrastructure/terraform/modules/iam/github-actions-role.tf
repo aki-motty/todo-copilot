@@ -206,7 +206,14 @@ resource "aws_iam_policy" "api_gateway_deploy" {
           "logs:CreateLogStream",
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams",
-          "logs:PutRetentionPolicy"
+          "logs:PutRetentionPolicy",
+          "logs:CreateLogDelivery",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies"
         ]
         Resource = "*"
       }
