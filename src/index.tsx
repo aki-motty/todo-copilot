@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./presentation/App";
+import { ApiConfigProvider } from "./presentation/providers/ApiConfigProvider";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -10,6 +11,8 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <App />
+    <ApiConfigProvider>
+      <App />
+    </ApiConfigProvider>
   </React.StrictMode>
 );

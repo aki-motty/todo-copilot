@@ -1,25 +1,25 @@
 import "./App.css";
 import { CreateTodoInput } from "./components/CreateTodoInput";
 import { TodoList } from "./components/TodoList";
-import { useTodoAPI } from "./hooks/useTodoAPI";
+import { useTodoList } from "./hooks/useTodoList";
 
 /**
  * Inner app component
- * Uses Lambda API for all todo operations
+ * Uses Lambda API with fallback to localStorage
  */
 function AppContent() {
   const {
     todos,
     error,
-    isLoading: loading,
+    loading,
     createTodo,
-    toggleTodo,
+    toggleTodoCompletion,
     deleteTodo,
     clearError,
-  } = useTodoAPI();
+  } = useTodoList();
 
   const handleToggleCompletion = async (id: string) => {
-    await toggleTodo(id);
+    await toggleTodoCompletion(id);
   };
 
   return (
@@ -28,7 +28,7 @@ function AppContent() {
         <h1>📝 Todo Copilot</h1>
         <p className="subtitle">Stay organized with your personal todo list</p>
         <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.5rem" }}>
-          Mode: 🌐 API Backend (AWS Lambda)
+          Mode: 🌐 API Backend (AWS Lambda) with localStorage Fallback
         </p>
       </header>
 

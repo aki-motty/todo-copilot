@@ -1,5 +1,5 @@
-import { DeleteTodoHandler } from "../../../../src/application/handlers/DeleteTodoHandler";
 import { CreateTodoCommandHandler } from "../../../../src/application/handlers/CreateTodoCommandHandler";
+import { DeleteTodoHandler } from "../../../../src/application/handlers/DeleteTodoHandler";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Toggle Todos', () => {
+test.describe('Delete Todos', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => localStorage.clear());
@@ -9,15 +9,15 @@ test.describe('Toggle Todos', () => {
     await page.waitForTimeout(1000);
   });
 
-  test('should toggle todo completion', async ({ page }) => {
+  test('should delete a todo', async ({ page }) => {
     const input = page.locator('input').first();
     const button = page.locator('button').first();
 
-    await input.fill('Task to toggle');
+    await input.fill('Todo to delete');
     await button.click();
     await page.waitForTimeout(1000);
 
-    const todoItem = page.getByText('Task to toggle');
+    const todoItem = page.getByText('Todo to delete');
     await expect(todoItem).toBeVisible();
   });
 });

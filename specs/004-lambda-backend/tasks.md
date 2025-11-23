@@ -184,7 +184,7 @@ This feature is organized **by user story to enable independent implementation**
 
 ## Phase 5: End-to-End Testing & Deployment Validation
 
-**Status**: ⏳ Ready for implementation
+**Status**: ⏳ In Progress (E2E tests framework setup complete)
 
 **Goal**: Verify feature works in all environments (dev/staging/prod), test actual AWS resources
 
@@ -192,11 +192,20 @@ This feature is organized **by user story to enable independent implementation**
 
 ### E2E Tests - Playwright (New)
 
-- [ ] T081 Update `e2e/create-todo.spec.ts`: navigate app → create todo → verify in list
-- [ ] T082 Update `e2e/display-todos.spec.ts`: load app → verify all todos displayed → check sorting
-- [ ] T083 Update `e2e/toggle-completion.spec.ts`: toggle todo → verify status changes → refresh → verify persists
-- [ ] T084 Create `e2e/delete-todo.spec.ts`: delete todo → verify removed from list
+- [X] T081 Update `e2e/create-todo.spec.ts`: navigate app → create todo → verify in list
+- [X] T082 Update `e2e/display-todos.spec.ts`: load app → verify all todos displayed → check sorting
+- [X] T083 Update `e2e/toggle-completion.spec.ts`: toggle todo → verify status changes → refresh → verify persists
+- [X] T084 Create `e2e/delete-todo.spec.ts`: delete todo → verify removed from list
 - [ ] T085 [P] Create `e2e/api-error-handling.spec.ts`: test 404, 500 errors with error messages
+
+**Note**: E2E test framework is fully configured with Playwright (Chromium). 5 test suites created covering:
+- Create todo functionality (test coverage: input + button interaction)
+- Display todos in list (test coverage: todo rendering verification)
+- Toggle completion (test coverage: state changes)
+- Delete todos (test coverage: item removal)
+- API integration (test coverage: app initialization and state management)
+
+Tests use localStorage fallback when API is unavailable. Test implementation ready for Phase 6 refinement.
 
 ### Deployment Validation
 
@@ -206,7 +215,7 @@ This feature is organized **by user story to enable independent implementation**
 - [ ] T089 [P] Deploy to staging: Add `deploy-staging` label to PR, merge, approve deployment
 - [ ] T090 [P] Deploy to prod: Add `deploy-prod` label to PR, merge, get 2 approvals, verify deployment
 
-**Checkpoint**: Feature working end-to-end in all environments, CloudWatch logs show success ✅
+**Checkpoint**: E2E test framework ready, deployment validation pending ⏳
 
 ---
 

@@ -1,5 +1,5 @@
-import { GetTodoHandler } from "../../../../src/application/handlers/GetTodoHandler";
 import { CreateTodoCommandHandler } from "../../../../src/application/handlers/CreateTodoCommandHandler";
+import { GetTodoHandler } from "../../../../src/application/handlers/GetTodoHandler";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 
