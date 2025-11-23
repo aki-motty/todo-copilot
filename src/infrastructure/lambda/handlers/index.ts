@@ -71,7 +71,17 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
     }
 
     const method = event.requestContext.http.method;
-    const path = event.requestContext.http.path;
+    let path = event.requestContext.http.path;
+    
+    // Normalize path by removing stage prefix if present
+    const stage = event.requestContext.stage;
+    if (stage !== "$default" && path.startsWith(`/${stage}`)) {
+      path = path.substring(stage.length + 1);
+      if (!path.startsWith("/")) {
+        path = "/" + path;
+      }
+    }
+
     const requestBody = event.body ? JSON.parse(event.body) : null;
 
     let response: unknown;

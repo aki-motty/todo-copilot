@@ -36,6 +36,9 @@ export default defineConfig({
     // Build for Server-Side Rendering (Node.js environment)
     ssr: true,
   },
+  ssr: {
+    noExternal: true,
+  },
   resolve: {
     alias: {
       "@domain": path.resolve(__dirname, "./src/domain"),
