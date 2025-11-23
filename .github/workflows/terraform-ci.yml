@@ -298,15 +298,6 @@ jobs:
             -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
             -backend-config="region=${{ env.AWS_REGION }}"
 
-      - name: Fix IAM Permissions (Temporary)
-        run: |
-          aws iam put-role-policy \
-            --role-name github-actions-role-dev \
-            --policy-name TemporaryIAMFix \
-            --policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["s3:GetAccelerateConfiguration","s3:GetLifecycleConfiguration","s3:GetReplicationConfiguration","s3:GetEncryptionConfiguration","s3:GetBucket*","logs:CreateLogDelivery","logs:GetLogDelivery","logs:UpdateLogDelivery","logs:DeleteLogDelivery","logs:ListLogDeliveries","logs:PutResourcePolicy","logs:DescribeResourcePolicies","logs:DescribeLogGroups"],"Resource":"*"}]}'
-          echo "Waiting for IAM propagation..."
-          sleep 60
-
       - name: Terraform Apply
         working-directory: infrastructure/terraform
         run: |
