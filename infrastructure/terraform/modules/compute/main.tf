@@ -98,9 +98,7 @@ resource "aws_lambda_function" "main" {
     }
   )
 
-  depends_on = [
-    aws_cloudwatch_log_group.lambda_logs
-  ]
+  # Note: CloudWatch Log Group is auto-created by Lambda, so no explicit dependency needed
 }
 
 # API Gateway HTTP API
