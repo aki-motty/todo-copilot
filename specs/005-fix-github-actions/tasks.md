@@ -1,7 +1,7 @@
 # Tasks: Fix GitHub Actions Workflows
 
 **Input**: Design documents from `/specs/005-fix-github-actions/`
-**Status**: Phase 1 ✅ COMPLETE | Phase 3 ✅ COMPLETE | Phase 4 ✅ COMPLETE
+**Status**: Phase 1 ✅ COMPLETE | Phase 3 ✅ COMPLETE | Phase 4 ✅ COMPLETE | Phase 5 ✅ COMPLETE
 **Total Tasks**: 5 tasks across 4 phases
 **Dependencies**: None
 
@@ -9,7 +9,7 @@
 - ✅ Phase 1 (T001): Setup
 - ✅ Phase 3 (T002): User Story 1 - Reliable Deployment
 - ✅ Phase 4 (T003): User Story 2 - Format Check
-- ⏳ Phase 5 (T004-T005): Verification
+- ✅ Phase 5 (T004-T005): Verification
 
 ---
 
@@ -22,7 +22,7 @@ This feature is organized **by user story to enable independent implementation**
 | **Phase 1** | — | Setup | T001 | 5 min | ✅ COMPLETE |
 | **Phase 3** | US1 | Reliable Deployment | T002 | 15 min | ✅ COMPLETE |
 | **Phase 4** | US2 | Format Check | T003 | 10 min | ✅ COMPLETE |
-| **Phase 5** | — | Verification | T004-T005 | 20 min | ⏳ Pending |
+| **Phase 5** | — | Verification | T004-T005 | 20 min | ✅ COMPLETE |
 
 **MVP Scope**: All phases are required for the fix.
 
@@ -74,14 +74,14 @@ This feature is organized **by user story to enable independent implementation**
 
 ## Phase 5: Polish & Verification
 
-**Status**: ⏳ Pending
+**Status**: ✅ COMPLETE
 
 **Goal**: Verify fixes in CI environment.
 
 ### Verification
 
-- [ ] T004 Verify "Deploy to Dev" triggers on infrastructure change (manual verification via git push)
-- [ ] T005 Verify "Terraform Format Check" passes in CI (manual verification via GitHub Actions UI)
+- [X] T004 Verify "Deploy to Dev" triggers on infrastructure change (manual verification via git push)
+- [X] T005 Verify "Terraform Format Check" passes in CI (manual verification via GitHub Actions UI)
 
 ---
 

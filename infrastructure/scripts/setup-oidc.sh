@@ -147,22 +147,116 @@ TERRAFORM_POLICY=$(cat <<'EOF'
 EOF
 )
 
+# Deployment policy (Lambda, API Gateway, CloudWatch, etc.)
+DEPLOYMENT_POLICY=$(cat <<'EOF'
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::todo-copilot-terraform-state-*",
+        "arn:aws:s3:::todo-copilot-terraform-state-*/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:UpdateTable",
+        "dynamodb:TagResource"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/todo-copilot-*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteLogGroup",
+        "logs:TagResource",
+        "logs:ListTagsLogGroup"
+      ],
+      "Resource": "arn:aws:logs:*:*:log-group:/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource",
+        "cloudwatch:ListTagsForResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+)
+
 # Create and attach policies
 for ENVIRONMENT in dev staging prod; do
   POLICY_NAME="github-actions-terraform-access-${ENVIRONMENT}"
   ROLE_NAME="github-actions-role-${ENVIRONMENT}"
   
-  if ! aws iam get-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" --region "$AWS_REGION" >/dev/null 2>&1; then
-    aws iam put-role-policy \
-      --role-name "$ROLE_NAME" \
-      --policy-name "$POLICY_NAME" \
-      --policy-document "$TERRAFORM_POLICY" \
-      --region "$AWS_REGION" \
-      >/dev/null 2>&1
-    echo -e "${GREEN}✓ Attached policy to $ROLE_NAME${NC}"
-  else
-    echo -e "${YELLOW}ℹ Policy already attached to $ROLE_NAME${NC}"
-  fi
+  # Attach Terraform State Access Policy
+  aws iam put-role-policy \
+    --role-name "$ROLE_NAME" \
+    --policy-name "$POLICY_NAME" \
+    --policy-document "$TERRAFORM_POLICY" \
+    --region "$AWS_REGION" \
+    >/dev/null 2>&1
+  echo -e "${GREEN}✓ Attached state access policy to $ROLE_NAME${NC}"
+
+  # Attach Deployment Policy
+  DEPLOY_POLICY_NAME="github-actions-terraform-deploy"
+  aws iam put-role-policy \
+    --role-name "$ROLE_NAME" \
+    --policy-name "$DEPLOY_POLICY_NAME" \
+    --policy-document "$DEPLOYMENT_POLICY" \
+    --region "$AWS_REGION" \
+    >/dev/null 2>&1
+  echo -e "${GREEN}✓ Attached deployment policy to $ROLE_NAME${NC}"
 done
 echo ""
 

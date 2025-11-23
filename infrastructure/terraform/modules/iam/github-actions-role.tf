@@ -247,6 +247,34 @@ resource "aws_iam_policy" "dynamodb_manage" {
   tags = var.common_tags
 }
 
+# Policy for CloudWatch Alarms management
+resource "aws_iam_policy" "cloudwatch_manage" {
+  name        = "github-actions-cloudwatch-manage"
+  description = "Policy for GitHub Actions to manage CloudWatch Alarms"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricAlarm",
+          "cloudwatch:DeleteAlarms",
+          "cloudwatch:DescribeAlarms",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:TagResource",
+          "cloudwatch:UntagResource",
+          "cloudwatch:ListTagsForResource"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = var.common_tags
+}
+
 # Policy for IAM role management
 resource "aws_iam_policy" "iam_role_management" {
   name        = "github-actions-iam-role-management"
@@ -311,6 +339,11 @@ resource "aws_iam_role_policy_attachment" "dev_dynamodb" {
   policy_arn = aws_iam_policy.dynamodb_manage.arn
 }
 
+resource "aws_iam_role_policy_attachment" "dev_cloudwatch" {
+  role       = aws_iam_role.github_actions_dev.name
+  policy_arn = aws_iam_policy.cloudwatch_manage.arn
+}
+
 resource "aws_iam_role_policy_attachment" "dev_iam_role_mgmt" {
   role       = aws_iam_role.github_actions_dev.name
   policy_arn = aws_iam_policy.iam_role_management.arn
@@ -337,6 +370,11 @@ resource "aws_iam_role_policy_attachment" "staging_dynamodb" {
   policy_arn = aws_iam_policy.dynamodb_manage.arn
 }
 
+resource "aws_iam_role_policy_attachment" "staging_cloudwatch" {
+  role       = aws_iam_role.github_actions_staging.name
+  policy_arn = aws_iam_policy.cloudwatch_manage.arn
+}
+
 resource "aws_iam_role_policy_attachment" "staging_iam_role_mgmt" {
   role       = aws_iam_role.github_actions_staging.name
   policy_arn = aws_iam_policy.iam_role_management.arn
@@ -361,6 +399,11 @@ resource "aws_iam_role_policy_attachment" "prod_api_gateway" {
 resource "aws_iam_role_policy_attachment" "prod_dynamodb" {
   role       = aws_iam_role.github_actions_prod.name
   policy_arn = aws_iam_policy.dynamodb_manage.arn
+}
+
+resource "aws_iam_role_policy_attachment" "prod_cloudwatch" {
+  role       = aws_iam_role.github_actions_prod.name
+  policy_arn = aws_iam_policy.cloudwatch_manage.arn
 }
 
 resource "aws_iam_role_policy_attachment" "prod_iam_role_mgmt" {
