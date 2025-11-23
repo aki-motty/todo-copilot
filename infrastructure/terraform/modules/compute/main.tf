@@ -65,7 +65,7 @@ variable "common_tags" {
 
 # Lambda function with built handler
 resource "aws_lambda_function" "main" {
-  filename         = "${path.root}/../../dist-lambda/index.js"
+  filename         = "${path.root}/../../infrastructure/terraform/dist/index.zip"
   function_name    = "${var.project_name}-api-${var.environment}"
   role             = var.lambda_execution_role_arn
   handler          = "index.handler"
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "main" {
   architectures    = ["x86_64"]
   timeout          = var.lambda_timeout
   memory_size      = var.lambda_memory_size
-  source_code_hash = filebase64sha256("${path.root}/../../dist-lambda/index.js")
+  source_code_hash = filebase64sha256("${path.root}/../../infrastructure/terraform/dist/index.zip")
 
   environment {
     variables = {

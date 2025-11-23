@@ -280,7 +280,7 @@ jobs:
         run: |
           mkdir -p infrastructure/terraform/dist
           cd dist-lambda
-          zip -q ../infrastructure/terraform/dist/index.zip .
+          zip -r ../infrastructure/terraform/dist/index.zip .
           cd ../infrastructure/terraform
           pwd
           ls -lh dist/
@@ -358,7 +358,7 @@ jobs:
         run: |
           mkdir -p infrastructure/terraform/dist
           cd dist-lambda
-          zip -q ../infrastructure/terraform/dist/index.zip .
+          zip -r ../infrastructure/terraform/dist/index.zip .
           cd ../infrastructure/terraform
           pwd
           ls -lh dist/
@@ -442,7 +442,7 @@ jobs:
         run: |
           mkdir -p infrastructure/terraform/dist
           cd dist-lambda
-          zip -q ../infrastructure/terraform/dist/index.zip .
+          zip -r ../infrastructure/terraform/dist/index.zip .
           cd ../infrastructure/terraform
           pwd
           ls -lh dist/
