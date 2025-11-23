@@ -196,7 +196,7 @@ This feature is organized **by user story to enable independent implementation**
 - [X] T082 Update `e2e/display-todos.spec.ts`: load app → verify all todos displayed → check sorting
 - [X] T083 Update `e2e/toggle-completion.spec.ts`: toggle todo → verify status changes → refresh → verify persists
 - [X] T084 Create `e2e/delete-todo.spec.ts`: delete todo → verify removed from list
-- [ ] T085 [P] Create `e2e/api-error-handling.spec.ts`: test 404, 500 errors with error messages
+- [X] T085 [P] Create `e2e/api-error-handling.spec.ts`: test 404, 500 errors with error messages
 
 **Note**: E2E test framework is fully configured with Playwright (Chromium). 5 test suites created covering:
 - Create todo functionality (test coverage: input + button interaction)

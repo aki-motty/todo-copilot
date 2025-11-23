@@ -36,7 +36,10 @@ export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }
     // @ts-ignore - Accessing Vite environment variable
     const apiBaseUrl = import.meta.env["VITE_API_BASE_URL"] as string | undefined;
 
-    const isEnabled = Boolean(apiBaseUrl);
+    // Check for localStorage override (useful for testing)
+    const forceLocalStorage = typeof window !== 'undefined' && window.localStorage.getItem('forceLocalStorage') === 'true';
+
+    const isEnabled = Boolean(apiBaseUrl) && !forceLocalStorage;
     const isLocalStorageMode = !isEnabled;
 
     let logMessage = "";
@@ -47,14 +50,19 @@ export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }
         baseUrl: apiBaseUrl,
       });
     } else {
-      logMessage = "Using localStorage backend (no VITE_API_BASE_URL configured)";
+      logMessage = forceLocalStorage 
+        ? "Using localStorage backend (forced via localStorage)"
+        : "Using localStorage backend (no VITE_API_BASE_URL configured)";
+      
       logger.info("API Configuration", {
         backend: "localStorage",
+        baseUrl: null,
+        forced: forceLocalStorage
       });
     }
 
     return {
-      baseUrl: apiBaseUrl ?? null,
+      baseUrl: isEnabled ? apiBaseUrl || null : null,
       isEnabled,
       isLocalStorageMode,
       logMessage,

@@ -47,7 +47,7 @@ export class LocalStorageTodoRepository implements ITodoRepository {
     }
   }
 
-  findById(id: TodoId): Todo | null {
+  async findById(id: TodoId): Promise<Todo | null> {
     const todos = this.getAllFromStorage();
     const todoData = todos.find((t) => t.id === id);
     return todoData
@@ -61,14 +61,14 @@ export class LocalStorageTodoRepository implements ITodoRepository {
       : null;
   }
 
-  findAll(): Todo[] {
+  async findAll(): Promise<Todo[]> {
     const todos = this.getAllFromStorage();
     return todos.map((t) =>
       Todo.fromPersistence(t.id, t.title, t.completed, t.createdAt, t.updatedAt)
     );
   }
 
-  save(todo: Todo): void {
+  async save(todo: Todo): Promise<void> {
     try {
       const todos = this.getAllFromStorage();
       const existingIndex = todos.findIndex((t) => t.id === todo.id);
@@ -88,7 +88,7 @@ export class LocalStorageTodoRepository implements ITodoRepository {
     }
   }
 
-  remove(id: TodoId): void {
+  async remove(id: TodoId): Promise<void> {
     const todos = this.getAllFromStorage();
     const initialLength = todos.length;
     const filtered = todos.filter((t) => t.id !== id);
@@ -100,11 +100,11 @@ export class LocalStorageTodoRepository implements ITodoRepository {
     this.storage.setItem(this.storageKey, JSON.stringify(filtered));
   }
 
-  clear(): void {
+  async clear(): Promise<void> {
     this.storage.removeItem(this.storageKey);
   }
 
-  count(): number {
+  async count(): Promise<number> {
     return this.getAllFromStorage().length;
   }
 

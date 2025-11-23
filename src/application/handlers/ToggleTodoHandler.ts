@@ -17,7 +17,7 @@ export class ToggleTodoHandler {
     }
 
     // Fetch existing todo
-    const todo = this.todoRepository.findById(id as TodoId);
+    const todo = await this.todoRepository.findById(id as TodoId);
 
     if (!todo) {
       throw new NotFoundError(`Todo with ID "${id}" not found`);
@@ -27,7 +27,7 @@ export class ToggleTodoHandler {
     const updated = todo.toggleCompletion();
 
     // Persist updated todo
-    this.todoRepository.save(updated);
+    await this.todoRepository.save(updated);
 
     return this.toDTO(updated);
   }

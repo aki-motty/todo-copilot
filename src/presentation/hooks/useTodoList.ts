@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import { TodoApplicationService } from "../../application/services/TodoApplicationService";
-import type { Todo } from "../../domain/entities/Todo";
 import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
@@ -16,29 +16,27 @@ const logger = createLogger("useTodoList");
  */
 export const useTodoList = () => {
   const { baseUrl, isLocalStorageMode } = useApiConfig();
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<TodoResponseDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [backendMode, setBackendMode] = useState<"api" | "localStorage">("localStorage");
+  
+  // Derive backend mode directly from config
+  const backendMode = (!isLocalStorageMode && baseUrl) ? "api" : "localStorage";
 
   // Create appropriate repository and services based on configuration
-  const { todoController } = useCallback(() => {
+  const todoController = useMemo(() => {
     let repo;
-    if (!isLocalStorageMode && baseUrl) {
+    if (backendMode === "api" && baseUrl) {
       repo = new AsyncApiTodoRepository(baseUrl);
-      setBackendMode("api");
       logger.info("Using API backend", { baseUrl });
     } else {
       repo = new LocalStorageTodoRepository();
-      setBackendMode("localStorage");
       logger.info("Using localStorage backend");
     }
 
     const appService = new TodoApplicationService(repo as any);
-    const controller = new TodoController(appService);
-
-    return { todoController: controller };
-  }, [isLocalStorageMode, baseUrl])();
+    return new TodoController(appService);
+  }, [backendMode, baseUrl]);
 
   // Initialize todos on mount
   useEffect(() => {

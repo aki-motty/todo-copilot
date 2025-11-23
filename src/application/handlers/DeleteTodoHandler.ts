@@ -16,14 +16,14 @@ export class DeleteTodoHandler {
     }
 
     // Check if todo exists
-    const todo = this.todoRepository.findById(id as TodoId);
+    const todo = await this.todoRepository.findById(id as TodoId);
 
     if (!todo) {
       throw new NotFoundError(`Todo with ID "${id}" not found`);
     }
 
     // Remove from repository
-    this.todoRepository.remove(id as TodoId);
+    await this.todoRepository.remove(id as TodoId);
 
     return {
       success: true,

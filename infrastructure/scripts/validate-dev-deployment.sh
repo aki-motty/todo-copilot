@@ -5,9 +5,9 @@
 
 set -e
 
-ENVIRONMENT="dev"
-API_ENDPOINT="https://api-${ENVIRONMENT}.todos.internal"
-FRONTEND_URL="https://todos-${ENVIRONMENT}.example.com"
+ENVIRONMENT="${ENVIRONMENT:-dev}"
+API_ENDPOINT="${API_ENDPOINT:-https://api-${ENVIRONMENT}.todos.internal}"
+FRONTEND_URL="${FRONTEND_URL:-https://todos-${ENVIRONMENT}.example.com}"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 Deployment Validation: $ENVIRONMENT Environment"

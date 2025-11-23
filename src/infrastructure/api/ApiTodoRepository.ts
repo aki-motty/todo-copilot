@@ -90,8 +90,11 @@ export class AsyncApiTodoRepository {
       this.logger.debug("Saving todo", { id: todo.id, method });
 
       const payload = {
+        id: todo.id,
         title: todo.title.toString(),
         completed: todo.status === "Completed",
+        createdAt: todo.createdAt.toISOString(),
+        updatedAt: todo.updatedAt.toISOString(),
       };
 
       if (isNew) {

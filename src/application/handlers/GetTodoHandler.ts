@@ -17,7 +17,7 @@ export class GetTodoHandler {
     }
 
     // Fetch from repository
-    const todo = this.todoRepository.findById(id as TodoId);
+    const todo = await this.todoRepository.findById(id as TodoId);
 
     if (!todo) {
       throw new NotFoundError(`Todo with ID "${id}" not found`);

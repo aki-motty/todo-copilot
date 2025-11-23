@@ -14,7 +14,7 @@ export class ListTodosHandler {
     const cursor = options?.cursor;
 
     // Get all todos from repository
-    const todos = this.todoRepository.findAll();
+    const todos = await this.todoRepository.findAll();
 
     // Sort by createdAt DESC (most recent first)
     const sorted = todos.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

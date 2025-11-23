@@ -24,7 +24,7 @@ export class CreateTodoHandler {
     const todo = Todo.create(title);
 
     // Persist to repository
-    this.todoRepository.save(todo);
+    await this.todoRepository.save(todo);
 
     // Return DTO
     return this.toDTO(todo);

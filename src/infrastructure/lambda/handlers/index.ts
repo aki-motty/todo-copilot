@@ -10,6 +10,7 @@ import { CreateTodoHandler } from "../../../application/handlers/CreateTodoHandl
 import { DeleteTodoHandler } from "../../../application/handlers/DeleteTodoHandler";
 import { GetTodoHandler } from "../../../application/handlers/GetTodoHandler";
 import { ListTodosHandler } from "../../../application/handlers/ListTodosHandler";
+import { SaveTodoHandler } from "../../../application/handlers/SaveTodoHandler";
 import { ToggleTodoHandler } from "../../../application/handlers/ToggleTodoHandler";
 import { DynamoDBTodoRepository } from "../../repositories/DynamoDBTodoRepository";
 
@@ -19,6 +20,7 @@ let handlers: {
   createTodo: CreateTodoHandler;
   listTodos: ListTodosHandler;
   getTodo: GetTodoHandler;
+  saveTodo: SaveTodoHandler;
   toggleTodo: ToggleTodoHandler;
   deleteTodo: DeleteTodoHandler;
 };
@@ -35,6 +37,7 @@ async function initializeHandlers(): Promise<void> {
       createTodo: new CreateTodoHandler(repository),
       listTodos: new ListTodosHandler(repository),
       getTodo: new GetTodoHandler(repository),
+      saveTodo: new SaveTodoHandler(repository),
       toggleTodo: new ToggleTodoHandler(repository),
       deleteTodo: new DeleteTodoHandler(repository),
     };
@@ -92,6 +95,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       const id = path.split("/")[2];
       if (id) {
         response = await handlers.getTodo.execute(id);
+      }
+    } else if (method === "PUT" && path.match(/^\/todos\/[^/]+$/)) {
+      // Update todo (SaveTodo)
+      const id = path.split("/")[2];
+      if (id) {
+        const request = { ...requestBody, id };
+        response = await handlers.saveTodo.execute(request);
       }
     } else if (method === "PUT" && path.match(/^\/todos\/[^/]+\/toggle$/)) {
       // Toggle todo

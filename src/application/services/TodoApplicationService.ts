@@ -30,11 +30,11 @@ export class TodoApplicationService {
    * Create a new todo
    * COMMAND: Changes application state
    */
-  createTodo(command: CreateTodoCommand): Todo {
+  async createTodo(command: CreateTodoCommand): Promise<Todo> {
     this.logger.debug("Creating todo", { title: command.title });
 
     const todo = Todo.create(command.title);
-    this.todoRepository.save(todo);
+    await this.todoRepository.save(todo);
 
     // Publish domain event
     const event = createTodoCreatedEvent(todo.id, command.title, todo.createdAt);
@@ -48,16 +48,16 @@ export class TodoApplicationService {
    * Toggle todo completion status
    * COMMAND: Changes application state
    */
-  toggleTodoCompletion(command: ToggleTodoCompletionCommand): Todo {
+  async toggleTodoCompletion(command: ToggleTodoCompletionCommand): Promise<Todo> {
     this.logger.debug("Toggling todo completion", { id: command.id });
 
-    const todo = this.todoRepository.findById(command.id as TodoId);
+    const todo = await this.todoRepository.findById(command.id as TodoId);
     if (!todo) {
       throw new NotFoundError(`Todo with id ${command.id} not found`);
     }
 
     const updatedTodo = todo.toggleCompletion();
-    this.todoRepository.save(updatedTodo);
+    await this.todoRepository.save(updatedTodo);
 
     // Publish domain event
     const event = createTodoCompletedEvent(
@@ -78,15 +78,15 @@ export class TodoApplicationService {
    * Delete a todo
    * COMMAND: Changes application state
    */
-  deleteTodo(command: DeleteTodoCommand): void {
+  async deleteTodo(command: DeleteTodoCommand): Promise<void> {
     this.logger.debug("Deleting todo", { id: command.id });
 
-    const todo = this.todoRepository.findById(command.id as TodoId);
+    const todo = await this.todoRepository.findById(command.id as TodoId);
     if (!todo) {
       throw new NotFoundError(`Todo with id ${command.id} not found`);
     }
 
-    this.todoRepository.remove(command.id as TodoId);
+    await this.todoRepository.remove(command.id as TodoId);
 
     // Publish domain event
     const event = createTodoDeletedEvent(todo.id, new Date());
@@ -98,28 +98,36 @@ export class TodoApplicationService {
    * Get all todos
    * QUERY: Read-only operation
    */
-  getAllTodos(_query: GetAllTodosQuery): GetAllTodosResponse {
-    this.logger.debug("Fetching all todos");
-    const todos = this.todoRepository.findAll();
-    this.logger.info("Retrieved todos", { count: todos.length });
+  async getAllTodos(_query: GetAllTodosQuery): Promise<GetAllTodosResponse> {
+    this.logger.debug("Getting all todos");
+
+    const todos = await this.todoRepository.findAll();
+    
+    // Sort by createdAt descending (newest first)
+    const sortedTodos = [...todos].sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
+
+    this.logger.debug("Retrieved todos", { count: sortedTodos.length });
+
     return {
-      todos,
-      count: todos.length,
+      todos: sortedTodos,
+      count: sortedTodos.length,
     };
   }
 
   /**
-   * Get a single todo by ID
+   * Get todo by ID
    * QUERY: Read-only operation
    */
-  getTodoById(query: GetTodoByIdQuery): Todo | null {
-    this.logger.debug("Fetching todo", { id: query.id });
-    const todo = this.todoRepository.findById(query.id as TodoId);
-    if (todo) {
-      this.logger.debug("Todo found", { id: query.id });
-    } else {
-      this.logger.debug("Todo not found", { id: query.id });
+  async getTodoById(query: GetTodoByIdQuery): Promise<Todo> {
+    this.logger.debug("Getting todo by id", { id: query.id });
+
+    const todo = await this.todoRepository.findById(query.id as TodoId);
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${query.id} not found`);
     }
+
     return todo;
   }
 
