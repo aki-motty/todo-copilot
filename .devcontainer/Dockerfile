@@ -4,7 +4,8 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
 
 # Install Node.js (for TypeScript)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && apt-get install -y net-tools lsof iproute2 procps
 
 
 # Install Terraform
@@ -28,6 +29,13 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     unzip awscliv2.zip && \
     ./aws/install && \
     rm -rf awscliv2.zip aws
+
+# Install AWS SAM CLI
+RUN curl -L "https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip" -o "aws-sam-cli-linux-x86_64.zip" && \
+    unzip aws-sam-cli-linux-x86_64.zip -d sam-installation && \
+    ./sam-installation/install && \
+    rm -rf aws-sam-cli-linux-x86_64.zip sam-installation
+
 
 
 # Install Python 3.11+ and pip, then uv (Python package manager)
