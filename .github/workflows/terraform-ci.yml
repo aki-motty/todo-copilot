@@ -258,6 +258,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Lambda package
+        run: npm run build:lambda
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -267,16 +279,17 @@ jobs:
       - name: Create Lambda ZIP
         run: |
           mkdir -p infrastructure/terraform/dist
-          cd infrastructure/terraform/dist
-          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
-          zip -q index.zip index.js
+          cd dist-lambda
+          zip -q ../infrastructure/terraform/dist/index.zip .
+          cd ../infrastructure/terraform
           pwd
-          ls -lh index.zip
+          ls -lh dist/
 
       - name: Verify Lambda ZIP location
         working-directory: infrastructure/terraform
         run: |
           ls -la dist/
+          unzip -t dist/index.zip
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -323,6 +336,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_STAGING }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Lambda package
+        run: npm run build:lambda
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -332,16 +357,17 @@ jobs:
       - name: Create Lambda ZIP
         run: |
           mkdir -p infrastructure/terraform/dist
-          cd infrastructure/terraform/dist
-          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
-          zip -q index.zip index.js
+          cd dist-lambda
+          zip -q ../infrastructure/terraform/dist/index.zip .
+          cd ../infrastructure/terraform
           pwd
-          ls -lh index.zip
+          ls -lh dist/
 
       - name: Verify Lambda ZIP location
         working-directory: infrastructure/terraform
         run: |
           ls -la dist/
+          unzip -t dist/index.zip
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
@@ -394,6 +420,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Lambda package
+        run: npm run build:lambda
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -403,16 +441,17 @@ jobs:
       - name: Create Lambda ZIP
         run: |
           mkdir -p infrastructure/terraform/dist
-          cd infrastructure/terraform/dist
-          echo 'module.exports.handler = async (event) => ({ statusCode: 200, body: JSON.stringify({ message: "Hello" }) });' > index.js
-          zip -q index.zip index.js
+          cd dist-lambda
+          zip -q ../infrastructure/terraform/dist/index.zip .
+          cd ../infrastructure/terraform
           pwd
-          ls -lh index.zip
+          ls -lh dist/
 
       - name: Verify Lambda ZIP location
         working-directory: infrastructure/terraform
         run: |
           ls -la dist/
+          unzip -t dist/index.zip
 
       - name: Terraform Init
         working-directory: infrastructure/terraform
