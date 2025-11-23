@@ -314,6 +314,24 @@ jobs:
           cat outputs.json
           echo "::set-output name=status::success"
 
+      - name: Build Frontend
+        run: |
+          API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
+          echo "Building frontend with API_URL=$API_URL"
+          VITE_API_URL=$API_URL npm run build
+
+      - name: Deploy Frontend to S3
+        run: |
+          BUCKET_NAME=$(jq -r '.frontend_bucket_name.value' infrastructure/terraform/outputs.json)
+          echo "Deploying to bucket: $BUCKET_NAME"
+          aws s3 sync dist/ s3://$BUCKET_NAME --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          DIST_ID=$(jq -r '.cloudfront_distribution_id.value' infrastructure/terraform/outputs.json)
+          echo "Invalidating CloudFront distribution: $DIST_ID"
+          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -398,6 +416,24 @@ jobs:
           terraform output -json > outputs.json
           cat outputs.json
 
+      - name: Build Frontend
+        run: |
+          API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
+          echo "Building frontend with API_URL=$API_URL"
+          VITE_API_URL=$API_URL npm run build
+
+      - name: Deploy Frontend to S3
+        run: |
+          BUCKET_NAME=$(jq -r '.frontend_bucket_name.value' infrastructure/terraform/outputs.json)
+          echo "Deploying to bucket: $BUCKET_NAME"
+          aws s3 sync dist/ s3://$BUCKET_NAME --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          DIST_ID=$(jq -r '.cloudfront_distribution_id.value' infrastructure/terraform/outputs.json)
+          echo "Invalidating CloudFront distribution: $DIST_ID"
+          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+
   deploy-prod:
     name: Deploy to Prod
     runs-on: ubuntu-latest
@@ -481,6 +517,24 @@ jobs:
         run: |
           terraform output -json > outputs.json
           cat outputs.json
+
+      - name: Build Frontend
+        run: |
+          API_URL=$(jq -r '.api_gateway_endpoint.value' infrastructure/terraform/outputs.json)
+          echo "Building frontend with API_URL=$API_URL"
+          VITE_API_URL=$API_URL npm run build
+
+      - name: Deploy Frontend to S3
+        run: |
+          BUCKET_NAME=$(jq -r '.frontend_bucket_name.value' infrastructure/terraform/outputs.json)
+          echo "Deploying to bucket: $BUCKET_NAME"
+          aws s3 sync dist/ s3://$BUCKET_NAME --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          DIST_ID=$(jq -r '.cloudfront_distribution_id.value' infrastructure/terraform/outputs.json)
+          echo "Invalidating CloudFront distribution: $DIST_ID"
+          aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
 
       - name: Create Deployment Record
         run: |
