@@ -35,6 +35,12 @@ The application will be available at `http://localhost:5173`
 
 ## ✨ Features
 
+### Sprint 2: Cloud Backend (Current)
+- ✅ **Serverless API** - AWS Lambda & API Gateway backend
+- ✅ **Cloud Persistence** - DynamoDB storage for data synchronization
+- ✅ **Infrastructure as Code** - Terraform-managed AWS resources
+- ✅ **Hybrid Mode** - Seamless fallback to localStorage if API is unavailable
+
 ### Sprint 1 MVP
 - ✅ **Create Todos** - Add new todos with validation (1-500 characters)
 - ✅ **Display Todos** - View all todos in a list with empty state handling
@@ -44,7 +50,15 @@ The application will be available at `http://localhost:5173`
 
 ## 🏗️ Architecture
 
-This project follows **Domain-Driven Design (DDD)** principles with a 4-layer architecture:
+This project follows **Domain-Driven Design (DDD)** principles with a 4-layer architecture, now extended with a Serverless backend:
+
+```mermaid
+graph TD
+    Client[React Frontend] -->|HTTPS| APIGW[API Gateway]
+    APIGW -->|Route| Lambda[Node.js Lambda]
+    Lambda -->|Persistence| DDB[(DynamoDB)]
+    Lambda -->|Domain Logic| Domain[Domain Layer]
+```
 
 ```
 ┌─────────────────────────────────────┐

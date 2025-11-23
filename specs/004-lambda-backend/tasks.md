@@ -229,19 +229,19 @@ Tests use localStorage fallback when API is unavailable. Test implementation rea
 
 ### Performance Optimization
 
-- [ ] T091 [P] Profile Lambda cold start time, optimize if > 1 second (reduce bundle size, etc)
-- [ ] T092 [P] Profile DynamoDB query times, verify P95 < 500ms for typical operations
-- [ ] T093 [P] Add CloudWatch metrics for Lambda duration, errors, throttles
-- [ ] T094 [P] Add CloudWatch alarms for error rate > 1%, p99 latency > 2 seconds
+- [X] T091 [P] Profile Lambda cold start time, optimize if > 1 second (reduce bundle size, etc)
+- [X] T092 [P] Profile DynamoDB query times, verify P95 < 500ms for typical operations
+- [X] T093 [P] Add CloudWatch metrics for Lambda duration, errors, throttles
+- [X] T094 [P] Add CloudWatch alarms for error rate > 1%, p99 latency > 2 seconds
 
 ### Documentation & Knowledge Transfer
 
-- [ ] T095 Create `docs/IMPLEMENTATION_COMPLETE.md` with summary of changes, links to docs
-- [ ] T096 Update main `README.md` with Lambda backend architecture diagram
-- [ ] T097 [P] Create `docs/ADR-004-Lambda-Backend.md` documenting architectural decisions
-- [ ] T098 [P] Add API documentation link to `docs/API.md` (auto-generated from OpenAPI spec)
-- [ ] T099 [P] Tag repository with `v1.0.0-lambda-backend` release
-- [ ] T100 Create GitHub Release notes with feature summary, deployment guide, known issues
+- [X] T095 Create `docs/IMPLEMENTATION_COMPLETE.md` with summary of changes, links to docs
+- [X] T096 Update main `README.md` with Lambda backend architecture diagram
+- [X] T097 [P] Create `docs/ADR-004-Lambda-Backend.md` documenting architectural decisions
+- [X] T098 [P] Add API documentation link to `docs/API.md` (auto-generated from OpenAPI spec)
+- [X] T099 [P] Tag repository with `v1.0.0-lambda-backend` release
+- [X] T100 Create GitHub Release notes with feature summary, deployment guide, known issues
 
 **Checkpoint**: Feature complete, documented, deployed to production, monitoring in place ✅
 

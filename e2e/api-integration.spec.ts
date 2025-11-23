@@ -18,11 +18,12 @@ test.describe("API Integration E2E Tests", () => {
     const input = page.locator("input").first();
     const button = page.locator("button").first();
 
-    await input.fill("Buy groceries");
+    const uniqueTitle = `Buy groceries ${Date.now()}`;
+    await input.fill(uniqueTitle);
     await button.click();
     await page.waitForTimeout(1000);
 
-    const todoText = page.getByText("Buy groceries");
+    const todoText = page.getByText(uniqueTitle);
     await expect(todoText).toBeVisible();
   });
 
@@ -30,11 +31,12 @@ test.describe("API Integration E2E Tests", () => {
     const input = page.locator("input").first();
     const button = page.locator("button").first();
 
-    await input.fill("Test todo");
+    const uniqueTitle = `Test todo ${Date.now()}`;
+    await input.fill(uniqueTitle);
     await button.click();
     await page.waitForTimeout(1000);
 
-    const todoText = page.getByText("Test todo");
+    const todoText = page.getByText(uniqueTitle);
     await expect(todoText).toBeVisible();
   });
 

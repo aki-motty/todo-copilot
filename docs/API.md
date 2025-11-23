@@ -2,6 +2,22 @@
 
 > TypeScript JSDoc API reference for todo-copilot
 
+## REST API Reference
+
+The application communicates with a Serverless Backend via REST API.
+
+**Base URL**: `https://{api-id}.execute-api.{region}.amazonaws.com/{stage}`
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/todos` | List all todos (supports pagination) |
+| `POST` | `/todos` | Create a new todo |
+| `GET` | `/todos/{id}` | Get a single todo by ID |
+| `PUT` | `/todos/{id}/toggle` | Toggle todo completion status |
+| `DELETE` | `/todos/{id}` | Delete a todo |
+
+---
+
 ## Table of Contents
 1. [Domain Layer](#domain-layer)
 2. [Application Layer](#application-layer)
