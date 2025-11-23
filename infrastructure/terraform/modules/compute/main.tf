@@ -65,14 +65,14 @@ variable "common_tags" {
 
 # Lambda function with built handler
 resource "aws_lambda_function" "main" {
-  filename         = "${path.root}/../../infrastructure/terraform/dist/index.zip"
-  function_name    = "${var.project_name}-api-${var.environment}"
-  role             = var.lambda_execution_role_arn
-  handler          = "index.handler"
-  runtime          = "nodejs18.x"
-  architectures    = ["x86_64"]
-  timeout          = var.lambda_timeout
-  memory_size      = var.lambda_memory_size
+  filename      = "${path.root}/../../infrastructure/terraform/dist/index.zip"
+  function_name = "${var.project_name}-api-${var.environment}"
+  role          = var.lambda_execution_role_arn
+  handler       = "index.handler"
+  runtime       = "nodejs18.x"
+  architectures = ["x86_64"]
+  timeout       = var.lambda_timeout
+  memory_size   = var.lambda_memory_size
   # Note: source_code_hash is computed from the ZIP file during apply
   # During validation with -backend=false, the file may not exist
   source_code_hash = try(
