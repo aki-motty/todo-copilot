@@ -182,8 +182,10 @@ resource "aws_apigatewayv2_stage" "prod" {
   # }
 
   default_route_settings {
-    logging_level      = var.environment == "prod" ? "ERROR" : "INFO"
-    data_trace_enabled = var.environment == "prod" ? false : true
+    logging_level          = var.environment == "prod" ? "ERROR" : "INFO"
+    data_trace_enabled     = var.environment == "prod" ? false : true
+    throttling_burst_limit = 5000
+    throttling_rate_limit  = 10000
   }
 
   tags = merge(
