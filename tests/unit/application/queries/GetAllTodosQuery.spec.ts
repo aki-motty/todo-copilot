@@ -38,9 +38,9 @@ describe("GetAllTodosQuery - Unit Tests", () => {
 
     it("should return all created todos", async () => {
       await service.createTodo({ title: "Todo 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 3" });
 
       const query: GetAllTodosQuery = {};
@@ -55,9 +55,9 @@ describe("GetAllTodosQuery - Unit Tests", () => {
 
     it("should return todos in creation order", async () => {
       const todo1 = await service.createTodo({ title: "Todo 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "Todo 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo3 = await service.createTodo({ title: "Todo 3" });
 
       const query: GetAllTodosQuery = {};

@@ -28,9 +28,9 @@ npm test && npm run lint
 TypeScript 5.x、Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 007-enhance-ci-workflow: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 006-deploy-spa-s3: Added Terraform (HCL) ~> 1.5, TypeScript 5.x (Frontend Build), YAML (CI/CD) + AWS Provider for Terraform, Vite (Build Tool)
 - 006-deploy-spa-s3: Added Terraform (HCL) ~> 1.5, TypeScript 5.x (Frontend Build), YAML (CI/CD) + AWS Provider for Terraform, Vite (Build Tool)
-- 005-fix-github-actions: Added TypeScript 5.x, Node.js 18+, HCL (Terraform) + GitHub Actions, Terraform 1.5.0
 
 
 <!-- MANUAL ADDITIONS START -->

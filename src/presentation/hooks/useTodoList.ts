@@ -20,9 +20,9 @@ export const useTodoList = () => {
   const [todos, setTodos] = useState<TodoResponseDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Derive backend mode directly from config
-  const backendMode = (!isLocalStorageMode && baseUrl) ? "api" : "localStorage";
+  const backendMode = !isLocalStorageMode && baseUrl ? "api" : "localStorage";
 
   // Create appropriate repository and services based on configuration
   const todoController = useMemo(() => {
@@ -60,53 +60,62 @@ export const useTodoList = () => {
   }, [todoController, backendMode]);
 
   // Create new todo
-  const createTodo = useCallback(async (title: string) => {
-    try {
-      setError(null);
-      const newTodo = await todoController.createTodo(title);
-      setTodos((prevTodos) => [...prevTodos, newTodo]);
-      logger.info("Todo created via hook", { id: newTodo.id, title });
-      return newTodo;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to create todo";
-      setError(message);
-      logger.error("Failed to create todo", { error: message, title });
-      throw err;
-    }
-  }, [todoController]);
+  const createTodo = useCallback(
+    async (title: string) => {
+      try {
+        setError(null);
+        const newTodo = await todoController.createTodo(title);
+        setTodos((prevTodos) => [...prevTodos, newTodo]);
+        logger.info("Todo created via hook", { id: newTodo.id, title });
+        return newTodo;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to create todo";
+        setError(message);
+        logger.error("Failed to create todo", { error: message, title });
+        throw err;
+      }
+    },
+    [todoController]
+  );
 
   // Toggle todo completion
-  const toggleTodoCompletion = useCallback(async (id: string) => {
-    try {
-      setError(null);
-      const updatedTodo = await todoController.toggleTodoCompletion(id);
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
-      );
-      logger.info("Todo toggled via hook", { id, status: updatedTodo.status });
-      return updatedTodo;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to toggle todo";
-      setError(message);
-      logger.error("Failed to toggle todo", { error: message, id });
-      throw err;
-    }
-  }, [todoController]);
+  const toggleTodoCompletion = useCallback(
+    async (id: string) => {
+      try {
+        setError(null);
+        const updatedTodo = await todoController.toggleTodoCompletion(id);
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+        );
+        logger.info("Todo toggled via hook", { id, status: updatedTodo.status });
+        return updatedTodo;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to toggle todo";
+        setError(message);
+        logger.error("Failed to toggle todo", { error: message, id });
+        throw err;
+      }
+    },
+    [todoController]
+  );
 
   // Delete todo
-  const deleteTodo = useCallback(async (id: string) => {
-    try {
-      setError(null);
-      await todoController.deleteTodo(id);
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-      logger.info("Todo deleted via hook", { id });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete todo";
-      setError(message);
-      logger.error("Failed to delete todo", { error: message, id });
-      throw err;
-    }
-  }, [todoController]);
+  const deleteTodo = useCallback(
+    async (id: string) => {
+      try {
+        setError(null);
+        await todoController.deleteTodo(id);
+        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+        logger.info("Todo deleted via hook", { id });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to delete todo";
+        setError(message);
+        logger.error("Failed to delete todo", { error: message, id });
+        throw err;
+      }
+    },
+    [todoController]
+  );
 
   // Clear error message
   const clearError = useCallback(() => {

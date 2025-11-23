@@ -7,7 +7,7 @@ export class HttpError extends Error {
   constructor(
     public statusCode: number,
     public statusText: string,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = "HttpError";
@@ -51,7 +51,10 @@ export class HttpClient {
   private logger = createLogger("HttpClient");
   private readonly timeout: number;
 
-  constructor(private readonly baseUrl: string, options?: { timeout?: number }) {
+  constructor(
+    private readonly baseUrl: string,
+    options?: { timeout?: number }
+  ) {
     this.timeout = options?.timeout ?? 5000; // 5 seconds default
     this.logger.debug("HttpClient initialized", { baseUrl, timeout: this.timeout });
   }
@@ -91,7 +94,7 @@ export class HttpClient {
     method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
     body?: unknown,
-    options?: HttpRequestOptions,
+    options?: HttpRequestOptions
   ): Promise<T> {
     const url = this.buildUrl(path);
     const headers = this.buildHeaders(options?.headers);
@@ -146,7 +149,7 @@ export class HttpClient {
       // Extract data from API response wrapper if present
       if (isJson && typeof data === "object" && data !== null) {
         const apiData = data as Record<string, unknown>;
-        
+
         // Handle standard API response format { status, data, meta }
         if ("status" in apiData && "data" in apiData) {
           return apiData.data as T;
@@ -171,7 +174,7 @@ export class HttpClient {
 
       if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
         const networkError = new NetworkError(
-          `Network error: Unable to connect to ${url}. Check if the server is running.`,
+          `Network error: Unable to connect to ${url}. Check if the server is running.`
         );
         this.logger.error(`${method} ${path} - Network Error`, networkError);
         throw networkError;
@@ -179,7 +182,7 @@ export class HttpClient {
 
       if (error instanceof Error && error.name === "AbortError") {
         const timeoutError = new TimeoutError(
-          `Request timeout: ${method} ${path} took longer than ${timeout}ms`,
+          `Request timeout: ${method} ${path} took longer than ${timeout}ms`
         );
         this.logger.error(`${method} ${path} - Timeout`, timeoutError);
         throw timeoutError;

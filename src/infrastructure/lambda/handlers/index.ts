@@ -72,7 +72,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 
     const method = event.requestContext.http.method;
     let path = event.requestContext.http.path;
-    
+
     // Normalize path by removing stage prefix if present
     const stage = event.requestContext.stage;
     if (stage !== "$default" && path.startsWith(`/${stage}`)) {

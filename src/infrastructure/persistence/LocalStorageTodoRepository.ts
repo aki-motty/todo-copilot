@@ -31,7 +31,7 @@ export class LocalStorageTodoRepository implements ITodoRepository {
         removeItem: () => {},
         clear: () => {},
         key: () => null,
-        length: 0
+        length: 0,
       } as unknown as Storage;
     }
     this.initializeStorage();

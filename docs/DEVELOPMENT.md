@@ -737,6 +737,36 @@ git add .
 git commit -m "chore: Resolve merge conflicts"
 ```
 
+## 🔍 Code Quality
+
+### Continuous Integration (CI)
+
+We use GitHub Actions to enforce code quality on every push and pull request. The workflow is defined in `.github/workflows/app-ci.yml`.
+
+#### Automated Checks
+The following checks run automatically:
+
+1.  **Linting & Formatting**:
+    *   Tool: **Biome**
+    *   Command: `npm run check`
+    *   Ensures code style consistency and catches common errors.
+
+2.  **Unit Tests**:
+    *   Tool: **Jest**
+    *   Command: `npm test`
+    *   Verifies that all unit tests pass.
+
+3.  **Security Scan**:
+    *   Tool: **GitHub CodeQL**
+    *   Analyzes code for security vulnerabilities (e.g., XSS, injection).
+
+#### Pull Request Quality Gate
+All checks must pass before a Pull Request can be merged into `main`. If a check fails:
+1.  Click "Details" on the failed check in the PR.
+2.  Review the logs to identify the issue.
+3.  Fix the issue locally (run `npm run check` or `npm test`).
+4.  Push the fix to update the PR.
+
 ## 📚 Additional Resources
 
 ### Configuration Files

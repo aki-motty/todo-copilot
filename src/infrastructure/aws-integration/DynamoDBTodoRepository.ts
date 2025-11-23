@@ -1,9 +1,9 @@
-import type { Todo, TodoId } from '../../domain/entities/Todo';
-import type { DynamoDBClient_ } from './dynamodb-client';
+import type { Todo, TodoId } from "../../domain/entities/Todo";
+import type { DynamoDBClient_ } from "./dynamodb-client";
 
 /**
  * DynamoDB Todo リポジトリ（非同期版）
- * 
+ *
  * DynamoDB をバックエンドとする非同期 Todo 永続化を提供します
  * ITodoRepository ではなく独立したインターフェースを実装します
  */
@@ -20,7 +20,7 @@ export interface IAsyncTodoRepository {
 
 /**
  * DynamoDB Todo リポジトリ
- * 
+ *
  * IAsyncTodoRepository を実装し、
  * DynamoDB をバックエンドとする Todo の永続化を提供します
  */
@@ -59,7 +59,7 @@ export class DynamoDBTodoRepository implements IAsyncTodoRepository {
       });
       return todos;
     } catch (error) {
-      console.error('Failed to find all todos', error);
+      console.error("Failed to find all todos", error);
       throw error;
     }
   }
@@ -72,9 +72,9 @@ export class DynamoDBTodoRepository implements IAsyncTodoRepository {
   async findByCompletion(completed: boolean): Promise<Todo[]> {
     try {
       const todos = await this.dynamoDBClient.scan<Todo>({
-        filterExpression: 'completed = :completed',
+        filterExpression: "completed = :completed",
         expressionAttributeValues: {
-          ':completed': completed,
+          ":completed": completed,
         },
       });
       return todos;
@@ -154,7 +154,7 @@ export class DynamoDBTodoRepository implements IAsyncTodoRepository {
     try {
       return await this.dynamoDBClient.healthCheck();
     } catch (error) {
-      console.error('DynamoDB health check failed', error);
+      console.error("DynamoDB health check failed", error);
       return false;
     }
   }

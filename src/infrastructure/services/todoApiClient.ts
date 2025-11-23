@@ -4,7 +4,12 @@
  * Handles request/response serialization and error handling
  */
 
-import type { ApiResponseDTO, ErrorResponseDTO, ListTodosResponseDTO, TodoResponseDTO } from "../../application/dto/TodoDTO";
+import type {
+  ApiResponseDTO,
+  ErrorResponseDTO,
+  ListTodosResponseDTO,
+  TodoResponseDTO,
+} from "../../application/dto/TodoDTO";
 
 /**
  * API Configuration
@@ -60,8 +65,12 @@ export const TodoApiClient = {
    */
   async listTodos(options?: { limit?: number; cursor?: string }): Promise<ListTodosResponseDTO> {
     const params = new URLSearchParams();
-    if (options?.limit) { params.append("limit", String(options.limit)); }
-    if (options?.cursor) { params.append("cursor", options.cursor); }
+    if (options?.limit) {
+      params.append("limit", String(options.limit));
+    }
+    if (options?.cursor) {
+      params.append("cursor", options.cursor);
+    }
 
     const queryString = params.toString();
     const url = `/todos${queryString ? `?${queryString}` : ""}`;
@@ -129,11 +138,16 @@ export const TodoApiClient = {
       // Handle error responses
       if (!response.ok) {
         const errorData = data as ErrorResponseDTO;
-        throw new ApiError(response.status, errorData.code || "API_ERROR", errorData.message || "API request failed", {
-          code: errorData.code,
-          message: errorData.message,
-          requestId: errorData.requestId,
-        });
+        throw new ApiError(
+          response.status,
+          errorData.code || "API_ERROR",
+          errorData.message || "API request failed",
+          {
+            code: errorData.code,
+            message: errorData.message,
+            requestId: errorData.requestId,
+          }
+        );
       }
 
       return data as ApiResponseDTO<unknown>;
@@ -161,12 +175,17 @@ export const TodoApiClient = {
         });
       }
 
-      throw new ApiError(500, "UNKNOWN_ERROR", error instanceof Error ? error.message : "Unknown error occurred", {
-        originalError: error,
-      });
+      throw new ApiError(
+        500,
+        "UNKNOWN_ERROR",
+        error instanceof Error ? error.message : "Unknown error occurred",
+        {
+          originalError: error,
+        }
+      );
     }
-  }
-}
+  },
+};
 
 /**
  * API health check

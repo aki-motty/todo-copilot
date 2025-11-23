@@ -77,7 +77,9 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
     });
 
     it("should throw error for non-existent todo", async () => {
-      await expect(service.toggleTodoCompletion({ id: "non-existent-id" as any })).rejects.toThrow();
+      await expect(
+        service.toggleTodoCompletion({ id: "non-existent-id" as any })
+      ).rejects.toThrow();
     });
 
     it("should maintain todo integrity after toggle", async () => {

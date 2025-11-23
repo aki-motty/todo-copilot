@@ -1,141 +1,156 @@
 /**
  * Unit Tests: CloudWatch Logs クライアント
- * 
+ *
  * AWS SDK v3 CloudWatch Logs クライアントのユニットテスト
  * ログ出力とログレベル管理の検証
  */
 
-import { type CloudWatchLogsClientService, getCloudWatchLogsClient, getLogger, initializeGlobalLogger, resetCloudWatchLogsClient } from '../../../../src/infrastructure/aws-integration/cloudwatch-client';
+import {
+    type CloudWatchLogsClientService,
+    getCloudWatchLogsClient,
+    getLogger,
+    initializeGlobalLogger,
+    resetCloudWatchLogsClient,
+} from "../../../../src/infrastructure/aws-integration/cloudwatch-client";
 
 // Mock AWS SDK
-jest.mock('@aws-sdk/client-cloudwatch-logs', () => {
+jest.mock("@aws-sdk/client-cloudwatch-logs", () => {
   const mockSend = jest.fn().mockResolvedValue({ logGroups: [], logStreams: [] });
   return {
-    CloudWatchLogsClient: jest.fn(function() {
+    CloudWatchLogsClient: jest.fn(function () {
       this.send = mockSend;
       return this;
     }),
-    CreateLogGroupCommand: jest.fn((params) => ({ params, commandName: 'CreateLogGroupCommand' })),
-    CreateLogStreamCommand: jest.fn((params) => ({ params, commandName: 'CreateLogStreamCommand' })),
-    PutLogEventsCommand: jest.fn((params) => ({ params, commandName: 'PutLogEventsCommand' })),
-    DescribeLogGroupsCommand: jest.fn((params) => ({ params, commandName: 'DescribeLogGroupsCommand' })),
-    DescribeLogStreamsCommand: jest.fn((params) => ({ params, commandName: 'DescribeLogStreamsCommand' })),
+    CreateLogGroupCommand: jest.fn((params) => ({ params, commandName: "CreateLogGroupCommand" })),
+    CreateLogStreamCommand: jest.fn((params) => ({
+      params,
+      commandName: "CreateLogStreamCommand",
+    })),
+    PutLogEventsCommand: jest.fn((params) => ({ params, commandName: "PutLogEventsCommand" })),
+    DescribeLogGroupsCommand: jest.fn((params) => ({
+      params,
+      commandName: "DescribeLogGroupsCommand",
+    })),
+    DescribeLogStreamsCommand: jest.fn((params) => ({
+      params,
+      commandName: "DescribeLogStreamsCommand",
+    })),
   };
 });
 
-describe('Unit Tests - CloudWatch Logs Client', () => {
+describe("Unit Tests - CloudWatch Logs Client", () => {
   let logsClient: CloudWatchLogsClientService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    logsClient = await getCloudWatchLogsClient('test-log-group', 'test-stream');
+    logsClient = await getCloudWatchLogsClient("test-log-group", "test-stream");
   });
 
-  describe('CloudWatchLogsClientService 初期化', () => {
-    it('ロググループとログストリーム名を指定して初期化可能', async () => {
-      const client = await getCloudWatchLogsClient('my-log-group', 'my-stream');
+  describe("CloudWatchLogsClientService 初期化", () => {
+    it("ロググループとログストリーム名を指定して初期化可能", async () => {
+      const client = await getCloudWatchLogsClient("my-log-group", "my-stream");
       expect(client).toBeDefined();
     });
 
-    it('デフォルトのログストリーム名で初期化可能', async () => {
-      const client = await getCloudWatchLogsClient('my-log-group');
+    it("デフォルトのログストリーム名で初期化可能", async () => {
+      const client = await getCloudWatchLogsClient("my-log-group");
       expect(client).toBeDefined();
     });
 
-    it('環境変数から設定を読み込み可能', async () => {
-      process.env.CLOUDWATCH_LOG_GROUP = 'env-log-group';
-      process.env.CLOUDWATCH_LOG_STREAM = 'env-stream';
+    it("環境変数から設定を読み込み可能", async () => {
+      process.env["CLOUDWATCH_LOG_GROUP"] = "env-log-group";
+      process.env["CLOUDWATCH_LOG_STREAM"] = "env-stream";
 
       const client = await getCloudWatchLogsClient();
       expect(client).toBeDefined();
 
-      process.env.CLOUDWATCH_LOG_GROUP = undefined;
-      process.env.CLOUDWATCH_LOG_STREAM = undefined;
+      process.env["CLOUDWATCH_LOG_GROUP"] = undefined;
+      process.env["CLOUDWATCH_LOG_STREAM"] = undefined;
     });
   });
 
-  describe('CloudWatch ログ出力メソッド', () => {
-    it('initialize メソッドがロググループとストリームを作成', async () => {
-      expect(typeof logsClient.initialize).toBe('function');
+  describe("CloudWatch ログ出力メソッド", () => {
+    it("initialize メソッドがロググループとストリームを作成", async () => {
+      expect(typeof logsClient.initialize).toBe("function");
       // 非同期メソッド
       const result = logsClient.initialize();
       expect(result instanceof Promise).toBe(true);
     });
 
-    it('log メソッドで汎用ログを出力', async () => {
-      expect(typeof logsClient.log).toBe('function');
+    it("log メソッドで汎用ログを出力", async () => {
+      expect(typeof logsClient.log).toBe("function");
     });
 
-    it('info メソッドで INFO レベルログを出力', () => {
-      expect(typeof logsClient.info).toBe('function');
+    it("info メソッドで INFO レベルログを出力", () => {
+      expect(typeof logsClient.info).toBe("function");
     });
 
-    it('warn メソッドで WARN レベルログを出力', () => {
-      expect(typeof logsClient.warn).toBe('function');
+    it("warn メソッドで WARN レベルログを出力", () => {
+      expect(typeof logsClient.warn).toBe("function");
     });
 
-    it('error メソッドで ERROR レベルログを出力', () => {
-      expect(typeof logsClient.error).toBe('function');
+    it("error メソッドで ERROR レベルログを出力", () => {
+      expect(typeof logsClient.error).toBe("function");
     });
 
-    it('debug メソッドで DEBUG レベルログを出力', () => {
-      expect(typeof logsClient.debug).toBe('function');
+    it("debug メソッドで DEBUG レベルログを出力", () => {
+      expect(typeof logsClient.debug).toBe("function");
     });
 
-    it('healthCheck メソッドが存在', () => {
-      expect(typeof logsClient.healthCheck).toBe('function');
+    it("healthCheck メソッドが存在", () => {
+      expect(typeof logsClient.healthCheck).toBe("function");
     });
   });
 
-  describe('ログレベルの管理', () => {
-    it('デフォルトのログレベルは INFO', async () => {
+  describe("ログレベルの管理", () => {
+    it("デフォルトのログレベルは INFO", async () => {
       // デフォルト環境変数を確認
-      const logLevel = process.env.LOG_LEVEL || 'INFO';
-      expect(['DEBUG', 'INFO', 'WARN', 'ERROR']).toContain(logLevel);
+      const logLevel = process.env["LOG_LEVEL"] || "INFO";
+      expect(["DEBUG", "INFO", "WARN", "ERROR"]).toContain(logLevel);
     });
 
-    it('LOG_LEVEL 環境変数で制御可能', async () => {
-      process.env.LOG_LEVEL = 'DEBUG';
+    it("LOG_LEVEL 環境変数で制御可能", async () => {
+      process.env["LOG_LEVEL"] = "DEBUG";
 
-      const client = await getCloudWatchLogsClient('test', 'test');
+      const client = await getCloudWatchLogsClient("test", "test");
       expect(client).toBeDefined();
 
-      process.env.LOG_LEVEL = undefined;
+      process.env["LOG_LEVEL"] = undefined;
     });
 
-    it('無効なログレベルはデフォルトにフォールバック', async () => {
-      process.env.LOG_LEVEL = 'INVALID';
+    it("無効なログレベルはデフォルトにフォールバック", async () => {
+      process.env["LOG_LEVEL"] = "INVALID";
 
-      const client = await getCloudWatchLogsClient('test', 'test');
+      const client = await getCloudWatchLogsClient("test", "test");
       expect(client).toBeDefined();
 
-      process.env.LOG_LEVEL = undefined;
+      process.env["LOG_LEVEL"] = undefined;
     });
   });
 
-  describe('ログメッセージのフォーマット', () => {
-    it('ログメッセージが構造化される', () => {
+  describe("ログメッセージのフォーマット", () => {
+    it("ログメッセージが構造化される", () => {
       // 構造化ログの検証
       expect(logsClient).toBeDefined();
     });
 
-    it('メタデータが JSON 形式で含まれる', () => {
+    it("メタデータが JSON 形式で含まれる", () => {
       // メタデータの検証
       expect(logsClient).toBeDefined();
     });
 
-    it('タイムスタンプが自動的に追加される', () => {
+    it("タイムスタンプが自動的に追加される", () => {
       // タイムスタンプの検証
       expect(logsClient).toBeDefined();
     });
 
-    it('複数のメタデータキーが保持される', () => {
+    it("複数のメタデータキーが保持される", () => {
       const metadata = {
-        userId: 'user-123',
-        requestId: 'req-456',
+        userId: "user-123",
+        requestId: "req-456",
         duration: 125,
         nested: {
-          key: 'value',
+          key: "value",
         },
       };
 
@@ -143,26 +158,26 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
     });
   });
 
-  describe('エラーハンドリング', () => {
-    it('空のメッセージをハンドル可能', async () => {
+  describe("エラーハンドリング", () => {
+    it("空のメッセージをハンドル可能", async () => {
       // 空文字列メッセージ
       expect(async () => {
-        await logsClient.log('', 'INFO');
+        await logsClient.log("", "INFO");
       }).toBeDefined();
     });
 
-    it('null/undefined メッセージをハンドル可能', async () => {
+    it("null/undefined メッセージをハンドル可能", async () => {
       expect(async () => {
-        await logsClient.log(null as any, 'INFO');
+        await logsClient.log(null as any, "INFO");
       }).toBeDefined();
     });
 
-    it('大きなメッセージをハンドル可能', async () => {
+    it("大きなメッセージをハンドル可能", async () => {
       expect(logsClient.log).toBeDefined();
     });
 
-    it('循環参照メタデータをハンドル可能', () => {
-      const obj: any = { key: 'value' };
+    it("循環参照メタデータをハンドル可能", () => {
+      const obj: any = { key: "value" };
       obj.self = obj; // 循環参照
 
       expect(obj).toBeDefined();
@@ -170,7 +185,7 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
   });
 });
 
-describe('Unit Tests - CloudWatch Logs Global Logger', () => {
+describe("Unit Tests - CloudWatch Logs Global Logger", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     resetCloudWatchLogsClient();
@@ -178,68 +193,68 @@ describe('Unit Tests - CloudWatch Logs Global Logger', () => {
     await initializeGlobalLogger();
   });
 
-  it('getLogger でグローバルロガーを取得可能', async () => {
+  it("getLogger でグローバルロガーを取得可能", async () => {
     const logger = getLogger();
     expect(logger).toBeDefined();
   });
 
-  it('getLogger が常に同じインスタンスを返す', async () => {
+  it("getLogger が常に同じインスタンスを返す", async () => {
     const logger1 = getLogger();
     const logger2 = getLogger();
 
     expect(logger1).toBe(logger2);
   });
 
-  it('グローバルロガーがすべてのログメソッドを提供', () => {
+  it("グローバルロガーがすべてのログメソッドを提供", () => {
     const logger = getLogger();
 
-    expect(typeof logger.log).toBe('function');
-    expect(typeof logger.info).toBe('function');
-    expect(typeof logger.warn).toBe('function');
-    expect(typeof logger.error).toBe('function');
-    expect(typeof logger.debug).toBe('function');
+    expect(typeof logger.log).toBe("function");
+    expect(typeof logger.info).toBe("function");
+    expect(typeof logger.warn).toBe("function");
+    expect(typeof logger.error).toBe("function");
+    expect(typeof logger.debug).toBe("function");
   });
 });
 
-describe('Unit Tests - CloudWatch Logs シーケンスTokens', () => {
+describe("Unit Tests - CloudWatch Logs シーケンスTokens", () => {
   let client: CloudWatchLogsClientService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    client = await getCloudWatchLogsClient('test-group', 'test-stream');
+    client = await getCloudWatchLogsClient("test-group", "test-stream");
   });
 
-  it('シーケンストークンが管理される', () => {
+  it("シーケンストークンが管理される", () => {
     expect(client).toBeDefined();
   });
 
-  it('連続ログ出力がシーケンスを更新', () => {
+  it("連続ログ出力がシーケンスを更新", () => {
     expect(client).toBeDefined();
   });
 
-  it('失敗時にシーケンストークンが回復される', () => {
+  it("失敗時にシーケンストークンが回復される", () => {
     expect(client).toBeDefined();
   });
 });
 
-describe('Unit Tests - CloudWatch 型安全性', () => {
+describe("Unit Tests - CloudWatch 型安全性", () => {
   let client: CloudWatchLogsClientService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    client = await getCloudWatchLogsClient('test', 'test');
+    client = await getCloudWatchLogsClient("test", "test");
   });
 
-  it('ログレベルが型安全である', () => {
-    const validLevels = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
+  it("ログレベルが型安全である", () => {
+    const validLevels = ["DEBUG", "INFO", "WARN", "ERROR"];
     for (const level of validLevels) {
       expect(validLevels).toContain(level);
     }
   });
 
-  it('メタデータが任意の型を受け入れ可能', () => {
+  it("メタデータが任意の型を受け入れ可能", () => {
     const metadata1: Record<string, any> = { id: 1 };
-    const metadata2: Record<string, string> = { message: 'test' };
+    const metadata2: Record<string, string> = { message: "test" };
     const metadata3: Record<string, boolean> = { success: true };
 
     expect(metadata1).toBeDefined();
@@ -247,37 +262,37 @@ describe('Unit Tests - CloudWatch 型安全性', () => {
     expect(metadata3).toBeDefined();
   });
 
-  it('非同期ログ出力が型チェックされる', () => {
-    const logPromise = client.log('test message', 'INFO');
+  it("非同期ログ出力が型チェックされる", () => {
+    const logPromise = client.log("test message", "INFO");
     expect(logPromise instanceof Promise).toBe(true);
   });
 });
 
-describe('Unit Tests - CloudWatch ユーティリティメソッド', () => {
+describe("Unit Tests - CloudWatch ユーティリティメソッド", () => {
   let client: CloudWatchLogsClientService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    client = await getCloudWatchLogsClient('test', 'test');
+    client = await getCloudWatchLogsClient("test", "test");
   });
 
-  it('info メソッドが便利メソッドとして機能', () => {
-    expect(typeof client.info).toBe('function');
+  it("info メソッドが便利メソッドとして機能", () => {
+    expect(typeof client.info).toBe("function");
   });
 
-  it('warn メソッドが便利メソッドとして機能', () => {
-    expect(typeof client.warn).toBe('function');
+  it("warn メソッドが便利メソッドとして機能", () => {
+    expect(typeof client.warn).toBe("function");
   });
 
-  it('error メソッドが便利メソッドとして機能', () => {
-    expect(typeof client.error).toBe('function');
+  it("error メソッドが便利メソッドとして機能", () => {
+    expect(typeof client.error).toBe("function");
   });
 
-  it('debug メソッドが便利メソッドとして機能', () => {
-    expect(typeof client.debug).toBe('function');
+  it("debug メソッドが便利メソッドとして機能", () => {
+    expect(typeof client.debug).toBe("function");
   });
 
-  it('healthCheck がサービス接続性を確認', () => {
-    expect(typeof client.healthCheck).toBe('function');
+  it("healthCheck がサービス接続性を確認", () => {
+    expect(typeof client.healthCheck).toBe("function");
   });
 });

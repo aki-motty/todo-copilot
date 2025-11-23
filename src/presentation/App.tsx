@@ -8,15 +8,8 @@ import { useTodoList } from "./hooks/useTodoList";
  * Uses Lambda API with fallback to localStorage
  */
 function AppContent() {
-  const {
-    todos,
-    error,
-    loading,
-    createTodo,
-    toggleTodoCompletion,
-    deleteTodo,
-    clearError,
-  } = useTodoList();
+  const { todos, error, loading, createTodo, toggleTodoCompletion, deleteTodo, clearError } =
+    useTodoList();
 
   const handleToggleCompletion = async (id: string) => {
     await toggleTodoCompletion(id);

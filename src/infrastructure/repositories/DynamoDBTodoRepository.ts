@@ -1,4 +1,9 @@
-import { DeleteItemCommand, DynamoDBClient, PutItemCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
+import {
+  DeleteItemCommand,
+  DynamoDBClient,
+  PutItemCommand,
+  ScanCommand,
+} from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { DatabaseError } from "../../application/errors/AppError";
 import { Todo, type TodoId } from "../../domain/entities/Todo";
@@ -37,20 +42,20 @@ export class DynamoDBTodoRepository implements ITodoRepository {
       // Note: In a real implementation, we would use GetItemCommand here
       // But since we have initializeFromDynamoDB, we might rely on that for now
       // However, for correctness, we should implement GetItem
-      
-      // For now, let's stick to the pattern of loading all if not cached, 
+
+      // For now, let's stick to the pattern of loading all if not cached,
       // or just return null if we assume initializeFromDynamoDB was called.
       // But since we changed the interface to async, we should probably implement the real fetch.
-      
+
       // Let's implement proper GetItem
       // But wait, the previous implementation had `initializeFromDynamoDB`.
       // Let's keep that pattern if it's used by the handler.
-      
+
       if (this.cacheAll) {
         const todo = this.cacheAll.find((t) => t.id === id) || null;
         return todo;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error finding todo:", error);
@@ -114,7 +119,6 @@ export class DynamoDBTodoRepository implements ITodoRepository {
   async count(): Promise<number> {
     return this.cacheAll ? this.cacheAll.length : 0;
   }
-
 
   /**
    * Initialize repository with todos from DynamoDB
@@ -189,7 +193,13 @@ export class DynamoDBTodoRepository implements ITodoRepository {
    * Convert DynamoDB item to Todo entity
    */
   private unmarshallTodo(item: any): Todo {
-    return Todo.fromPersistence(item.id, item.title, item.completed, item.createdAt, item.updatedAt);
+    return Todo.fromPersistence(
+      item.id,
+      item.title,
+      item.completed,
+      item.createdAt,
+      item.updatedAt
+    );
   }
 
   /**

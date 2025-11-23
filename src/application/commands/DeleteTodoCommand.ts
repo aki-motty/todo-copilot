@@ -1,4 +1,4 @@
-import type { TodoId } from '../../domain/entities/Todo';
+import type { TodoId } from "../../domain/entities/Todo";
 
 /**
  * Command to delete a todo item.

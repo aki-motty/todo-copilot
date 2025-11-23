@@ -18,7 +18,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleToggle = async () => {
-    if (!onToggleCompletion) { return; }
+    if (!onToggleCompletion) {
+      return;
+    }
 
     try {
       setIsToggling(true);
@@ -31,7 +33,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
   };
 
   const handleDelete = async () => {
-    if (!onDelete) { return; }
+    if (!onDelete) {
+      return;
+    }
 
     try {
       setIsDeleting(true);

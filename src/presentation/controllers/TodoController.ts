@@ -1,7 +1,7 @@
 import type {
-    CreateTodoCommand,
-    DeleteTodoCommand,
-    ToggleTodoCompletionCommand,
+  CreateTodoCommand,
+  DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../../application/commands";
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import type { GetAllTodosQuery } from "../../application/queries";
@@ -41,7 +41,7 @@ export class TodoController {
       this.logger.debug("Controller: getAllTodos");
       const query: GetAllTodosQuery = {};
       const response = await this.applicationService.getAllTodos(query);
-      return response.todos.map(todo => todo.toJSON());
+      return response.todos.map((todo) => todo.toJSON());
     } catch (error) {
       this.logger.error("Controller: getAllTodos failed", error as Error);
       throw error;

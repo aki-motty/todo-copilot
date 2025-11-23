@@ -87,9 +87,9 @@ describe("TodoApplicationService - Integration Tests", () => {
 
     it("should return all created todos", async () => {
       await service.createTodo({ title: "Todo 1" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 2" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 3" });
 
       const response = await service.getAllTodos({});
@@ -101,7 +101,7 @@ describe("TodoApplicationService - Integration Tests", () => {
 
     it("should return todos with correct state", async () => {
       await service.createTodo({ title: "Pending" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "Complete" });
 
       await service.toggleTodoCompletion({ id: todo2.id });
@@ -125,7 +125,9 @@ describe("TodoApplicationService - Integration Tests", () => {
     });
 
     it("should throw error for non-existent ID", async () => {
-      await expect(service.getTodoById({ id: "non-existent" as any })).rejects.toThrow(NotFoundError);
+      await expect(service.getTodoById({ id: "non-existent" as any })).rejects.toThrow(
+        NotFoundError
+      );
     });
   });
 
@@ -173,7 +175,9 @@ describe("TodoApplicationService - Integration Tests", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.toggleTodoCompletion({ id: "non-existent" as any })).rejects.toThrow(NotFoundError);
+      await expect(service.toggleTodoCompletion({ id: "non-existent" as any })).rejects.toThrow(
+        NotFoundError
+      );
     });
 
     it("should update timestamp on toggle", async () => {
@@ -210,14 +214,16 @@ describe("TodoApplicationService - Integration Tests", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.deleteTodo({ id: "non-existent" as any })).rejects.toThrow(NotFoundError);
+      await expect(service.deleteTodo({ id: "non-existent" as any })).rejects.toThrow(
+        NotFoundError
+      );
     });
 
     it("should not affect other todos", async () => {
       await service.createTodo({ title: "Keep" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "Delete" });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       await service.createTodo({ title: "Keep too" });
 
       await service.deleteTodo({ id: todo2.id });

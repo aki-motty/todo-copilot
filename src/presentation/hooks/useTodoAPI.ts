@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import type {
-    CreateTodoRequestDTO,
-    ListTodosResponseDTO,
-    TodoResponseDTO,
+  CreateTodoRequestDTO,
+  ListTodosResponseDTO,
+  TodoResponseDTO,
 } from "../../application/dto/TodoDTO";
 import { TodoApiClient, checkApiHealth } from "../../infrastructure/services/todoApiClient";
 
@@ -48,153 +48,129 @@ export function useTodoAPI(): UseTodoAPIReturn {
     checkHealth();
   }, []);
 
-  const createTodo = useCallback(
-    async (title: string): Promise<TodoResponseDTO | undefined> => {
-      try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const createTodo = useCallback(async (title: string): Promise<TodoResponseDTO | undefined> => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const request: CreateTodoRequestDTO = { title };
-        const newTodo = await TodoApiClient.createTodo(request.title);
+      const request: CreateTodoRequestDTO = { title };
+      const newTodo = await TodoApiClient.createTodo(request.title);
 
-        setState((prev) => ({
-          ...prev,
-          todos: [newTodo, ...prev.todos],
-          isLoading: false,
-        }));
+      setState((prev) => ({
+        ...prev,
+        todos: [newTodo, ...prev.todos],
+        isLoading: false,
+      }));
 
-        return newTodo;
-      } catch (error) {
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to create todo",
-        }));
-      }
-    },
-    []
-  );
+      return newTodo;
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Failed to create todo",
+      }));
+    }
+  }, []);
 
-  const listTodos = useCallback(
-    async (limit = 10): Promise<ListTodosResponseDTO | undefined> => {
-      try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const listTodos = useCallback(async (limit = 10): Promise<ListTodosResponseDTO | undefined> => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const pagination = await TodoApiClient.listTodos({ limit });
+      const pagination = await TodoApiClient.listTodos({ limit });
 
-        setState((prev) => ({
-          ...prev,
-          todos: pagination.todos,
-          hasMore: pagination.hasMore ?? false,
-          currentCursor: pagination.cursor,
-          isLoading: false,
-        }));
+      setState((prev) => ({
+        ...prev,
+        todos: pagination.todos,
+        hasMore: pagination.hasMore ?? false,
+        currentCursor: pagination.cursor,
+        isLoading: false,
+      }));
 
-        return pagination;
-      } catch (error) {
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to load todos",
-        }));
-      }
-    },
-    []
-  );
+      return pagination;
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Failed to load todos",
+      }));
+    }
+  }, []);
 
-  const getTodo = useCallback(
-    async (id: string): Promise<TodoResponseDTO | undefined> => {
-      try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const getTodo = useCallback(async (id: string): Promise<TodoResponseDTO | undefined> => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const todo = await TodoApiClient.getTodo(id);
+      const todo = await TodoApiClient.getTodo(id);
 
-        setState((prev) => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
 
-        return todo;
-      } catch (error) {
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to fetch todo",
-        }));
-      }
-    },
-    []
-  );
+      return todo;
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Failed to fetch todo",
+      }));
+    }
+  }, []);
 
-  const toggleTodo = useCallback(
-    async (id: string): Promise<TodoResponseDTO | undefined> => {
-      try {
-        // Optimistic update
-        setState((prev) => ({
-          ...prev,
-          todos: prev.todos.map((t) =>
-            t.id === id ? { ...t, completed: !t.completed } : t
-          ),
+  const toggleTodo = useCallback(async (id: string): Promise<TodoResponseDTO | undefined> => {
+    try {
+      // Optimistic update
+      setState((prev) => ({
+        ...prev,
+        todos: prev.todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+        isLoading: true,
+        error: null,
+      }));
+
+      const updated = await TodoApiClient.toggleTodo(id);
+
+      setState((prev) => ({
+        ...prev,
+        todos: prev.todos.map((t) => (t.id === id ? updated : t)),
+        isLoading: false,
+      }));
+
+      return updated;
+    } catch (error) {
+      // Revert optimistic update on error
+      setState((prev) => ({
+        ...prev,
+        todos: prev.todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Failed to toggle todo",
+      }));
+    }
+  }, []);
+
+  const deleteTodo = useCallback(async (id: string): Promise<{ success: boolean } | undefined> => {
+    try {
+      // Store original state for rollback before optimistic update
+      setState((prev) => {
+        const originalTodos = prev.todos;
+        setState((prevAgain) => ({
+          ...prevAgain,
+          todos: prevAgain.todos.filter((t) => t.id !== id),
           isLoading: true,
           error: null,
         }));
+        return { ...prev, todos: originalTodos };
+      });
 
-        const updated = await TodoApiClient.toggleTodo(id);
+      await TodoApiClient.deleteTodo(id);
 
-        setState((prev) => ({
-          ...prev,
-          todos: prev.todos.map((t) => (t.id === id ? updated : t)),
-          isLoading: false,
-        }));
+      setState((prev) => ({ ...prev, isLoading: false }));
 
-        return updated;
-      } catch (error) {
-        // Revert optimistic update on error
-        setState((prev) => ({
-          ...prev,
-          todos: prev.todos.map((t) =>
-            t.id === id ? { ...t, completed: !t.completed } : t
-          ),
-          isLoading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to toggle todo",
-        }));
-      }
-    },
-    []
-  );
-
-  const deleteTodo = useCallback(
-    async (id: string): Promise<{ success: boolean } | undefined> => {
-      try {
-        // Store original state for rollback before optimistic update
-        setState((prev) => {
-          const originalTodos = prev.todos;
-          setState((prevAgain) => ({
-            ...prevAgain,
-            todos: prevAgain.todos.filter((t) => t.id !== id),
-            isLoading: true,
-            error: null,
-          }));
-          return { ...prev, todos: originalTodos };
-        });
-
-        await TodoApiClient.deleteTodo(id);
-
-        setState((prev) => ({ ...prev, isLoading: false }));
-
-        return { success: true };
-      } catch (error) {
-        setState((prev) => ({
-          ...prev,
-          todos: prev.todos,
-          isLoading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to delete todo",
-        }));
-      }
-    },
-    []
-  );
+      return { success: true };
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        todos: prev.todos,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Failed to delete todo",
+      }));
+    }
+  }, []);
 
   const loadMore = useCallback(async (): Promise<void> => {
     if (!state.hasMore || !state.currentCursor) {
@@ -220,8 +196,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error:
-          error instanceof Error ? error.message : "Failed to load more todos",
+        error: error instanceof Error ? error.message : "Failed to load more todos",
       }));
     }
   }, [state.hasMore, state.currentCursor]);

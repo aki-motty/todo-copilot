@@ -21,7 +21,8 @@
             },
             "complexity": {
                 "noBannedTypes": "error",
-                "noExcessiveNestedTestSuites": "error"
+                "noExcessiveNestedTestSuites": "error",
+                "useLiteralKeys": "off"
             }
         }
     },
