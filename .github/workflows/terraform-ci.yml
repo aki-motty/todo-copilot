@@ -296,7 +296,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="key=dev/terraform.tfstate" \
+            -backend-config="key=main/terraform.tfstate" \
             -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
             -backend-config="region=${{ env.AWS_REGION }}"
 
