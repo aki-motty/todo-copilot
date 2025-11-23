@@ -61,14 +61,14 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # Lambda function with built handler
 resource "aws_lambda_function" "main" {
-  filename      = "${path.root}/../../dist-lambda/index.js"
-  function_name = "${var.project_name}-api-${var.environment}"
-  role          = var.lambda_execution_role_arn
-  handler       = "index.handler"
-  runtime       = "nodejs18.x"
-  architectures = ["x86_64"]
-  timeout       = var.lambda_timeout
-  memory_size   = var.lambda_memory_size
+  filename         = "${path.root}/../../dist-lambda/index.js"
+  function_name    = "${var.project_name}-api-${var.environment}"
+  role             = var.lambda_execution_role_arn
+  handler          = "index.handler"
+  runtime          = "nodejs18.x"
+  architectures    = ["x86_64"]
+  timeout          = var.lambda_timeout
+  memory_size      = var.lambda_memory_size
   source_code_hash = filebase64sha256("${path.root}/../../dist-lambda/index.js")
 
   environment {
