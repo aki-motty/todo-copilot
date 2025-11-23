@@ -362,7 +362,13 @@ resource "aws_iam_policy" "frontend_manage" {
           "s3:GetBucketTagging",
           "s3:PutBucketTagging",
           "s3:GetBucketCors",
-          "s3:PutBucketCors"
+          "s3:PutBucketCors",
+          "s3:GetAccelerateConfiguration",
+          "s3:GetBucketRequestPayment",
+          "s3:GetBucketLogging",
+          "s3:GetLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetEncryptionConfiguration"
         ]
         Resource = [
           "arn:aws:s3:::todo-copilot-*-frontend",
