@@ -146,6 +146,12 @@ export class HttpClient {
       // Extract data from API response wrapper if present
       if (isJson && typeof data === "object" && data !== null) {
         const apiData = data as Record<string, unknown>;
+        
+        // Handle standard API response format { status, data, meta }
+        if ("status" in apiData && "data" in apiData) {
+          return apiData["data"] as T;
+        }
+
         if ("body" in apiData && typeof apiData["body"] === "object") {
           const apiBody = apiData["body"] as Record<string, unknown>;
           if ("data" in apiBody) {

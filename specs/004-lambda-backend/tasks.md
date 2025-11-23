@@ -209,9 +209,9 @@ Tests use localStorage fallback when API is unavailable. Test implementation rea
 
 ### Deployment Validation
 
-- [ ] T086 Deploy to dev environment: Push to main, wait for GitHub Actions, verify Lambda active
-- [ ] T087 [P] Verify dev API responds: curl GET /todos, verify CORS headers, check response format
-- [ ] T088 [P] Manual testing in dev: Create/toggle/delete todos in UI, verify persists
+- [X] T086 Deploy to dev environment: Push to main, wait for GitHub Actions, verify Lambda active
+- [X] T087 [P] Verify dev API responds: curl GET /todos, verify CORS headers, check response format
+- [X] T088 [P] Manual testing in dev: Create/toggle/delete todos in UI, verify persists
 - [ ] T089 [P] Deploy to staging: Add `deploy-staging` label to PR, merge, approve deployment
 - [ ] T090 [P] Deploy to prod: Add `deploy-prod` label to PR, merge, get 2 approvals, verify deployment
 

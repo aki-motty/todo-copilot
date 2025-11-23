@@ -58,15 +58,14 @@ export class AsyncApiTodoRepository {
     try {
       this.logger.debug("Finding all todos");
       const response = await this.httpClient.get<{
-        items: TodoDTO[];
-        total: number;
-        page: number;
-        pageSize: number;
+        todos: TodoDTO[];
+        count: number;
         hasMore: boolean;
+        cursor?: string;
       }>("/todos");
 
-      const todos = response.items.map((dto) => this.mapTodoFromDTO(dto));
-      this.logger.debug("Todos retrieved", { count: todos.length, total: response.total });
+      const todos = response.todos.map((dto) => this.mapTodoFromDTO(dto));
+      this.logger.debug("Todos retrieved", { count: todos.length, total: response.count });
       return todos;
     } catch (error) {
       this.logger.error(
