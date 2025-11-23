@@ -13,12 +13,12 @@
 import { Todo, TodoTitle } from '../../src/domain/entities/Todo';
 import { DynamoDBClient_ } from '../../src/infrastructure/aws-integration/dynamodb-client';
 import { DynamoDBTodoRepository } from '../../src/infrastructure/aws-integration/DynamoDBTodoRepository';
-import { LambdaClientService, getLambdaClient, resetLambdaClient } from '../../src/infrastructure/aws-integration/lambda-client';
+import { type LambdaClientService, getLambdaClient, resetLambdaClient } from '../../src/infrastructure/aws-integration/lambda-client';
 
 /**
  * テスト用の Todo エンティティ作成ヘルパー
  */
-function createTestTodo(title: string, completed: boolean = false): Todo {
+function createTestTodo(title: string, completed = false): Todo {
   const todoId = `todo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` as any;
   const todoTitle = TodoTitle.create(title);
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
@@ -26,8 +26,8 @@ function createTestTodo(title: string, completed: boolean = false): Todo {
 
 // AWS 環境が利用可能かどうかを判定
 const hasAWSEnvironment = () => {
-  const hasLocalStack = !!process.env['LOCALSTACK_ENDPOINT'];
-  const hasAWSCredentials = !!process.env['AWS_ACCESS_KEY_ID'] && !!process.env['AWS_SECRET_ACCESS_KEY'];
+  const hasLocalStack = !!process.env.LOCALSTACK_ENDPOINT;
+  const hasAWSCredentials = !!process.env.AWS_ACCESS_KEY_ID && !!process.env.AWS_SECRET_ACCESS_KEY;
   return hasLocalStack || hasAWSCredentials;
 };
 
@@ -36,17 +36,17 @@ const describeIfAWSAvailable = hasAWSEnvironment() ? describe : describe.skip;
 
 describeIfAWSAvailable('AWS Integration Tests - DynamoDB', () => {
   let dynamoClient: DynamoDBClient_;
-  const testTableName = process.env['DYNAMODB_TABLE_NAME'] || 'todos-test';
+  const testTableName = process.env.DYNAMODB_TABLE_NAME || 'todos-test';
 
   beforeAll(() => {
     // LocalStack または実 AWS 環境への接続を初期化
-    const region = process.env['AWS_REGION'] || 'ap-northeast-1';
-    const endpoint = process.env['LOCALSTACK_ENDPOINT'] || process.env['AWS_ENDPOINT_URL'];
+    const region = process.env.AWS_REGION || 'ap-northeast-1';
+    const endpoint = process.env.LOCALSTACK_ENDPOINT || process.env.AWS_ENDPOINT_URL;
 
-    console.log(`🔧 DynamoDB クライアント初期化`);
+    console.log("🔧 DynamoDB クライアント初期化");
     console.log(`   - テーブル: ${testTableName}`);
     console.log(`   - リージョン: ${region}`);
-    if (endpoint) console.log(`   - エンドポイント: ${endpoint}`);
+    if (endpoint) { console.log(`   - エンドポイント: ${endpoint}`); }
   });
 
   describe('DynamoDB クライアント - 基本操作', () => {
@@ -204,7 +204,7 @@ describeIfAWSAvailable('AWS Integration Tests - DynamoDB', () => {
 describeIfAWSAvailable('AWS Integration Tests - DynamoDB Repository', () => {
   let repository: DynamoDBTodoRepository;
   let dynamoClient: DynamoDBClient_;
-  const testTableName = process.env['DYNAMODB_TABLE_NAME'] || 'todos-test';
+  const testTableName = process.env.DYNAMODB_TABLE_NAME || 'todos-test';
 
   beforeEach(() => {
     dynamoClient = new DynamoDBClient_(testTableName);
@@ -253,9 +253,9 @@ describeIfAWSAvailable('AWS Integration Tests - DynamoDB Repository', () => {
 
       expect(completed.length).toBeGreaterThanOrEqual(1);
       // すべて完了済みであることを確認
-      completed.forEach(todo => {
+      for (const todo of completed) {
         expect(todo.completed).toBe(true);
-      });
+      }
     }, 15000);
 
     it('複数 Todo を一括保存 - saveMany', async () => {
@@ -316,7 +316,7 @@ describeIfAWSAvailable('AWS Integration Tests - DynamoDB Repository', () => {
 
   describe('エラーハンドリング', () => {
     it('存在しない ID を取得するとエラーを処理', async () => {
-      const nonExistentId = 'non-existent-id-' + Date.now();
+      const nonExistentId = `non-existent-id-${Date.now()}`;
 
       const result = await repository.findById(nonExistentId);
 
@@ -349,9 +349,9 @@ describeIfAWSAvailable('AWS Integration Tests - Lambda Client', () => {
     resetLambdaClient();
     lambdaClient = getLambdaClient();
 
-    console.log(`🔧 Lambda クライアント初期化`);
-    const endpoint = process.env['LOCALSTACK_ENDPOINT'] || process.env['AWS_ENDPOINT_URL'];
-    if (endpoint) console.log(`   - エンドポイント: ${endpoint}`);
+    console.log("🔧 Lambda クライアント初期化");
+    const endpoint = process.env.LOCALSTACK_ENDPOINT || process.env.AWS_ENDPOINT_URL;
+    if (endpoint) { console.log(`   - エンドポイント: ${endpoint}`); }
   });
 
   describe('Lambda クライアント - 基本動作', () => {
@@ -405,18 +405,18 @@ describeIfAWSAvailable('AWS Integration Tests - Lambda Client', () => {
 describeIfAWSAvailable('AWS Integration Tests - 環境検出', () => {
   it('AWS_REGION 環境変数が検出可能', () => {
     // 環境変数の存在を確認（テスト環境では設定されていなくても良い）
-    const region = process.env['AWS_REGION'];
+    const region = process.env.AWS_REGION;
     expect(typeof region === 'string' || typeof region === 'undefined').toBe(true);
   });
 
   it('DynamoDB テーブル名が設定可能', () => {
-    const tableName = process.env['DYNAMODB_TABLE_NAME'] || 'todos-test';
+    const tableName = process.env.DYNAMODB_TABLE_NAME || 'todos-test';
     expect(tableName).toBeDefined();
     expect(typeof tableName).toBe('string');
   });
 
   it('LocalStack エンドポイント検出', () => {
-    const endpoint = process.env['LOCALSTACK_ENDPOINT'] || process.env['AWS_ENDPOINT_URL'];
+    const endpoint = process.env.LOCALSTACK_ENDPOINT || process.env.AWS_ENDPOINT_URL;
     // どちらかが設定されている、または両方とも未設定（実 AWS を使用）
     expect(typeof endpoint === 'string' || typeof endpoint === 'undefined').toBe(true);
   });

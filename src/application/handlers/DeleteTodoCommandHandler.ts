@@ -1,7 +1,7 @@
-import { ITodoRepository } from '../../domain/repositories/TodoRepository';
+import type { ITodoRepository } from '../../domain/repositories/TodoRepository';
 import { createLogger } from '../../infrastructure/config/logger';
 import { NotFoundError } from '../../shared/types';
-import { DeleteTodoCommand } from '../commands/DeleteTodoCommand';
+import type { DeleteTodoCommand } from '../commands/DeleteTodoCommand';
 
 /**
  * Handler for DeleteTodoCommand.

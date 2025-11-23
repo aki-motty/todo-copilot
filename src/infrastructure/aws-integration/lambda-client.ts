@@ -18,7 +18,7 @@ export class LambdaClientService {
    * コンストラクタ
    * @param region AWS リージョン
    */
-  constructor(region: string = process.env['AWS_REGION'] || 'ap-northeast-1') {
+  constructor(region: string = process.env.AWS_REGION || 'ap-northeast-1') {
     this.client = new LambdaClient({ region });
   }
 
@@ -163,7 +163,7 @@ export class LambdaClientService {
    * @param maxItems 最大件数
    * @returns 関数一覧
    */
-  async listFunctions(maxItems: number = 50) {
+  async listFunctions(maxItems = 50) {
     try {
       const command = new ListFunctionsCommand({
         MaxItems: maxItems,

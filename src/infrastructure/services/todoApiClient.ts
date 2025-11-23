@@ -16,8 +16,8 @@ function getApiBaseUrl(): string {
   if (typeof __VITE_API_URL__ !== "undefined") {
     return __VITE_API_URL__;
   }
-  if (typeof process !== "undefined" && process.env?.["VITE_API_URL"]) {
-    return process.env["VITE_API_URL"];
+  if (typeof process !== "undefined" && process.env?.VITE_API_URL) {
+    return process.env.VITE_API_URL;
   }
   // Default fallback
   return "http://localhost:3000";
@@ -46,57 +46,57 @@ export class ApiError extends Error {
  * Todo API Client
  * Provides methods for all CRUD operations
  */
-export class TodoApiClient {
+export const TodoApiClient = {
   /**
    * Create a new todo
    */
-  static async createTodo(title: string): Promise<TodoResponseDTO> {
-    const response = await this.fetch("/todos", "POST", { title });
+  async createTodo(title: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch("/todos", "POST", { title });
     return response.data as TodoResponseDTO;
-  }
+  },
 
   /**
    * Get all todos with pagination support
    */
-  static async listTodos(options?: { limit?: number; cursor?: string }): Promise<ListTodosResponseDTO> {
+  async listTodos(options?: { limit?: number; cursor?: string }): Promise<ListTodosResponseDTO> {
     const params = new URLSearchParams();
-    if (options?.limit) params.append("limit", String(options.limit));
-    if (options?.cursor) params.append("cursor", options.cursor);
+    if (options?.limit) { params.append("limit", String(options.limit)); }
+    if (options?.cursor) { params.append("cursor", options.cursor); }
 
     const queryString = params.toString();
     const url = `/todos${queryString ? `?${queryString}` : ""}`;
-    const response = await this.fetch(url, "GET");
+    const response = await TodoApiClient.fetch(url, "GET");
     return response.data as ListTodosResponseDTO;
-  }
+  },
 
   /**
    * Get a single todo by ID
    */
-  static async getTodo(id: string): Promise<TodoResponseDTO> {
-    const response = await this.fetch(`/todos/${id}`, "GET");
+  async getTodo(id: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${id}`, "GET");
     return response.data as TodoResponseDTO;
-  }
+  },
 
   /**
    * Toggle todo completion status
    */
-  static async toggleTodo(id: string): Promise<TodoResponseDTO> {
-    const response = await this.fetch(`/todos/${id}/toggle`, "PUT", {});
+  async toggleTodo(id: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${id}/toggle`, "PUT", {});
     return response.data as TodoResponseDTO;
-  }
+  },
 
   /**
    * Delete a todo
    */
-  static async deleteTodo(id: string): Promise<{ success: boolean; id: string }> {
-    const response = await this.fetch(`/todos/${id}`, "DELETE");
+  async deleteTodo(id: string): Promise<{ success: boolean; id: string }> {
+    const response = await TodoApiClient.fetch(`/todos/${id}`, "DELETE");
     return response.data as { success: boolean; id: string };
-  }
+  },
 
   /**
    * Internal fetch method with retry logic and error handling
    */
-  private static async fetch(
+  async fetch(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     body?: unknown,
@@ -147,7 +147,7 @@ export class TodoApiClient {
         // Network error - retry if attempts remain
         if (attempt < RETRY_MAX_ATTEMPTS) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt));
-          return this.fetch(endpoint, method, body, attempt + 1);
+          return TodoApiClient.fetch(endpoint, method, body, attempt + 1);
         }
         throw new ApiError(0, "NETWORK_ERROR", "Failed to connect to API", {
           originalMessage: error.message,

@@ -62,7 +62,7 @@ export async function migrateFromLocalStorage(
 
   let migrated = 0;
   let failed = 0;
-  let skipped = 0;
+  const skipped = 0;
 
   console.info(`Starting migration of ${localTodos.length} todos...`);
 
@@ -125,12 +125,11 @@ export async function performFullMigration(
     if (stats.failed === 0) {
       clearLocalStorageTodos();
       return true;
-    } else {
+    }
       console.warn(
         `Migration completed with errors: ${stats.failed} failed. Keeping localStorage backup.`
       );
       return false;
-    }
   } catch (error) {
     console.error("Migration failed:", error);
     return false;

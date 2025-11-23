@@ -18,7 +18,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleToggle = async () => {
-    if (!onToggleCompletion) return;
+    if (!onToggleCompletion) { return; }
 
     try {
       setIsToggling(true);
@@ -31,7 +31,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
   };
 
   const handleDelete = async () => {
-    if (!onDelete) return;
+    if (!onDelete) { return; }
 
     try {
       setIsDeleting(true);
@@ -62,6 +62,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
         {showDeleteConfirm ? (
           <>
             <button
+              type="button"
               onClick={handleDelete}
               disabled={isDeleting}
               className="delete-confirm-btn"
@@ -70,6 +71,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
               {isDeleting ? "..." : "Confirm"}
             </button>
             <button
+              type="button"
               onClick={() => setShowDeleteConfirm(false)}
               className="delete-cancel-btn"
               aria-label="Cancel delete"
@@ -79,6 +81,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
           </>
         ) : (
           <button
+            type="button"
             onClick={() => setShowDeleteConfirm(true)}
             className="delete-btn"
             aria-label="Delete todo"

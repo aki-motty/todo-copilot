@@ -8,9 +8,9 @@
  * - Output 値検証
  */
 
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { execSync } from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 describe('T064: Terraform Module & Configuration Tests', () => {
   const terraformDir = path.resolve(__dirname, '../../infrastructure/terraform');
@@ -442,10 +442,10 @@ describe('T064: Terraform Module & Configuration Tests', () => {
 
   describe('統合検証レポート', () => {
     it('テスト実行サマリーを出力', () => {
-      console.log(`\n📊 Terraform Module テスト統計`);
+      console.log("\n📊 Terraform Module テスト統計");
       console.log(`  - モジュール数: ${requiredModules.length}`);
       console.log(`  - 環境数: ${environments.length}`);
-      console.log(`  - チェック項目: 30+`);
+      console.log("  - チェック項目: 30+");
       console.log(`  - 実行完了: ${new Date().toISOString()}`);
     });
   });

@@ -5,7 +5,7 @@
 
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import type { ApiResponseDTO, ErrorResponseDTO } from "../../../application/dto/TodoDTO";
-import { AppError, isAppError } from "../../../application/errors/AppError";
+import { type AppError, isAppError } from "../../../application/errors/AppError";
 import { CreateTodoHandler } from "../../../application/handlers/CreateTodoHandler";
 import { DeleteTodoHandler } from "../../../application/handlers/DeleteTodoHandler";
 import { GetTodoHandler } from "../../../application/handlers/GetTodoHandler";
@@ -78,7 +78,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
     if (stage !== "$default" && path.startsWith(`/${stage}`)) {
       path = path.substring(stage.length + 1);
       if (!path.startsWith("/")) {
-        path = "/" + path;
+        path = `/${path}`;
       }
     }
 
@@ -104,10 +104,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       statusCode = 201;
     } else if (method === "GET" && path === "/todos") {
       // List todos
-      const limit = event.queryStringParameters?.["limit"]
-        ? parseInt(event.queryStringParameters["limit"])
+      const limit = event.queryStringParameters?.limit
+        ? Number.parseInt(event.queryStringParameters.limit)
         : undefined;
-      const cursor = event.queryStringParameters?.["cursor"];
+      const cursor = event.queryStringParameters?.cursor;
       response = await handlers.listTodos.execute({ limit, cursor });
     } else if (method === "GET" && path.match(/^\/todos\/[^/]+$/) && !path.endsWith("/toggle")) {
       // Get single todo

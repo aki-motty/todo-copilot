@@ -1,4 +1,4 @@
-import { ToggleTodoCompletionCommand } from "../../../../src/application/commands";
+import type { ToggleTodoCompletionCommand } from "../../../../src/application/commands";
 
 describe("ToggleTodoCompletionCommand - Unit Tests", () => {
   describe("Command structure", () => {
@@ -18,10 +18,10 @@ describe("ToggleTodoCompletionCommand - Unit Tests", () => {
     it("should work with any non-empty id string", () => {
       const testIds = ["1", "abc", "some-complex-uuid", "123-456-789"];
 
-      testIds.forEach((id) => {
+      for (const id of testIds) {
         const command: ToggleTodoCompletionCommand = { id };
         expect(command.id).toBe(id);
-      });
+      }
     });
   });
 

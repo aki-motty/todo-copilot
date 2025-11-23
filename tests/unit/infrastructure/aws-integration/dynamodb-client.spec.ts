@@ -45,10 +45,10 @@ describe('Unit Tests - DynamoDB Client', () => {
     });
 
     it('環境変数 AWS_REGION を使用', () => {
-      process.env['AWS_REGION'] = 'eu-west-1';
+      process.env.AWS_REGION = 'eu-west-1';
       const client = new DynamoDBClient_('todos');
       expect(client).toBeDefined();
-      delete process.env['AWS_REGION'];
+      process.env.AWS_REGION = undefined;
     });
   });
 
@@ -177,21 +177,10 @@ describe('Unit Tests - DynamoDB パラメータ構築', () => {
   });
 
   it('putItem パラメータが正しく構築される', () => {
-    const testItem = {
-      id: 'test-123',
-      title: 'Test',
-      completed: false,
-    };
-
     expect(client).toBeDefined();
   });
 
   it('updateItem パラメータが正しく構築される', () => {
-    const updates = {
-      title: 'Updated',
-      completed: true,
-    };
-
     expect(client).toBeDefined();
   });
 
@@ -214,12 +203,6 @@ describe('Unit Tests - DynamoDB 型安全性', () => {
   });
 
   it('ジェネリック型 T で型推論が機能する', () => {
-    interface TestItem {
-      id: string;
-      name: string;
-      age: number;
-    }
-
     // ジェネリック型チェック
     expect(typeof client.getItem).toBe('function');
     expect(typeof client.putItem).toBe('function');

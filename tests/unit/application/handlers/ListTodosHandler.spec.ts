@@ -19,14 +19,17 @@ describe("ListTodosHandler", () => {
 
   it("should list all todos", async () => {
     // Create some todos
-    createHandler.handle({ title: "First Todo" });
-    createHandler.handle({ title: "Second Todo" });
-    createHandler.handle({ title: "Third Todo" });
+    await createHandler.handle({ title: "First Todo" });
+    await new Promise(resolve => setTimeout(resolve, 10));
+    await createHandler.handle({ title: "Second Todo" });
+    await new Promise(resolve => setTimeout(resolve, 10));
+    await createHandler.handle({ title: "Third Todo" });
 
     const result = await handler.execute({});
 
     expect(result.todos).toHaveLength(3);
-    expect(result.todos?.[0]?.title).toBe("Third Todo"); // Most recent first
+    // Newest first
+    expect(result.todos?.[0]?.title).toBe("Third Todo");
     expect(result.todos?.[1]?.title).toBe("Second Todo");
     expect(result.todos?.[2]?.title).toBe("First Todo");
   });
@@ -39,7 +42,7 @@ describe("ListTodosHandler", () => {
 
   it("should support limit parameter", async () => {
     for (let i = 1; i <= 10; i++) {
-      createHandler.handle({ title: `Todo ${i}` });
+      await createHandler.handle({ title: `Todo ${i}` });
     }
 
     const result = await handler.execute({ limit: 5 });

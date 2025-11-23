@@ -7,7 +7,7 @@
 
 import { Todo, TodoTitle } from '../../../../src/domain/entities/Todo';
 import { DynamoDBTodoRepository } from '../../../../src/infrastructure/aws-integration/DynamoDBTodoRepository';
-import { DynamoDBClient_ } from '../../../../src/infrastructure/aws-integration/dynamodb-client';
+import type { DynamoDBClient_ } from '../../../../src/infrastructure/aws-integration/dynamodb-client';
 
 // Mock DynamoDB Client
 jest.mock('../../../../src/infrastructure/aws-integration/dynamodb-client');

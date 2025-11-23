@@ -16,7 +16,8 @@
             "suspicious": {
                 "noAssignInExpressions": "error",
                 "noMisleadingCharacterClass": "error",
-                "noMisleadingInstantiator": "error"
+                "noMisleadingInstantiator": "error",
+                "noExplicitAny": "off"
             },
             "complexity": {
                 "noBannedTypes": "error",

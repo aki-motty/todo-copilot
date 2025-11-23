@@ -5,7 +5,7 @@
  * ログ出力とログレベル管理の検証
  */
 
-import { CloudWatchLogsClientService, getCloudWatchLogsClient, getLogger, initializeGlobalLogger, resetCloudWatchLogsClient } from '../../../../src/infrastructure/aws-integration/cloudwatch-client';
+import { type CloudWatchLogsClientService, getCloudWatchLogsClient, getLogger, initializeGlobalLogger, resetCloudWatchLogsClient } from '../../../../src/infrastructure/aws-integration/cloudwatch-client';
 
 // Mock AWS SDK
 jest.mock('@aws-sdk/client-cloudwatch-logs', () => {
@@ -43,14 +43,14 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
     });
 
     it('環境変数から設定を読み込み可能', async () => {
-      process.env['CLOUDWATCH_LOG_GROUP'] = 'env-log-group';
-      process.env['CLOUDWATCH_LOG_STREAM'] = 'env-stream';
+      process.env.CLOUDWATCH_LOG_GROUP = 'env-log-group';
+      process.env.CLOUDWATCH_LOG_STREAM = 'env-stream';
 
       const client = await getCloudWatchLogsClient();
       expect(client).toBeDefined();
 
-      delete process.env['CLOUDWATCH_LOG_GROUP'];
-      delete process.env['CLOUDWATCH_LOG_STREAM'];
+      process.env.CLOUDWATCH_LOG_GROUP = undefined;
+      process.env.CLOUDWATCH_LOG_STREAM = undefined;
     });
   });
 
@@ -90,26 +90,26 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
   describe('ログレベルの管理', () => {
     it('デフォルトのログレベルは INFO', async () => {
       // デフォルト環境変数を確認
-      const logLevel = process.env['LOG_LEVEL'] || 'INFO';
+      const logLevel = process.env.LOG_LEVEL || 'INFO';
       expect(['DEBUG', 'INFO', 'WARN', 'ERROR']).toContain(logLevel);
     });
 
     it('LOG_LEVEL 環境変数で制御可能', async () => {
-      process.env['LOG_LEVEL'] = 'DEBUG';
+      process.env.LOG_LEVEL = 'DEBUG';
 
       const client = await getCloudWatchLogsClient('test', 'test');
       expect(client).toBeDefined();
 
-      delete process.env['LOG_LEVEL'];
+      process.env.LOG_LEVEL = undefined;
     });
 
     it('無効なログレベルはデフォルトにフォールバック', async () => {
-      process.env['LOG_LEVEL'] = 'INVALID';
+      process.env.LOG_LEVEL = 'INVALID';
 
       const client = await getCloudWatchLogsClient('test', 'test');
       expect(client).toBeDefined();
 
-      delete process.env['LOG_LEVEL'];
+      process.env.LOG_LEVEL = undefined;
     });
   });
 
@@ -158,7 +158,6 @@ describe('Unit Tests - CloudWatch Logs Client', () => {
     });
 
     it('大きなメッセージをハンドル可能', async () => {
-      const largeMessage = 'x'.repeat(10000);
       expect(logsClient.log).toBeDefined();
     });
 
@@ -233,9 +232,9 @@ describe('Unit Tests - CloudWatch 型安全性', () => {
 
   it('ログレベルが型安全である', () => {
     const validLevels = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
-    validLevels.forEach((level) => {
+    for (const level of validLevels) {
       expect(validLevels).toContain(level);
-    });
+    }
   });
 
   it('メタデータが任意の型を受け入れ可能', () => {

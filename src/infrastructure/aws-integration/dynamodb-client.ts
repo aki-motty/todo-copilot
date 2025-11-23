@@ -28,7 +28,7 @@ export class DynamoDBClient_ {
    */
   constructor(
     tableName: string,
-    region: string = process.env['AWS_REGION'] || 'ap-northeast-1'
+    region: string = process.env.AWS_REGION || 'ap-northeast-1'
   ) {
     this.tableName = tableName;
     this.client = new DynamoDBClient({ region });
@@ -69,7 +69,7 @@ export class DynamoDBClient_ {
       await this.client.send(command);
       return item;
     } catch (error) {
-      console.error(`DynamoDB PutItem error:`, error);
+      console.error("DynamoDB PutItem error:", error);
       throw error;
     }
   }
@@ -101,7 +101,7 @@ export class DynamoDBClient_ {
 
         await this.client.send(command);
       } catch (error) {
-        console.error(`DynamoDB BatchPutItems error:`, error);
+        console.error("DynamoDB BatchPutItems error:", error);
         throw error;
       }
     }
@@ -121,9 +121,9 @@ export class DynamoDBClient_ {
         .join(', ');
 
       const expressionAttributeValues: Record<string, any> = {};
-      Object.entries(updates).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(updates)) {
         expressionAttributeValues[`:${key}`] = value;
-      });
+      }
 
       const command = new UpdateItemCommand({
         TableName: this.tableName,
@@ -185,7 +185,7 @@ export class DynamoDBClient_ {
 
         await this.client.send(command);
       } catch (error) {
-        console.error(`DynamoDB BatchDeleteItems error:`, error);
+        console.error("DynamoDB BatchDeleteItems error:", error);
         throw error;
       }
     }
@@ -236,7 +236,7 @@ export class DynamoDBClient_ {
       const response = await this.client.send(command);
       return (response.Items || []).map((item: any) => unmarshall(item) as T);
     } catch (error) {
-      console.error(`DynamoDB Query error:`, error);
+      console.error("DynamoDB Query error:", error);
       throw error;
     }
   }
@@ -266,7 +266,7 @@ export class DynamoDBClient_ {
       const response = await this.client.send(command);
       return (response.Items || []).map((item: any) => unmarshall(item) as T);
     } catch (error) {
-      console.error(`DynamoDB Scan error:`, error);
+      console.error("DynamoDB Scan error:", error);
       throw error;
     }
   }
@@ -299,7 +299,7 @@ export class DynamoDBClient_ {
         const items = response.Responses?.[this.tableName] || [];
         results.push(...items.map((item: any) => unmarshall(item) as T));
       } catch (error) {
-        console.error(`DynamoDB BatchGetItems error:`, error);
+        console.error("DynamoDB BatchGetItems error:", error);
         throw error;
       }
     }
@@ -353,7 +353,7 @@ let instance: DynamoDBClient_ | null = null;
 export function getDynamoDBClient(
   tableName?: string
 ): DynamoDBClient_ {
-  const table = tableName || process.env['DYNAMODB_TABLE'] || 'todo-copilot-dev';
+  const table = tableName || process.env.DYNAMODB_TABLE || 'todo-copilot-dev';
 
   if (!instance) {
     instance = new DynamoDBClient_(table);

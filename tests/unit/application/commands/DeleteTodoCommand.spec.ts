@@ -1,4 +1,4 @@
-import { DeleteTodoCommand } from '../../../../src/application/commands/DeleteTodoCommand';
+import type { DeleteTodoCommand } from '../../../../src/application/commands/DeleteTodoCommand';
 import { Todo } from '../../../../src/domain/entities/Todo';
 
 describe('DeleteTodoCommand', () => {

@@ -15,11 +15,11 @@ export interface UseTodoAPIState {
 }
 
 export interface UseTodoAPIReturn extends UseTodoAPIState {
-  createTodo(title: string): Promise<TodoResponseDTO | void>;
-  listTodos(limit?: number): Promise<ListTodosResponseDTO | void>;
-  getTodo(id: string): Promise<TodoResponseDTO | void>;
-  toggleTodo(id: string): Promise<TodoResponseDTO | void>;
-  deleteTodo(id: string): Promise<{ success: boolean } | void>;
+  createTodo(title: string): Promise<TodoResponseDTO | undefined>;
+  listTodos(limit?: number): Promise<ListTodosResponseDTO | undefined>;
+  getTodo(id: string): Promise<TodoResponseDTO | undefined>;
+  toggleTodo(id: string): Promise<TodoResponseDTO | undefined>;
+  deleteTodo(id: string): Promise<{ success: boolean } | undefined>;
   loadMore(): Promise<void>;
   retry(): Promise<void>;
   clearError(): void;
@@ -49,7 +49,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
   }, []);
 
   const createTodo = useCallback(
-    async (title: string): Promise<TodoResponseDTO | void> => {
+    async (title: string): Promise<TodoResponseDTO | undefined> => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -76,7 +76,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
   );
 
   const listTodos = useCallback(
-    async (limit = 10): Promise<ListTodosResponseDTO | void> => {
+    async (limit = 10): Promise<ListTodosResponseDTO | undefined> => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -104,7 +104,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
   );
 
   const getTodo = useCallback(
-    async (id: string): Promise<TodoResponseDTO | void> => {
+    async (id: string): Promise<TodoResponseDTO | undefined> => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -126,7 +126,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
   );
 
   const toggleTodo = useCallback(
-    async (id: string): Promise<TodoResponseDTO | void> => {
+    async (id: string): Promise<TodoResponseDTO | undefined> => {
       try {
         // Optimistic update
         setState((prev) => ({
@@ -164,7 +164,7 @@ export function useTodoAPI(): UseTodoAPIReturn {
   );
 
   const deleteTodo = useCallback(
-    async (id: string): Promise<{ success: boolean } | void> => {
+    async (id: string): Promise<{ success: boolean } | undefined> => {
       try {
         // Store original state for rollback before optimistic update
         setState((prev) => {

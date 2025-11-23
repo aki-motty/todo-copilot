@@ -19,7 +19,7 @@ export interface ApiConfig {
  * Falls back to localhost for development
  */
 export function getApiConfig(): ApiConfig {
-  const baseUrl = import.meta.env["VITE_API_URL"] || "http://localhost:3000";
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   return {
     baseUrl,
@@ -45,7 +45,7 @@ export function isValidApiUrl(url: string): boolean {
  */
 export function validateApiConfiguration(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  const apiUrl = import.meta.env["VITE_API_URL"];
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   if (!apiUrl) {
     errors.push("VITE_API_URL environment variable is not set");
@@ -84,7 +84,7 @@ export function getApiEndpoint(path: string): string {
  * Checks if API is configured for production
  */
 export function isProduction(): boolean {
-  const baseUrl = import.meta.env["VITE_API_URL"];
+  const baseUrl = import.meta.env.VITE_API_URL;
   return (
     baseUrl !== undefined &&
     !baseUrl.includes("localhost") &&

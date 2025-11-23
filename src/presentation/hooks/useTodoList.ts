@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import { TodoApplicationService } from "../../application/services/TodoApplicationService";
+import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
@@ -25,7 +26,7 @@ export const useTodoList = () => {
 
   // Create appropriate repository and services based on configuration
   const todoController = useMemo(() => {
-    let repo;
+    let repo: ITodoRepository;
     if (backendMode === "api" && baseUrl) {
       repo = new AsyncApiTodoRepository(baseUrl);
       logger.info("Using API backend", { baseUrl });

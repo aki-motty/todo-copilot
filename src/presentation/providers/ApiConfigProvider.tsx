@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useMemo } from "react";
+import type React from "react";
+import { createContext, useContext, useMemo } from "react";
 import { createLogger } from "../../infrastructure/config/logger";
 
 const logger = createLogger("ApiConfigProvider");
@@ -34,7 +35,7 @@ interface ApiConfigProviderProps {
 export const ApiConfigProvider: React.FC<ApiConfigProviderProps> = ({ children }) => {
   const config = useMemo(() => {
     // @ts-ignore - Accessing Vite environment variable
-    const apiBaseUrl = import.meta.env["VITE_API_BASE_URL"] as string | undefined;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
 
     // Check for localStorage override (useful for testing)
     const forceLocalStorage = typeof window !== 'undefined' && window.localStorage.getItem('forceLocalStorage') === 'true';

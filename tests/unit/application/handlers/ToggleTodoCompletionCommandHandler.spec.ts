@@ -12,26 +12,26 @@ describe("ToggleTodoCompletionCommandHandler", () => {
     handler = new ToggleTodoCompletionCommandHandler(service);
   });
 
-  it("should toggle todo through handler", () => {
-    const todo = service.createTodo({ title: "Toggle Test" });
+  it("should toggle todo through handler", async () => {
+    const todo = await service.createTodo({ title: "Toggle Test" });
     expect(todo.completed).toBe(false);
 
-    const result = handler.handle({ id: todo.id });
+    const result = await handler.handle({ id: todo.id });
 
     expect(result.completed).toBe(true);
     expect(result.id).toBe(todo.id);
   });
 
-  it("should delegate to application service", () => {
-    const todo = service.createTodo({ title: "Service Test" });
+  it("should delegate to application service", async () => {
+    const todo = await service.createTodo({ title: "Service Test" });
     const spy = jest.spyOn(service, "toggleTodoCompletion");
 
-    handler.handle({ id: todo.id });
+    await handler.handle({ id: todo.id });
 
     expect(spy).toHaveBeenCalledWith({ id: todo.id });
   });
 
-  it("should throw on non-existent todo", () => {
-    expect(() => handler.handle({ id: "non-existent" })).toThrow();
+  it("should throw on non-existent todo", async () => {
+    await expect(handler.handle({ id: "non-existent" })).rejects.toThrow();
   });
 });

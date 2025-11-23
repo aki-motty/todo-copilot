@@ -16,8 +16,8 @@ class Logger {
 
   constructor(private moduleName?: string) {
     // Check for process.env first (Node.js/Lambda)
-    if (typeof process !== "undefined" && process.env && process.env["LOG_LEVEL"]) {
-      this.logLevel = process.env["LOG_LEVEL"] as any;
+    if (typeof process !== "undefined" && process.env && process.env.LOG_LEVEL) {
+      this.logLevel = process.env.LOG_LEVEL as any;
     } 
     // Then check for window (Browser)
     else {

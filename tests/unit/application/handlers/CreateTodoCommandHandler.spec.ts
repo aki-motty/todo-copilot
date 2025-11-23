@@ -12,23 +12,23 @@ describe("CreateTodoCommandHandler", () => {
     handler = new CreateTodoCommandHandler(service);
   });
 
-  it("should create todo through handler", () => {
-    const result = handler.handle({ title: "Test Todo" });
+  it("should create todo through handler", async () => {
+    const result = await handler.handle({ title: "Test Todo" });
 
     expect(result).toBeDefined();
     expect(result.title.value).toBe("Test Todo");
     expect(result.completed).toBe(false);
   });
 
-  it("should delegate to application service", () => {
+  it("should delegate to application service", async () => {
     const spy = jest.spyOn(service, "createTodo");
 
-    handler.handle({ title: "Handler Test" });
+    await handler.handle({ title: "Handler Test" });
 
     expect(spy).toHaveBeenCalledWith({ title: "Handler Test" });
   });
 
-  it("should throw on validation error", () => {
-    expect(() => handler.handle({ title: "" })).toThrow();
+  it("should throw on validation error", async () => {
+    await expect(handler.handle({ title: "" })).rejects.toThrow();
   });
 });

@@ -87,26 +87,30 @@ describe("TodoApplicationService - Integration Tests", () => {
 
     it("should return all created todos", async () => {
       await service.createTodo({ title: "Todo 1" });
+      await new Promise(resolve => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 2" });
+      await new Promise(resolve => setTimeout(resolve, 10));
       await service.createTodo({ title: "Todo 3" });
 
       const response = await service.getAllTodos({});
 
       expect(response.count).toBe(3);
       expect(response.todos).toHaveLength(3);
-      expect(response.todos.map((t) => t.title.value)).toEqual(["Todo 1", "Todo 2", "Todo 3"]);
+      expect(response.todos.map((t) => t.title.value)).toEqual(["Todo 3", "Todo 2", "Todo 1"]);
     });
 
     it("should return todos with correct state", async () => {
       await service.createTodo({ title: "Pending" });
+      await new Promise(resolve => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "Complete" });
 
       await service.toggleTodoCompletion({ id: todo2.id });
 
       const response = await service.getAllTodos({});
 
-      expect(response.todos[0]?.completed).toBe(false);
-      expect(response.todos[1]?.completed).toBe(true);
+      // Newest first (Complete, then Pending)
+      expect(response.todos[0]?.completed).toBe(true);
+      expect(response.todos[1]?.completed).toBe(false);
     });
   });
 
@@ -211,7 +215,9 @@ describe("TodoApplicationService - Integration Tests", () => {
 
     it("should not affect other todos", async () => {
       await service.createTodo({ title: "Keep" });
+      await new Promise(resolve => setTimeout(resolve, 10));
       const todo2 = await service.createTodo({ title: "Delete" });
+      await new Promise(resolve => setTimeout(resolve, 10));
       await service.createTodo({ title: "Keep too" });
 
       await service.deleteTodo({ id: todo2.id });
@@ -219,7 +225,8 @@ describe("TodoApplicationService - Integration Tests", () => {
       const response = await service.getAllTodos({});
 
       expect(response.count).toBe(2);
-      expect(response.todos.map((t) => t.title.value)).toEqual(["Keep", "Keep too"]);
+      // Newest first
+      expect(response.todos.map((t) => t.title.value)).toEqual(["Keep too", "Keep"]);
     });
   });
 

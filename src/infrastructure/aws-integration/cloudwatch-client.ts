@@ -26,8 +26,8 @@ export class CloudWatchLogsClientService {
    */
   constructor(
     logGroupName: string,
-    logStreamName: string = 'default',
-    region: string = process.env['AWS_REGION'] || 'ap-northeast-1'
+    logStreamName = 'default',
+    region: string = process.env.AWS_REGION || 'ap-northeast-1'
   ) {
     this.logGroupName = logGroupName;
     this.logStreamName = logStreamName;
@@ -153,7 +153,7 @@ export class CloudWatchLogsClientService {
    * デバッグログを出力
    */
   async debug(message: string, metadata?: Record<string, any>): Promise<void> {
-    if (process.env['LOG_LEVEL'] === 'DEBUG') {
+    if (process.env.LOG_LEVEL === 'DEBUG') {
       await this.log(message, 'DEBUG', metadata);
     }
   }
@@ -197,8 +197,8 @@ export async function getCloudWatchLogsClient(
   logGroupName?: string,
   logStreamName?: string
 ): Promise<CloudWatchLogsClientService> {
-  const groupName = logGroupName || process.env['LOG_GROUP_NAME'] || '/aws/lambda/todo-copilot';
-  const streamName = logStreamName || process.env['LOG_STREAM_NAME'] || process.env['ENVIRONMENT'] || 'default';
+  const groupName = logGroupName || process.env.LOG_GROUP_NAME || '/aws/lambda/todo-copilot';
+  const streamName = logStreamName || process.env.LOG_STREAM_NAME || process.env.ENVIRONMENT || 'default';
 
   if (!instance) {
     instance = new CloudWatchLogsClientService(groupName, streamName);

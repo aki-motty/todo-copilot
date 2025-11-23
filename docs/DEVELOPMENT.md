@@ -428,6 +428,31 @@ expect(mockRepository.save).toHaveBeenCalledWith(
 );
 ```
 
+#### Integration Testing Best Practices
+
+When writing integration tests that involve sorting by timestamp (e.g., `createdAt`), be aware that creating items in rapid succession can result in identical timestamps. This can lead to non-deterministic sorting and flaky tests.
+
+**Solution**: Introduce a small delay between creation steps.
+
+```typescript
+// Helper for delays
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+it('should return todos sorted by newest first', async () => {
+  // Create first todo
+  await service.createTodo('First');
+  await delay(10); // Ensure distinct timestamp
+  
+  // Create second todo
+  await service.createTodo('Second');
+  
+  // Assert order
+  const todos = await service.getAllTodos();
+  expect(todos[0].title).toBe('Second');
+  expect(todos[1].title).toBe('First');
+});
+```
+
 ## 🏗️ Build & Deployment
 
 ### Development Server

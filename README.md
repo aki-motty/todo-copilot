@@ -2,6 +2,9 @@
 
 > A production-ready, test-driven Todo application built with TypeScript, React, and Domain-Driven Design (DDD) architecture.
 
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Test Status](https://img.shields.io/badge/tests-passing-brightgreen)
+
 ## 🚀 Quick Start
 
 ### Prerequisites

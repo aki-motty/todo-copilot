@@ -79,9 +79,9 @@ describe("Error Types", () => {
         new QuotaExceededError("test"),
       ];
 
-      errors.forEach((error) => {
+      for (const error of errors) {
         expect(error).toBeInstanceOf(Error);
-      });
+      }
     });
   });
 });

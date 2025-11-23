@@ -5,7 +5,7 @@
  * 関数呼び出しパターンの検証
  */
 
-import { LambdaClientService, getLambdaClient, resetLambdaClient } from '../../../../src/infrastructure/aws-integration/lambda-client';
+import { type LambdaClientService, getLambdaClient, resetLambdaClient } from '../../../../src/infrastructure/aws-integration/lambda-client';
 
 // Mock AWS SDK
 jest.mock('@aws-sdk/client-lambda', () => ({
@@ -36,10 +36,10 @@ describe('Unit Tests - Lambda Client', () => {
     });
 
     it('環境変数 AWS_REGION を使用', () => {
-      process.env['AWS_REGION'] = 'eu-west-1';
+      process.env.AWS_REGION = 'eu-west-1';
       const client = getLambdaClient();
       expect(client).toBeDefined();
-      delete process.env['AWS_REGION'];
+      process.env.AWS_REGION = undefined;
     });
   });
 
@@ -261,32 +261,14 @@ describe('Unit Tests - Lambda 型安全性', () => {
   });
 
   it('invokeSync がジェネリック型をサポート', () => {
-    interface TodoResponse {
-      id: string;
-      title: string;
-    }
-
     expect(client.invokeSync).toBeDefined();
   });
 
   it('invokeDryRun がジェネリック型をサポート', () => {
-    interface ValidationResult {
-      valid: boolean;
-      errors: string[];
-    }
-
     expect(client.invokeDryRun).toBeDefined();
   });
 
   it('複数の型を処理可能', () => {
-    interface CreateResponse {
-      success: boolean;
-    }
-
-    interface GetResponse {
-      data: any;
-    }
-
     expect(client.invokeSync).toBeDefined();
   });
 

@@ -19,7 +19,7 @@ describe("GetTodoHandler", () => {
 
   it("should retrieve an existing todo by id", async () => {
     // Create a todo first
-    const created = createHandler.handle({ title: "Test Todo" });
+    const created = await createHandler.handle({ title: "Test Todo" });
 
     const result = await handler.execute(created.id);
 
@@ -33,7 +33,7 @@ describe("GetTodoHandler", () => {
   });
 
   it("should retrieve todo with all properties", async () => {
-    const created = createHandler.handle({ title: "Complete Todo" });
+    const created = await createHandler.handle({ title: "Complete Todo" });
 
     const result = await handler.execute(created.id);
 

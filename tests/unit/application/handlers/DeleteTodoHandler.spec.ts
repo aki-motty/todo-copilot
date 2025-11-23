@@ -19,8 +19,8 @@ describe("DeleteTodoHandler", () => {
 
   it("should delete an existing todo", async () => {
     // Create a todo first
-    const created = createHandler.handle({ title: "Todo to Delete" });
-    const allBefore = repository.findAll();
+    const created = await createHandler.handle({ title: "Todo to Delete" });
+    const allBefore = await repository.findAll();
     expect(allBefore).toHaveLength(1);
 
     // Delete it
@@ -30,7 +30,7 @@ describe("DeleteTodoHandler", () => {
     expect(result.id).toBe(created.id);
 
     // Verify it's gone
-    const allAfter = repository.findAll();
+    const allAfter = await repository.findAll();
     expect(allAfter).toHaveLength(0);
   });
 
@@ -39,13 +39,13 @@ describe("DeleteTodoHandler", () => {
   });
 
   it("should not affect other todos when deleting one", async () => {
-    const todo1 = createHandler.handle({ title: "Todo 1" });
-    const todo2 = createHandler.handle({ title: "Todo 2" });
-    const todo3 = createHandler.handle({ title: "Todo 3" });
+    const todo1 = await createHandler.handle({ title: "Todo 1" });
+    const todo2 = await createHandler.handle({ title: "Todo 2" });
+    const todo3 = await createHandler.handle({ title: "Todo 3" });
 
     await handler.execute(todo2.id);
 
-    const remaining = repository.findAll();
+    const remaining = await repository.findAll();
     expect(remaining).toHaveLength(2);
     expect(remaining.map((t) => t.id)).toContain(todo1.id);
     expect(remaining.map((t) => t.id)).toContain(todo3.id);

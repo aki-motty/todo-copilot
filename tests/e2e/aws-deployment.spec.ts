@@ -11,27 +11,27 @@
 
 import { DynamoDBClient_ } from '../../src/infrastructure/aws-integration/dynamodb-client';
 import { DynamoDBTodoRepository } from '../../src/infrastructure/aws-integration/DynamoDBTodoRepository';
-import { LambdaClientService, getLambdaClient } from '../../src/infrastructure/aws-integration/lambda-client';
-import { CloudWatchLogsClientService, getCloudWatchLogsClient } from '../../src/infrastructure/aws-integration/cloudwatch-client';
+import { type LambdaClientService, getLambdaClient } from '../../src/infrastructure/aws-integration/lambda-client';
+import { type CloudWatchLogsClientService, getCloudWatchLogsClient } from '../../src/infrastructure/aws-integration/cloudwatch-client';
 import { Todo, TodoTitle } from '../../src/domain/entities/Todo';
 
 /**
  * テスト用 Todo 作成ヘルパー
  */
-function createE2ETodo(title: string, completed: boolean = false): Todo {
+function createE2ETodo(title: string, completed = false): Todo {
   const todoId = `e2e-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` as any;
   const todoTitle = TodoTitle.create(title);
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
 }
 
 describe('E2E Tests - AWS Deployment Verification', () => {
-  const environment = process.env['ENVIRONMENT'] || 'dev';
-  const region = process.env['AWS_REGION'] || 'ap-northeast-1';
-  const tableName = process.env['DYNAMODB_TABLE_NAME'] || `todo-${environment}`;
-  const logGroupName = process.env['CLOUDWATCH_LOG_GROUP'] || `/aws/lambda/todo-${environment}`;
+  const environment = process.env.ENVIRONMENT || 'dev';
+  const region = process.env.AWS_REGION || 'ap-northeast-1';
+  const tableName = process.env.DYNAMODB_TABLE_NAME || `todo-${environment}`;
+  const logGroupName = process.env.CLOUDWATCH_LOG_GROUP || `/aws/lambda/todo-${environment}`;
 
   beforeAll(() => {
-    console.log(`\n📋 E2E テスト初期化`);
+    console.log("\n📋 E2E テスト初期化");
     console.log(`   - 環境: ${environment}`);
     console.log(`   - リージョン: ${region}`);
     console.log(`   - DynamoDB テーブル: ${tableName}`);
@@ -275,9 +275,9 @@ describe('E2E Tests - AWS Deployment Verification', () => {
       );
 
       expect(results).toHaveLength(5);
-      results.forEach(result => {
+      for (const result of results) {
         expect(result).toBeDefined();
-      });
+      }
 
       console.log('✅ 並列操作シミュレーション完了');
     }, 30000);
@@ -313,9 +313,9 @@ describe('E2E Tests - AWS Deployment Verification', () => {
 
 describe('E2E Tests - Cleanup & Teardown', () => {
   it('テスト用リソースのクリーンアップ計画を記録', () => {
-    console.log(`\n🧹 クリーンアップ計画:`);
-    console.log(`   - テスト中に作成された Todo は手動で削除してください`);
-    console.log(`   - または、terraform destroy で全環境をクリーンアップしてください`);
-    console.log(`   - CloudWatch Logs は環境ごとに保持されます\n`);
+    console.log("\n🧹 クリーンアップ計画:");
+    console.log("   - テスト中に作成された Todo は手動で削除してください");
+    console.log("   - または、terraform destroy で全環境をクリーンアップしてください");
+    console.log("   - CloudWatch Logs は環境ごとに保持されます\n");
   });
 });

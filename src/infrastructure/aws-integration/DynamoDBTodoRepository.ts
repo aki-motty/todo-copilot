@@ -1,5 +1,5 @@
 import type { Todo, TodoId } from '../../domain/entities/Todo';
-import { DynamoDBClient_ } from './dynamodb-client';
+import type { DynamoDBClient_ } from './dynamodb-client';
 
 /**
  * DynamoDB Todo リポジトリ（非同期版）
