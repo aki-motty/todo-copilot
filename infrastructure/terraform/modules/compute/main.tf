@@ -45,20 +45,23 @@ variable "common_tags" {
   default     = {}
 }
 
-# CloudWatch Log Group for Lambda
-resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
-  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-  skip_destroy      = true
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name      = "${var.project_name}-lambda-logs"
-      Component = "Compute"
-    }
-  )
-}
+# NOTE: CloudWatch Log Group is automatically created by Lambda.
+# If you need to control retention policy, uncomment this resource.
+# However, if Lambda has already created the log group, Terraform import may be needed.
+#
+# resource "aws_cloudwatch_log_group" "lambda_logs" {
+#   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
+#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+#   skip_destroy      = true
+#
+#   tags = merge(
+#     var.common_tags,
+#     {
+#       Name      = "${var.project_name}-lambda-logs"
+#       Component = "Compute"
+#     }
+#   )
+# }
 
 # Lambda function with built handler
 resource "aws_lambda_function" "main" {
