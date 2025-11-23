@@ -20,7 +20,12 @@ export default defineConfig({
     },
     // Ensure dependencies are bundled
     rollupOptions: {
-      external: [],
+      external: [
+        "@aws-sdk/client-dynamodb",
+        "@aws-sdk/util-dynamodb",
+        "@aws-sdk/lib-dynamodb",
+        "aws-lambda"
+      ],
       output: {
         format: "cjs",
         strict: true,
