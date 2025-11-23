@@ -116,7 +116,8 @@ resource "aws_apigatewayv2_api" "main" {
   cors_configuration {
     allow_origins = [
       "https://todo-copilot.example.com",
-      var.environment != "prod" ? "http://localhost:3000" : ""
+      var.environment != "prod" ? "http://localhost:3000" : "",
+      var.environment != "prod" ? "http://localhost:5173" : ""
     ]
     allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     allow_headers = [

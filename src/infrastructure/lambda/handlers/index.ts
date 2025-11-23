@@ -77,6 +77,15 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
     let response: unknown;
     let statusCode = 200;
 
+    // Health check
+    if (method === "GET" && path === "/health") {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ status: "ok" }),
+      };
+    }
+
     // Route to appropriate handler
     if (method === "POST" && path === "/todos") {
       // Create todo
