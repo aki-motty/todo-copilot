@@ -39,6 +39,7 @@ The application will be available at `http://localhost:5173`
 - ✅ **Serverless API** - AWS Lambda & API Gateway backend
 - ✅ **Cloud Persistence** - DynamoDB storage for data synchronization
 - ✅ **Infrastructure as Code** - Terraform-managed AWS resources
+- ✅ **SPA Deployment** - S3 & CloudFront hosting with OAC security
 - ✅ **Hybrid Mode** - Seamless fallback to localStorage if API is unavailable
 
 ### Sprint 1 MVP

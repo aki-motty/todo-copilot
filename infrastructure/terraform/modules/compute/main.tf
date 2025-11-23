@@ -49,19 +49,19 @@ variable "common_tags" {
 # If you need to control retention policy, uncomment this resource.
 # However, if Lambda has already created the log group, Terraform import may be needed.
 #
-# resource "aws_cloudwatch_log_group" "lambda_logs" {
-#   name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
-#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-#   skip_destroy      = true
-#
-#   tags = merge(
-#     var.common_tags,
-#     {
-#       Name      = "${var.project_name}-lambda-logs"
-#       Component = "Compute"
-#     }
-#   )
-# }
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${var.project_name}-api-${var.environment}"
+  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+  skip_destroy      = false
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name      = "${var.project_name}-lambda-logs"
+      Component = "Compute"
+    }
+  )
+}
 
 # Lambda function with built handler
 resource "aws_lambda_function" "main" {
@@ -165,21 +165,21 @@ resource "aws_apigatewayv2_stage" "prod" {
   auto_deploy = true
 
   # Logging to pre-existing CloudWatch log group (commented to avoid reference errors)
-  # access_log_settings {
-  #   destination_arn = aws_cloudwatch_log_group.api_logs.arn
-  #   format = jsonencode({
-  #     requestId          = "$context.requestId"
-  #     ip                 = "$context.identity.sourceIp"
-  #     requestTime        = "$context.requestTime"
-  #     httpMethod         = "$context.httpMethod"
-  #     resourcePath       = "$context.resourcePath"
-  #     status             = "$context.status"
-  #     protocol           = "$context.protocol"
-  #     responseLength     = "$context.responseLength"
-  #     integrationLatency = "$context.integration.latency"
-  #     error              = "$context.error.messageString"
-  #   })
-  # }
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_logs.arn
+    format = jsonencode({
+      requestId          = "$context.requestId"
+      ip                 = "$context.identity.sourceIp"
+      requestTime        = "$context.requestTime"
+      httpMethod         = "$context.httpMethod"
+      resourcePath       = "$context.resourcePath"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
+      integrationLatency = "$context.integration.latency"
+      error              = "$context.error.messageString"
+    })
+  }
 
   default_route_settings {
     logging_level          = var.environment == "prod" ? "ERROR" : "INFO"
@@ -200,18 +200,19 @@ resource "aws_apigatewayv2_stage" "prod" {
 # CloudWatch Log Group for API Gateway
 # NOTE: Pre-created or auto-created by API Gateway service role
 # Commenting out resource creation to avoid conflicts with existing logs
-# resource "aws_cloudwatch_log_group" "api_logs" {
-#   name              = "/aws/apigateway/${var.project_name}-${var.environment}"
-#   retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
-#
-#   tags = merge(
-#     var.common_tags,
-#     {
-#       Name      = "${var.project_name}-api-logs"
-#       Component = "Compute"
-#     }
-#   )
-# }
+resource "aws_cloudwatch_log_group" "api_logs" {
+  name              = "/aws/apigateway/${var.project_name}-${var.environment}"
+  retention_in_days = var.environment == "prod" ? 365 : var.environment == "staging" ? 30 : 7
+  skip_destroy      = false
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name      = "${var.project_name}-api-logs"
+      Component = "Compute"
+    }
+  )
+}
 
 # Lambda permission for API Gateway to invoke
 resource "aws_lambda_permission" "api_gateway" {
