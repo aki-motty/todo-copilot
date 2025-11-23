@@ -34,11 +34,17 @@ export default {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.test.json',
+        useESM: true,
+        tsconfig: {
+          module: 'esnext',
+          target: 'es2020',
+          moduleResolution: 'node',
+        },
       },
     ],
   },

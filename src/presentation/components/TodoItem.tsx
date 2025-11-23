@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Todo } from "../../domain/entities/Todo";
+import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import "./TodoItem.css";
 
 interface TodoItemProps {
-  todo: Todo;
+  todo: TodoResponseDTO;
   onToggleCompletion?: (id: string) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
 }
@@ -53,9 +53,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleCompletion, on
           onChange={handleToggle}
           disabled={isToggling}
           className="todo-checkbox"
-          aria-label={`Toggle completion for: ${todo.title.value}`}
+          aria-label={`Toggle completion for: ${todo.title}`}
         />
-        <span className={`todo-text ${todo.completed ? "completed" : ""}`}>{todo.title.value}</span>
+        <span className={`todo-text ${todo.completed ? "completed" : ""}`}>{todo.title}</span>
       </div>
 
       <div className="todo-item-actions">

@@ -1,0 +1,217 @@
+{
+    "examples": {
+        "create_todo_event": {
+            "description": "API Gateway HTTP API V2 event for POST /todos",
+            "event": {
+                "version": "2.0",
+                "routeKey": "POST /todos",
+                "rawPath": "/dev/todos",
+                "rawQueryString": "",
+                "headers": {
+                    "accept": "application/json",
+                    "content-length": "22",
+                    "content-type": "application/json",
+                    "host": "ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com",
+                    "user-agent": "curl/7.68.0",
+                    "x-amzn-trace-id": "Root=1-6359d5c8-4ef2a4d20b12345a",
+                    "x-forwarded-for": "203.0.113.42",
+                    "x-forwarded-port": "443",
+                    "x-forwarded-proto": "https"
+                },
+                "requestContext": {
+                    "accountId": "446713282258",
+                    "apiId": "ada8f6v36f",
+                    "domainName": "ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com",
+                    "domainPrefix": "ada8f6v36f",
+                    "http": {
+                        "method": "POST",
+                        "path": "/dev/todos",
+                        "protocol": "HTTP/1.1",
+                        "sourceIp": "203.0.113.42",
+                        "userAgent": "curl/7.68.0"
+                    },
+                    "requestId": "JKJaXGb9RYACq3w=",
+                    "routeKey": "POST /todos",
+                    "stage": "dev",
+                    "time": "25/Nov/2025:12:34:56 +0000",
+                    "timeEpoch": 1700899496000
+                },
+                "body": "{\"title\":\"Buy milk\"}",
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"success\",\"data\":{\"id\":\"550e8400-e29b-41d4-a716-446655440000\",\"title\":\"Buy milk\",\"completed\":false,\"createdAt\":\"2025-11-23T12:34:56Z\",\"updatedAt\":\"2025-11-23T12:34:56Z\"},\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "create_todo_invalid_title": {
+            "description": "API Gateway event with invalid title (empty string)",
+            "event": {
+                "version": "2.0",
+                "routeKey": "POST /todos",
+                "rawPath": "/dev/todos",
+                "headers": {
+                    "content-type": "application/json"
+                },
+                "requestContext": {
+                    "http": {
+                        "method": "POST"
+                    },
+                    "stage": "dev"
+                },
+                "body": "{\"title\":\"\"}",
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 400,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"error\",\"error\":\"Title must be between 1 and 500 characters\",\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "list_todos_event": {
+            "description": "API Gateway event for GET /todos (list all)",
+            "event": {
+                "version": "2.0",
+                "routeKey": "GET /todos",
+                "rawPath": "/dev/todos",
+                "rawQueryString": "limit=10",
+                "headers": {
+                    "accept": "application/json",
+                    "host": "ada8f6v36f.execute-api.ap-northeast-1.amazonaws.com"
+                },
+                "requestContext": {
+                    "http": {
+                        "method": "GET"
+                    },
+                    "stage": "dev"
+                },
+                "queryStringParameters": {
+                    "limit": "10"
+                },
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"success\",\"data\":[{\"id\":\"550e8400-e29b-41d4-a716-446655440001\",\"title\":\"Buy milk\",\"completed\":false,\"createdAt\":\"2025-11-23T12:34:56Z\",\"updatedAt\":\"2025-11-23T12:34:56Z\"},{\"id\":\"550e8400-e29b-41d4-a716-446655440002\",\"title\":\"Clean house\",\"completed\":true,\"createdAt\":\"2025-11-23T11:00:00Z\",\"updatedAt\":\"2025-11-23T11:30:00Z\",\"completedAt\":\"2025-11-23T11:30:00Z\"}],\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\",\"total\":2,\"hasMore\":false}}"
+            }
+        },
+        "get_todo_by_id": {
+            "description": "API Gateway event for GET /todos/{id}",
+            "event": {
+                "version": "2.0",
+                "routeKey": "GET /todos/{id}",
+                "rawPath": "/dev/todos/550e8400-e29b-41d4-a716-446655440001",
+                "headers": {
+                    "accept": "application/json"
+                },
+                "requestContext": {
+                    "http": {
+                        "method": "GET"
+                    },
+                    "stage": "dev"
+                },
+                "pathParameters": {
+                    "id": "550e8400-e29b-41d4-a716-446655440001"
+                },
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"success\",\"data\":{\"id\":\"550e8400-e29b-41d4-a716-446655440001\",\"title\":\"Buy milk\",\"completed\":false,\"createdAt\":\"2025-11-23T12:34:56Z\",\"updatedAt\":\"2025-11-23T12:34:56Z\"},\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "toggle_todo": {
+            "description": "API Gateway event for PUT /todos/{id}/toggle",
+            "event": {
+                "version": "2.0",
+                "routeKey": "PUT /todos/{id}/toggle",
+                "rawPath": "/dev/todos/550e8400-e29b-41d4-a716-446655440001/toggle",
+                "headers": {
+                    "content-type": "application/json"
+                },
+                "requestContext": {
+                    "http": {
+                        "method": "PUT"
+                    },
+                    "stage": "dev"
+                },
+                "pathParameters": {
+                    "id": "550e8400-e29b-41d4-a716-446655440001"
+                },
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"success\",\"data\":{\"id\":\"550e8400-e29b-41d4-a716-446655440001\",\"title\":\"Buy milk\",\"completed\":true,\"createdAt\":\"2025-11-23T12:34:56Z\",\"updatedAt\":\"2025-11-23T12:45:00Z\",\"completedAt\":\"2025-11-23T12:45:00Z\"},\"meta\":{\"timestamp\":\"2025-11-23T12:45:00Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "delete_todo": {
+            "description": "API Gateway event for DELETE /todos/{id}",
+            "event": {
+                "version": "2.0",
+                "routeKey": "DELETE /todos/{id}",
+                "rawPath": "/dev/todos/550e8400-e29b-41d4-a716-446655440001",
+                "headers": {},
+                "requestContext": {
+                    "http": {
+                        "method": "DELETE"
+                    },
+                    "stage": "dev"
+                },
+                "pathParameters": {
+                    "id": "550e8400-e29b-41d4-a716-446655440001"
+                },
+                "isBase64Encoded": false
+            },
+            "response": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"success\",\"meta\":{\"timestamp\":\"2025-11-23T12:50:00Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "todo_not_found": {
+            "description": "Error response when todo ID doesn't exist",
+            "response": {
+                "statusCode": 404,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"error\",\"error\":\"Todo not found\",\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        },
+        "server_error": {
+            "description": "Error response for server-side errors (DynamoDB connection, etc)",
+            "response": {
+                "statusCode": 500,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": "{\"status\":\"error\",\"error\":\"Internal server error. Please try again later.\",\"meta\":{\"timestamp\":\"2025-11-23T12:34:56Z\",\"requestId\":\"JKJaXGb9RYACq3w=\"}}"
+            }
+        }
+    }
+}

@@ -1,365 +1,176 @@
 /**
- * Lambda handler for todo operations
- * Main entry point for AWS Lambda function handling HTTP requests from API Gateway
+ * AWS Lambda handler for Todo API
+ * Main entry point for HTTP requests from API Gateway V2
  */
 
-import type { CreateTodoCommand } from "../../../application/commands/CreateTodoCommand";
-import type { DeleteTodoCommand } from "../../../application/commands/DeleteTodoCommand";
-import type { ToggleTodoCompletionCommand } from "../../../application/commands/ToggleTodoCompletionCommand";
-import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
-import type { TodoId } from "../../../domain/entities/Todo";
-import type { ITodoRepository } from "../../../domain/repositories/TodoRepository";
-import { createLogger } from "../../../infrastructure/config/logger";
-import { LocalStorageTodoRepository } from "../../../infrastructure/persistence/LocalStorageTodoRepository";
-import type { CreateTodoRequest, LambdaContext, LambdaEvent, LambdaResponse, TodoDTO, UpdateTodoRequest } from "../../../shared/api/types";
-import {
-    createErrorResponse,
-    createSuccessResponse,
-    getPathParameter,
-    getQueryParameter,
-    parseBody,
-} from "../../../shared/api/types";
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
+import type { ApiResponseDTO, ErrorResponseDTO } from "../../../application/dto/TodoDTO";
+import { AppError, isAppError } from "../../../application/errors/AppError";
+import { CreateTodoHandler } from "../../../application/handlers/CreateTodoHandler";
+import { DeleteTodoHandler } from "../../../application/handlers/DeleteTodoHandler";
+import { GetTodoHandler } from "../../../application/handlers/GetTodoHandler";
+import { ListTodosHandler } from "../../../application/handlers/ListTodosHandler";
+import { ToggleTodoHandler } from "../../../application/handlers/ToggleTodoHandler";
+import { DynamoDBTodoRepository } from "../../repositories/DynamoDBTodoRepository";
 
-const logger = createLogger("LambdaHandler");
-let todoRepository: ITodoRepository;
-let applicationService: TodoApplicationService;
+// Initialize repository and handlers
+let repository: DynamoDBTodoRepository;
+let handlers: {
+  createTodo: CreateTodoHandler;
+  listTodos: ListTodosHandler;
+  getTodo: GetTodoHandler;
+  toggleTodo: ToggleTodoHandler;
+  deleteTodo: DeleteTodoHandler;
+};
 
 /**
- * Initialize repository and application service
- * Called once per Lambda container (cold start)
+ * Initialize handlers on first invocation
  */
-function initializeHandlers(): void {
-  if (!todoRepository) {
-    todoRepository = new LocalStorageTodoRepository();
-    applicationService = new TodoApplicationService(todoRepository);
-  }
-}
+async function initializeHandlers(): Promise<void> {
+  if (!repository) {
+    repository = new DynamoDBTodoRepository();
+    await repository.initializeFromDynamoDB();
 
-/**
- * Convert Todo domain entity to DTO for JSON response
- */
-function todoToDTO(todo: any): TodoDTO {
-  return {
-    id: todo.id,
-    title: todo.title.value || todo.title,
-    completed: todo.completed,
-    createdAt: todo.createdAt.toISOString?.() || todo.createdAt,
-    updatedAt: todo.updatedAt.toISOString?.() || todo.updatedAt,
-  };
-}
-
-/**
- * Handle GET /todos - Retrieve all todos
- */
-async function handleGetTodos(event: LambdaEvent): Promise<LambdaResponse> {
-  try {
-    const page = parseInt(getQueryParameter(event, "page") || "1", 10);
-    const pageSize = parseInt(getQueryParameter(event, "pageSize") || "50", 10);
-
-    const result = applicationService.getAllTodos({});
-    const todos = result.todos;
-    const total = todos.length;
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedTodos = todos.slice(startIndex, endIndex);
-
-    const response = createSuccessResponse(200, {
-      items: paginatedTodos.map(todoToDTO),
-      total,
-      page,
-      pageSize,
-      hasMore: endIndex < total,
-    });
-
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (error) {
-    logger.error("Error fetching todos", error as any);
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
+    handlers = {
+      createTodo: new CreateTodoHandler(repository),
+      listTodos: new ListTodosHandler(repository),
+      getTodo: new GetTodoHandler(repository),
+      toggleTodo: new ToggleTodoHandler(repository),
+      deleteTodo: new DeleteTodoHandler(repository),
     };
   }
 }
 
 /**
- * Handle GET /todos/{id} - Retrieve a specific todo
+ * Lambda handler function
  */
-async function handleGetTodoById(event: LambdaEvent): Promise<LambdaResponse> {
-  try {
-    const id = getPathParameter(event, "id");
-    if (!id) {
-      const response = createErrorResponse(400, "Bad Request", "Todo ID is required");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const todo = applicationService.getTodoById({ id: id as any as TodoId });
-    if (!todo) {
-      const response = createErrorResponse(404, "Not Found", `Todo with ID ${id} not found`);
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const response = createSuccessResponse(200, todoToDTO(todo));
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (error) {
-    logger.error("Error fetching todo", error as any);
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  }
-}
-
-/**
- * Handle POST /todos - Create a new todo
- */
-async function handleCreateTodo(event: LambdaEvent): Promise<LambdaResponse> {
-  try {
-    const payload = parseBody<CreateTodoRequest>(event.body);
-
-    if (!payload.title || payload.title.trim().length === 0) {
-      const response = createErrorResponse(400, "Bad Request", "Title is required");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    if (payload.title.length > 500) {
-      const response = createErrorResponse(400, "Bad Request", "Title cannot exceed 500 characters");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const command: CreateTodoCommand = {
-      title: payload.title,
-    };
-
-    const todo = applicationService.createTodo(command);
-    const response = createSuccessResponse(201, todoToDTO(todo));
-
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (error) {
-    logger.error("Error creating todo", error as any);
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  }
-}
-
-/**
- * Handle PUT /todos/{id} - Update a todo
- */
-async function handleUpdateTodo(event: LambdaEvent): Promise<LambdaResponse> {
-  try {
-    const id = getPathParameter(event, "id");
-    if (!id) {
-      const response = createErrorResponse(400, "Bad Request", "Todo ID is required");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const payload = parseBody<UpdateTodoRequest>(event.body);
-
-    if (payload.completed === undefined) {
-      const response = createErrorResponse(400, "Bad Request", "completed field is required");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const command: ToggleTodoCompletionCommand = {
-      id: id as any as TodoId,
-    };
-
-    const todo = applicationService.toggleTodoCompletion(command);
-    const response = createSuccessResponse(200, todoToDTO(todo));
-
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (error) {
-    logger.error("Error updating todo", error as any);
-
-    if (error instanceof Error && error.message.includes("not found")) {
-      const response = createErrorResponse(404, "Not Found", "Todo not found");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  }
-}
-
-/**
- * Handle DELETE /todos/{id} - Delete a todo
- */
-async function handleDeleteTodo(event: LambdaEvent): Promise<LambdaResponse> {
-  try {
-    const id = getPathParameter(event, "id");
-    if (!id) {
-      const response = createErrorResponse(400, "Bad Request", "Todo ID is required");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const command: DeleteTodoCommand = {
-      id: id as any as TodoId,
-    };
-
-    applicationService.deleteTodo(command);
-    const response = createSuccessResponse(204, null);
-
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify({ success: true }),
-      headers: { "Content-Type": "application/json" },
-    };
-  } catch (error) {
-    logger.error("Error deleting todo", error as any);
-
-    if (error instanceof Error && error.message.includes("not found")) {
-      const response = createErrorResponse(404, "Not Found", "Todo not found");
-      return {
-        statusCode: response.statusCode,
-        body: JSON.stringify(response.body),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
-    return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
-    };
-  }
-}
-
-/**
- * Main Lambda handler
- * Routes requests to appropriate handlers based on HTTP method and path
- */
-export async function handler(event: LambdaEvent, context: LambdaContext): Promise<LambdaResponse> {
-  logger.info("Received Lambda event", {
-    method: event.requestContext.http.method,
-    path: event.requestContext.http.path,
-    requestId: context.awsRequestId,
-  });
+export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
+  const requestId = event.requestContext.requestId || generateRequestId();
 
   try {
-    initializeHandlers();
+    // Initialize handlers on first invocation
+    await initializeHandlers();
+
+    // Add CORS headers
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "X-Request-ID": requestId,
+    };
+
+    // Handle OPTIONS requests (CORS preflight)
+    if (event.requestContext.http.method === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers,
+      };
+    }
 
     const method = event.requestContext.http.method;
     const path = event.requestContext.http.path;
+    const requestBody = event.body ? JSON.parse(event.body) : null;
 
-    // Route requests to appropriate handlers
-    if (method === "GET" && path === "/todos") {
-      return await handleGetTodos(event);
-    }
+    let response: unknown;
+    let statusCode = 200;
 
-    if (method === "GET" && path.startsWith("/todos/")) {
-      return await handleGetTodoById(event);
-    }
-
+    // Route to appropriate handler
     if (method === "POST" && path === "/todos") {
-      return await handleCreateTodo(event);
+      // Create todo
+      const { title } = requestBody;
+      response = await handlers.createTodo.execute(title);
+      statusCode = 201;
+    } else if (method === "GET" && path === "/todos") {
+      // List todos
+      const limit = event.queryStringParameters?.["limit"]
+        ? parseInt(event.queryStringParameters["limit"])
+        : undefined;
+      const cursor = event.queryStringParameters?.["cursor"];
+      response = await handlers.listTodos.execute({ limit, cursor });
+    } else if (method === "GET" && path.match(/^\/todos\/[^/]+$/) && !path.endsWith("/toggle")) {
+      // Get single todo
+      const id = path.split("/")[2];
+      if (id) {
+        response = await handlers.getTodo.execute(id);
+      }
+    } else if (method === "PUT" && path.match(/^\/todos\/[^/]+\/toggle$/)) {
+      // Toggle todo
+      const id = path.split("/")[2];
+      if (id) {
+        response = await handlers.toggleTodo.execute(id);
+      }
+    } else if (method === "DELETE" && path.match(/^\/todos\/[^/]+$/) && !path.endsWith("/toggle")) {
+      // Delete todo
+      const id = path.split("/")[2];
+      if (id) {
+        await handlers.deleteTodo.execute(id);
+        response = { success: true, id };
+      }
+    } else {
+      // Not found
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({
+          status: 404,
+          code: "NOT_FOUND",
+          message: "Endpoint not found",
+          timestamp: new Date().toISOString(),
+          requestId,
+        } as ErrorResponseDTO),
+      };
     }
 
-    if (method === "PUT" && path.startsWith("/todos/")) {
-      return await handleUpdateTodo(event);
-    }
-
-    if (method === "DELETE" && path.startsWith("/todos/")) {
-      return await handleDeleteTodo(event);
-    }
-
-    // 404 for unknown routes
-    const response = createErrorResponse(404, "Not Found", "Endpoint not found");
+    // Return successful response
     return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
+      statusCode,
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: statusCode,
+        data: response,
+        meta: {
+          timestamp: new Date().toISOString(),
+          requestId,
+        },
+      } as ApiResponseDTO<unknown>),
     };
   } catch (error) {
-    logger.error("Unhandled error in Lambda handler", error as any);
-    const response = createErrorResponse(
-      500,
-      "Internal Server Error",
-      error instanceof Error ? error.message : String(error)
-    );
+    // Handle errors
+    const statusCode = isAppError(error) ? (error as AppError).statusCode : 500;
+    const code = isAppError(error) ? (error as AppError).code : "INTERNAL_ERROR";
+    const message = error instanceof Error ? error.message : String(error);
+
+    console.error(`Lambda error [${requestId}]:`, {
+      statusCode,
+      code,
+      message,
+      error,
+    });
+
     return {
-      statusCode: response.statusCode,
-      body: JSON.stringify(response.body),
-      headers: { "Content-Type": "application/json" },
+      statusCode,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "X-Request-ID": requestId,
+      },
+      body: JSON.stringify({
+        status: statusCode,
+        code,
+        message,
+        timestamp: new Date().toISOString(),
+        requestId,
+      } as ErrorResponseDTO),
     };
   }
+}
+
+/**
+ * Generate request ID for tracing
+ */
+function generateRequestId(): string {
+  return `req-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
