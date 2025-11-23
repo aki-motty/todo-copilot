@@ -82,6 +82,7 @@ module "compute" {
   lambda_execution_role_arn = local.lambda_execution_role_arn
   project_name              = var.project_name
   common_tags               = local.common_tags
+  allowed_origins           = ["https://${module.frontend.cloudfront_domain_name}"]
 }
 
 # Frontend Module - S3 + CloudFront

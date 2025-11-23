@@ -45,6 +45,12 @@ variable "common_tags" {
   default     = {}
 }
 
+variable "allowed_origins" {
+  type        = list(string)
+  description = "List of allowed origins for CORS"
+  default     = []
+}
+
 # NOTE: CloudWatch Log Group is automatically created by Lambda.
 # If you need to control retention policy, uncomment this resource.
 # However, if Lambda has already created the log group, Terraform import may be needed.
@@ -114,11 +120,11 @@ resource "aws_apigatewayv2_api" "main" {
   description   = "API Gateway for Todo Copilot ${var.environment}"
 
   cors_configuration {
-    allow_origins = [
+    allow_origins = concat([
       "https://todo-copilot.example.com",
       var.environment != "prod" ? "http://localhost:3000" : "",
       var.environment != "prod" ? "http://localhost:5173" : ""
-    ]
+    ], var.allowed_origins)
     allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     allow_headers = [
       "content-type",
