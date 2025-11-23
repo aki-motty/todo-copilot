@@ -8,7 +8,7 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'infrastructure/terraform/**'
+      - 'infrastructure/**'
       - '.github/workflows/terraform-ci.yml'
       - 'package.json'
       - 'vite.config.ts'
@@ -20,7 +20,7 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'infrastructure/terraform/**'
+      - 'infrastructure/**'
       - '.github/workflows/terraform-ci.yml'
       - 'package.json'
       - 'vite.config.ts'
