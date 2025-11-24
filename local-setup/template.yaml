@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Local SAM Template for Todo Copilot
+  WARNING: This file is for local testing ONLY. Do not use for deployment.
+  Keep in sync with Terraform configuration manually.
+
+Globals:
+  Function:
+    Timeout: 30
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DYNAMODB_TABLE_NAME: todo-copilot-local
+        AWS_SAM_LOCAL: "true"
+        DYNAMODB_ENDPOINT: http://dynamodb:8000
+
+Resources:
+  TodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      DockerTag: local
+      DockerContext: ..
+      Dockerfile: local-setup/Dockerfile.lambda

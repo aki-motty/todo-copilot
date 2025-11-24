@@ -15,7 +15,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.lambda.ts"),
       name: "TodoLambdaHandler",
-      fileName: () => "index.cjs",
+      fileName: () => "index.js",
       formats: ["cjs"],
     },
     // Ensure dependencies are bundled

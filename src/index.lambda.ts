@@ -5,7 +5,8 @@
  * Can be bundled and deployed as Lambda function code
  */
 
-import { handler } from "./infrastructure/lambda/handlers/index";
+import { handler as originalHandler } from "./infrastructure/lambda/handlers/index";
+import { withMockAuth } from "./shared/middleware/mock-auth";
 
 /**
  * Export the Lambda handler
@@ -16,7 +17,7 @@ import { handler } from "./infrastructure/lambda/handlers/index";
  * - Configure API Gateway to route requests to this function
  * - Handler name in Lambda console: index.handler
  */
-export { handler };
+export const handler = withMockAuth(originalHandler);
 
 /**
  * For development/testing purposes, ensure the handler can be invoked directly
