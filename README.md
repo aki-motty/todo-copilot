@@ -10,6 +10,7 @@
 ### Prerequisites
 - Node.js 18+
 - npm 9+
+- **DevContainer**: Recommended for VS Code users (pre-configured environment)
 
 ### Installation
 
@@ -33,6 +34,17 @@ npm run lint
 # Format code
 npm run format
 ```
+
+### Local Development with SAM
+
+To run the backend locally using AWS SAM and DynamoDB Local:
+
+```bash
+# Start local environment (DB, API, Watch mode)
+npm run dev:local
+```
+
+See [Local SAM Testing Guide](specs/008-local-sam-testing/quickstart.md) for details.
 
 The application will be available at `http://localhost:5173`
 

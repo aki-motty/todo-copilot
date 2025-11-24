@@ -24,8 +24,11 @@ export class DynamoDBTodoRepository implements ITodoRepository {
   private cacheAll: Todo[] | null = null;
 
   constructor(tableName?: string) {
-    this.tableName = tableName || process.env.DYNAMODB_TABLE_NAME || "todo-copilot-dev";
-    this.client = new DynamoDBClient({ region: process.env.AWS_REGION || "ap-northeast-1" });
+    this.tableName = tableName || process.env["DYNAMODB_TABLE_NAME"] || "todo-copilot-dev";
+    this.client = new DynamoDBClient({
+      region: process.env["AWS_REGION"] || "ap-northeast-1",
+      endpoint: process.env["DYNAMODB_ENDPOINT"],
+    });
   }
 
   /**

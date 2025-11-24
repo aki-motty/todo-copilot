@@ -39,3 +39,8 @@ Thumbs.db
 
 # Package lock files (optional)
 # package-lock.json
+
+# Test reports
+playwright-report/
+test-results/
+.aws-sam/

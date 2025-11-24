@@ -24,7 +24,8 @@ export class AsyncApiTodoRepository {
   private httpClient: HttpClient;
 
   constructor(baseUrl: string) {
-    this.httpClient = new HttpClient(baseUrl, { timeout: 5000 });
+    // Increase timeout to 30s for local SAM environment which can be slow
+    this.httpClient = new HttpClient(baseUrl, { timeout: 30000 });
     this.logger.debug("AsyncApiTodoRepository initialized", { baseUrl });
   }
 

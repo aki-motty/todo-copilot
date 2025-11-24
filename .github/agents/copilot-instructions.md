@@ -9,6 +9,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-22
 - N/A (Infrastructure as Code) (005-fix-github-actions)
 - Terraform (HCL) ~> 1.5, TypeScript 5.x (Frontend Build), YAML (CI/CD) + AWS Provider for Terraform, Vite (Build Tool) (006-deploy-spa-s3)
 - AWS S3 (Static Website Hosting) (006-deploy-spa-s3)
+- TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode) (008-local-sam-testing)
+- DynamoDB Local (Docker) (008-local-sam-testing)
 
 - TypeScript 5.x、Node.js 18+ (001-basic-todo-list)
 
@@ -28,9 +30,9 @@ npm test && npm run lint
 TypeScript 5.x、Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
+- 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
 - 007-enhance-ci-workflow: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-- 006-deploy-spa-s3: Added Terraform (HCL) ~> 1.5, TypeScript 5.x (Frontend Build), YAML (CI/CD) + AWS Provider for Terraform, Vite (Build Tool)
-- 006-deploy-spa-s3: Added Terraform (HCL) ~> 1.5, TypeScript 5.x (Frontend Build), YAML (CI/CD) + AWS Provider for Terraform, Vite (Build Tool)
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -1,0 +1,52 @@
+{
+  "todo-copilot-local": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "seed-todo-1"
+          },
+          "userId": {
+            "S": "test-user-1"
+          },
+          "title": {
+            "S": "Setup local environment"
+          },
+          "completed": {
+            "BOOL": true
+          },
+          "createdAt": {
+            "S": "2023-01-01T10:00:00Z"
+          },
+          "updatedAt": {
+            "S": "2023-01-01T10:00:00Z"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "seed-todo-2"
+          },
+          "userId": {
+            "S": "test-user-1"
+          },
+          "title": {
+            "S": "Test API endpoints"
+          },
+          "completed": {
+            "BOOL": false
+          },
+          "createdAt": {
+            "S": "2023-01-01T11:00:00Z"
+          },
+          "updatedAt": {
+            "S": "2023-01-01T11:00:00Z"
+          }
+        }
+      }
+    }
+  ]
+}

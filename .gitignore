@@ -48,6 +48,7 @@ logs/
 # pnpm-lock.yaml
 
 # Temporary
+.aws-sam/
 tmp/
 temp/
 *.tmp

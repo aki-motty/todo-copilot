@@ -20,6 +20,23 @@
 - **AWS CLI** - for AWS infrastructure management
 - **VS Code** (recommended) with TypeScript support
 
+### DevContainer (Recommended)
+This project includes a configured DevContainer for VS Code. It provides a consistent development environment with all necessary tools pre-installed.
+
+**Features:**
+- **Automated Setup**: `npm install` and `npx playwright install` run automatically on container creation.
+- **Pre-installed Tools**:
+  - Node.js & npm
+  - AWS CLI & Terraform
+  - GitHub CLI
+  - Network tools (`net-tools`, `lsof`, `iproute2`, `procps`) for debugging
+  - Docker (Docker-in-Docker)
+
+**Usage:**
+1. Open the project in VS Code.
+2. When prompted, click "Reopen in Container" (or run the command `Dev Containers: Reopen in Container`).
+3. Wait for the container to build and initialize.
+
 ### Verify Installation
 ```bash
 node --version    # Should be v18.x or higher

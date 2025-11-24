@@ -1,0 +1,30 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /todos",
+  "rawPath": "/todos",
+  "rawQueryString": "",
+  "headers": {
+    "accept": "*/*",
+    "host": "localhost:3000",
+    "user-agent": "curl/7.64.1"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "local",
+    "domainName": "localhost:3000",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "GET",
+      "path": "/todos",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "curl/7.64.1"
+    },
+    "requestId": "local-request",
+    "routeKey": "GET /todos",
+    "stage": "$default",
+    "time": "10/Mar/2020:05:16:23 +0000",
+    "timeEpoch": 1583817383220
+  },
+  "isBase64Encoded": false
+}
