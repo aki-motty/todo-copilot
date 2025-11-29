@@ -83,7 +83,7 @@ module "compute" {
   project_name              = var.project_name
   common_tags               = local.common_tags
   # CloudFront経由で同一ドメインからアクセスするため、ワイルドカードを許可
-  allowed_origins           = ["*"]
+  allowed_origins = ["*"]
 }
 
 # Frontend Module - S3 + CloudFront
