@@ -1,7 +1,0 @@
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 Deployment Validation: dev Environment
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Test 1: API Health Check
-   Endpoint: https://9e4itrdq7c.execute-api.ap-northeast-1.amazonaws.com/dev/health
-   ✗ API health check failed (HTTP 429)

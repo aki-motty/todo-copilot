@@ -50,7 +50,12 @@ The application will be available at `http://localhost:5173`
 
 ## ✨ Features
 
-### Sprint 2: Cloud Backend (Current)
+### Sprint 3: Tags & Enhanced Features (Current)
+- ✅ **Task Tags** - Organize todos with predefined tags (Summary, Research, Split)
+- ✅ **CloudFront API Routing** - Unified domain for frontend and API
+- ✅ **Enhanced CORS** - Simplified cross-origin configuration
+
+### Sprint 2: Cloud Backend
 - ✅ **Serverless API** - AWS Lambda & API Gateway backend
 - ✅ **Cloud Persistence** - DynamoDB storage for data synchronization
 - ✅ **Infrastructure as Code** - Terraform-managed AWS resources
@@ -265,19 +270,15 @@ Users can mark todos as complete/incomplete with visual feedback.
 
 ## 🔄 Future Roadmap
 
-### Sprint 2 (P2 Features)
-- [ ] **US4: Delete Todos** - Remove todos with confirmation dialog
+### Sprint 4 (Planned)
 - [ ] **Undo/Redo** - Revert recent changes
-- [ ] **Todo Editing** - Modify todo titles
-
-### Sprint 3 (P3 Features)
-- [ ] **Categories/Tags** - Organize todos by category
-- [ ] **Priorities** - Set high/medium/low priority levels
-- [ ] **Due Dates** - Schedule todos with deadline tracking
+- [ ] **Todo Editing** - Modify todo titles inline
 - [ ] **Search/Filter** - Find todos by text or criteria
 
-### Later
-- [ ] **Cloud Sync** - Multi-device synchronization
+### Future Enhancements
+- [ ] **Priorities** - Set high/medium/low priority levels
+- [ ] **Due Dates** - Schedule todos with deadline tracking
+- [ ] **Custom Tags** - User-defined tag creation
 - [ ] **Sharing** - Share todo lists with others
 - [ ] **Dark Mode** - UI theme preferences
 - [ ] **Mobile App** - React Native version
@@ -310,6 +311,5 @@ For questions or feedback, reach out to the development team.
 
 ---
 
-**Last Updated**: November 22, 2025  
-**Version**: 1.0.0 (Sprint 1 MVP)
-# Trigger deploy
+**Last Updated**: November 29, 2025  
+**Version**: 1.1.0 (Tags Feature)

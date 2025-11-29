@@ -15,6 +15,9 @@ The application communicates with a Serverless Backend via REST API.
 | `GET` | `/todos/{id}` | Get a single todo by ID |
 | `PUT` | `/todos/{id}/toggle` | Toggle todo completion status |
 | `DELETE` | `/todos/{id}` | Delete a todo |
+| `GET` | `/tags` | Get list of available tags |
+| `POST` | `/todos/{id}/tags` | Add a tag to a todo |
+| `DELETE` | `/todos/{id}/tags/{tagName}` | Remove a tag from a todo |
 
 ---
 
