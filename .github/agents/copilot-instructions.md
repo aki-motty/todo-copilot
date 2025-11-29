@@ -13,6 +13,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-22
 - DynamoDB Local (Docker) (008-local-sam-testing)
 - TypeScript 5.x + React 18, AWS SDK v3 (009-add-subtasks)
 - DynamoDB (Single Table Design or Simple Table) (009-add-subtasks)
+- TypeScript 5.x (Node.js 20.x for Lambda, React 18.x for Frontend) + AWS SDK v3, React, Vite (010-add-task-tags)
+- DynamoDB (Single Table Design) (010-add-task-tags)
 
 - TypeScript 5.x、Node.js 18+ (001-basic-todo-list)
 
@@ -32,9 +34,9 @@ npm test && npm run lint
 TypeScript 5.x、Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 010-add-task-tags: Added TypeScript 5.x (Node.js 20.x for Lambda, React 18.x for Frontend) + AWS SDK v3, React, Vite
+- 010-add-task-tags: Added TypeScript 5.x (Node.js 20.x for Lambda, React 18.x for Frontend) + AWS SDK v3, React, Vite
 - 009-add-subtasks: Added TypeScript 5.x + React 18, AWS SDK v3
-- 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
-- 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
 
 
 <!-- MANUAL ADDITIONS START -->

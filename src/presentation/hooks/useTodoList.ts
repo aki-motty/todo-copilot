@@ -105,19 +105,17 @@ export const useTodoList = () => {
     async (todoId: string, title: string) => {
       try {
         setError(null);
-        
-        let updatedTodo: TodoResponseDTO;
 
         if (backendMode === "api") {
           // Use dedicated API endpoint for atomic update
           const subtask = await TodoApiClient.addSubtask(todoId, title);
-          
+
           // Optimistically update local state or fetch fresh
           // Here we manually construct the updated todo to avoid a full refetch if possible,
           // but since we need the full Todo object for the state, let's fetch it or patch it.
           // Actually, TodoApiClient.addSubtask returns SubtaskDTO, not Todo.
           // So we need to patch the local state.
-          
+
           setTodos((prevTodos) =>
             prevTodos.map((todo) => {
               if (todo.id === todoId) {
@@ -129,19 +127,17 @@ export const useTodoList = () => {
               return todo;
             })
           );
-          
+
           logger.info("Subtask added via API hook", { todoId, title });
           return; // We don't have the full updatedTodo from API, but state is updated.
-        } else {
-          // LocalStorage mode uses the controller/service logic
-          updatedTodo = await todoController.addSubtask(todoId, title);
-          setTodos((prevTodos) =>
-            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
-          );
-          logger.info("Subtask added via Controller hook", { todoId, title });
-          return updatedTodo;
         }
-
+        // LocalStorage mode uses the controller/service logic
+        const updatedTodo = await todoController.addSubtask(todoId, title);
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+        );
+        logger.info("Subtask added via Controller hook", { todoId, title });
+        return updatedTodo;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to add subtask";
         setError(message);
@@ -159,13 +155,13 @@ export const useTodoList = () => {
         setError(null);
 
         if (backendMode === "api") {
-           const subtask = await TodoApiClient.toggleSubtask(todoId, subtaskId);
-           setTodos((prevTodos) =>
+          const subtask = await TodoApiClient.toggleSubtask(todoId, subtaskId);
+          setTodos((prevTodos) =>
             prevTodos.map((todo) => {
               if (todo.id === todoId) {
                 return {
                   ...todo,
-                  subtasks: todo.subtasks.map(s => s.id === subtaskId ? subtask : s),
+                  subtasks: todo.subtasks.map((s) => (s.id === subtaskId ? subtask : s)),
                 };
               }
               return todo;
@@ -201,7 +197,7 @@ export const useTodoList = () => {
               if (todo.id === todoId) {
                 return {
                   ...todo,
-                  subtasks: todo.subtasks.filter(s => s.id !== subtaskId),
+                  subtasks: todo.subtasks.filter((s) => s.id !== subtaskId),
                 };
               }
               return todo;
@@ -242,6 +238,68 @@ export const useTodoList = () => {
     [todoController]
   );
 
+  // Add tag
+  const addTag = useCallback(
+    async (todoId: string, tagName: string) => {
+      try {
+        setError(null);
+
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const updatedTodo = await TodoApiClient.addTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag added via API hook", { todoId, tagName });
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          const updatedTodo = await todoController.addTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag added via Controller hook", { todoId, tagName });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to add tag";
+        setError(message);
+        logger.error("Failed to add tag", { error: message, todoId, tagName });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
+  // Remove tag
+  const removeTag = useCallback(
+    async (todoId: string, tagName: string) => {
+      try {
+        setError(null);
+
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const updatedTodo = await TodoApiClient.removeTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag removed via API hook", { todoId, tagName });
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          const updatedTodo = await todoController.removeTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag removed via Controller hook", { todoId, tagName });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to remove tag";
+        setError(message);
+        logger.error("Failed to remove tag", { error: message, todoId, tagName });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
   // Clear error message
   const clearError = useCallback(() => {
     setError(null);
@@ -257,6 +315,8 @@ export const useTodoList = () => {
     toggleSubtask,
     deleteSubtask,
     deleteTodo,
+    addTag,
+    removeTag,
     clearError,
     backendMode,
   };

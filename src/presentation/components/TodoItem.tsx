@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import { SubtaskList } from "./SubtaskList";
+import { TagSelector } from "./TagSelector";
 import "./TodoItem.css";
 
 interface TodoItemProps {
@@ -10,6 +11,8 @@ interface TodoItemProps {
   onAddSubtask?: (todoId: string, title: string) => Promise<void>;
   onToggleSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
   onDeleteSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
+  onAddTag?: (todoId: string, tagName: string) => Promise<void>;
+  onRemoveTag?: (todoId: string, tagName: string) => Promise<void>;
 }
 
 /**
@@ -23,6 +26,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   onAddSubtask,
   onToggleSubtask,
   onDeleteSubtask,
+  onAddTag,
+  onRemoveTag,
 }) => {
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,7 +77,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
   const handleAddSubtask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!onAddSubtask || !subtaskTitle.trim()) return;
+    if (!onAddSubtask || !subtaskTitle.trim()) {
+      return;
+    }
 
     try {
       await onAddSubtask(todo.id, subtaskTitle);
@@ -84,7 +91,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
-    if (!onToggleSubtask) return;
+    if (!onToggleSubtask) {
+      return;
+    }
     try {
       await onToggleSubtask(todo.id, subtaskId);
     } catch (err) {
@@ -93,11 +102,35 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleDeleteSubtask = async (subtaskId: string) => {
-    if (!onDeleteSubtask) return;
+    if (!onDeleteSubtask) {
+      return;
+    }
     try {
       await onDeleteSubtask(todo.id, subtaskId);
     } catch (err) {
       console.error("Failed to delete subtask:", err);
+    }
+  };
+
+  const handleAddTag = async (tagName: string) => {
+    if (!onAddTag) {
+      return;
+    }
+    try {
+      await onAddTag(todo.id, tagName);
+    } catch (err) {
+      console.error("Failed to add tag:", err);
+    }
+  };
+
+  const handleRemoveTag = async (tagName: string) => {
+    if (!onRemoveTag) {
+      return;
+    }
+    try {
+      await onRemoveTag(todo.id, tagName);
+    } catch (err) {
+      console.error("Failed to remove tag:", err);
     }
   };
 
@@ -107,7 +140,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
   return (
     <li className="todo-item-container">
-      <div className="todo-item">
+      <div className={`todo-item ${todo.completed ? "completed" : ""}`}>
         <div className="todo-item-content">
           <button
             type="button"
@@ -126,6 +159,25 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             aria-label={`Toggle completion for: ${todo.title}`}
           />
           <span className={`todo-text ${todo.completed ? "completed" : ""}`}>{todo.title}</span>
+          {todo.tags && todo.tags.length > 0 && (
+            <div className="todo-tags">
+              {todo.tags.map((tag) => (
+                <span key={tag} className="todo-tag">
+                  {tag}
+                  {onRemoveTag && (
+                    <button
+                      type="button"
+                      className="remove-tag-btn"
+                      onClick={() => handleRemoveTag(tag)}
+                      aria-label={`Remove tag ${tag}`}
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+          )}
           {hasSubtasks && (
             <span className="subtask-progress">
               ({completedSubtasks}/{totalSubtasks})
@@ -134,6 +186,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
         </div>
 
         <div className="todo-item-actions">
+          <TagSelector onSelect={handleAddTag} />
           <button
             type="button"
             onClick={handleAddSubtaskClick}
@@ -186,7 +239,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                 value={subtaskTitle}
                 onChange={(e) => setSubtaskTitle(e.target.value)}
                 placeholder="Subtask title"
-                autoFocus
                 className="subtask-input"
               />
               <button type="submit" className="subtask-submit-btn">

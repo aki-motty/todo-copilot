@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Handler } from "a
 
 export const withMockAuth = (handler: Handler<APIGatewayProxyEventV2, APIGatewayProxyResultV2>) => {
   return async (event: APIGatewayProxyEventV2, context: any, callback: any) => {
-    if (process.env.AWS_SAM_LOCAL === "true") {
+    if (process.env["AWS_SAM_LOCAL"] === "true") {
       console.log("🔒 Using Mock Authentication for Local SAM");
 
       // Inject mock user identity

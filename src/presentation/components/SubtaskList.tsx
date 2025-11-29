@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import type { SubtaskDTO } from "../../application/dto/TodoDTO";
 import "./SubtaskList.css";
 
@@ -13,7 +13,9 @@ export const SubtaskList: React.FC<SubtaskListProps> = ({
   onToggleSubtask,
   onDeleteSubtask,
 }) => {
-  if (!subtasks || subtasks.length === 0) return null;
+  if (!subtasks || subtasks.length === 0) {
+    return null;
+  }
 
   return (
     <ul className="subtask-list">

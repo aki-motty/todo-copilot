@@ -53,8 +53,9 @@ export class ListTodosHandler {
       subtasks: json.subtasks.map((s: any) => ({
         id: s.id,
         title: s.title,
-        completed: s.completed
-      }))
+        completed: s.completed,
+      })),
+      tags: json.tags || [],
     };
   }
 }

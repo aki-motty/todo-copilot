@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import type {
-    CreateTodoRequestDTO,
-    ListTodosResponseDTO,
-    SubtaskDTO,
-    TodoResponseDTO,
+  CreateTodoRequestDTO,
+  ListTodosResponseDTO,
+  SubtaskDTO,
+  TodoResponseDTO,
 } from "../../application/dto/TodoDTO";
 import { TodoApiClient, checkApiHealth } from "../../infrastructure/services/todoApiClient";
 
@@ -24,6 +24,9 @@ export interface UseTodoAPIReturn extends UseTodoAPIState {
   addSubtask(todoId: string, title: string): Promise<SubtaskDTO | undefined>;
   toggleSubtask(todoId: string, subtaskId: string): Promise<SubtaskDTO | undefined>;
   deleteSubtask(todoId: string, subtaskId: string): Promise<{ success: boolean } | undefined>;
+  addTag(todoId: string, tagName: string): Promise<TodoResponseDTO | undefined>;
+  removeTag(todoId: string, tagName: string): Promise<TodoResponseDTO | undefined>;
+  getTags(): Promise<string[] | undefined>;
   loadMore(): Promise<void>;
   retry(): Promise<void>;
   clearError(): void;
@@ -171,80 +174,143 @@ export function useTodoAPI(): UseTodoAPIReturn {
     }
   }, []);
 
-  const addSubtask = useCallback(async (todoId: string, title: string): Promise<SubtaskDTO | undefined> => {
+  const addSubtask = useCallback(
+    async (todoId: string, title: string): Promise<SubtaskDTO | undefined> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const subtask = await TodoApiClient.addSubtask(todoId, title);
+
+        setState((prev) => ({
+          ...prev,
+          todos: prev.todos.map((t) =>
+            t.id === todoId ? { ...t, subtasks: [...(t.subtasks || []), subtask] } : t
+          ),
+          isLoading: false,
+        }));
+
+        return subtask;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setState((prev) => ({ ...prev, isLoading: false, error: message }));
+        return undefined;
+      }
+    },
+    []
+  );
+
+  const toggleSubtask = useCallback(
+    async (todoId: string, subtaskId: string): Promise<SubtaskDTO | undefined> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const subtask = await TodoApiClient.toggleSubtask(todoId, subtaskId);
+
+        setState((prev) => ({
+          ...prev,
+          todos: prev.todos.map((t) =>
+            t.id === todoId
+              ? {
+                  ...t,
+                  subtasks: t.subtasks.map((s) => (s.id === subtaskId ? subtask : s)),
+                }
+              : t
+          ),
+          isLoading: false,
+        }));
+
+        return subtask;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setState((prev) => ({ ...prev, isLoading: false, error: message }));
+        return undefined;
+      }
+    },
+    []
+  );
+
+  const deleteSubtask = useCallback(
+    async (todoId: string, subtaskId: string): Promise<{ success: boolean } | undefined> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const result = await TodoApiClient.deleteSubtask(todoId, subtaskId);
+
+        setState((prev) => ({
+          ...prev,
+          todos: prev.todos.map((t) =>
+            t.id === todoId
+              ? {
+                  ...t,
+                  subtasks: t.subtasks.filter((s) => s.id !== subtaskId),
+                }
+              : t
+          ),
+          isLoading: false,
+        }));
+
+        return result;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setState((prev) => ({ ...prev, isLoading: false, error: message }));
+        return undefined;
+      }
+    },
+    []
+  );
+
+  const addTag = useCallback(
+    async (todoId: string, tagName: string): Promise<TodoResponseDTO | undefined> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const updatedTodo = await TodoApiClient.addTag(todoId, tagName);
+
+        setState((prev) => ({
+          ...prev,
+          todos: prev.todos.map((t) => (t.id === todoId ? updatedTodo : t)),
+          isLoading: false,
+        }));
+
+        return updatedTodo;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setState((prev) => ({ ...prev, isLoading: false, error: message }));
+        return undefined;
+      }
+    },
+    []
+  );
+
+  const removeTag = useCallback(
+    async (todoId: string, tagName: string): Promise<TodoResponseDTO | undefined> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const updatedTodo = await TodoApiClient.removeTag(todoId, tagName);
+
+        setState((prev) => ({
+          ...prev,
+          todos: prev.todos.map((t) => (t.id === todoId ? updatedTodo : t)),
+          isLoading: false,
+        }));
+
+        return updatedTodo;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setState((prev) => ({ ...prev, isLoading: false, error: message }));
+        return undefined;
+      }
+    },
+    []
+  );
+
+  const getTags = useCallback(async (): Promise<string[] | undefined> => {
     try {
-      setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-      const subtask = await TodoApiClient.addSubtask(todoId, title);
-
-      setState((prev) => ({
-        ...prev,
-        todos: prev.todos.map((t) =>
-          t.id === todoId
-            ? { ...t, subtasks: [...(t.subtasks || []), subtask] }
-            : t
-        ),
-        isLoading: false,
-      }));
-
-      return subtask;
+      return await TodoApiClient.getTags();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setState((prev) => ({ ...prev, isLoading: false, error: message }));
-      return undefined;
-    }
-  }, []);
-
-  const toggleSubtask = useCallback(async (todoId: string, subtaskId: string): Promise<SubtaskDTO | undefined> => {
-    try {
-      setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-      const subtask = await TodoApiClient.toggleSubtask(todoId, subtaskId);
-
-      setState((prev) => ({
-        ...prev,
-        todos: prev.todos.map((t) =>
-          t.id === todoId
-            ? {
-                ...t,
-                subtasks: t.subtasks.map((s) => (s.id === subtaskId ? subtask : s)),
-              }
-            : t
-        ),
-        isLoading: false,
-      }));
-
-      return subtask;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setState((prev) => ({ ...prev, isLoading: false, error: message }));
-      return undefined;
-    }
-  }, []);
-
-  const deleteSubtask = useCallback(async (todoId: string, subtaskId: string): Promise<{ success: boolean } | undefined> => {
-    try {
-      setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-      const result = await TodoApiClient.deleteSubtask(todoId, subtaskId);
-
-      setState((prev) => ({
-        ...prev,
-        todos: prev.todos.map((t) =>
-          t.id === todoId
-            ? {
-                ...t,
-                subtasks: t.subtasks.filter((s) => s.id !== subtaskId),
-              }
-            : t
-        ),
-        isLoading: false,
-      }));
-
-      return result;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setState((prev) => ({ ...prev, isLoading: false, error: message }));
+      setState((prev) => ({ ...prev, error: message }));
       return undefined;
     }
   }, []);
@@ -296,6 +362,9 @@ export function useTodoAPI(): UseTodoAPIReturn {
     addSubtask,
     toggleSubtask,
     deleteSubtask,
+    addTag,
+    removeTag,
+    getTags,
     loadMore,
     retry,
     clearError,

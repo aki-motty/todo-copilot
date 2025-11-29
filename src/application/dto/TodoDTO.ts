@@ -23,6 +23,7 @@ export interface TodoResponseDTO {
   createdAt: string; // ISO 8601 format
   updatedAt: string; // ISO 8601 format
   subtasks: SubtaskDTO[];
+  tags: string[];
 }
 
 /**

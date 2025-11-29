@@ -1,5 +1,5 @@
 import { Subtask } from "../../../../src/domain/entities/Subtask";
-import { TodoId } from "../../../../src/domain/value-objects/TodoId";
+import type { TodoId } from "../../../../src/domain/value-objects/TodoId";
 
 describe("Subtask Entity", () => {
   const parentId = "parent-id" as TodoId;
@@ -16,7 +16,7 @@ describe("Subtask Entity", () => {
 
   it("should toggle completion status", () => {
     const subtask = Subtask.create("Test", parentId);
-    
+
     const toggled = subtask.toggleCompletion();
     expect(toggled.completed).toBe(true);
     expect(toggled.id).toBe(subtask.id);
@@ -27,7 +27,7 @@ describe("Subtask Entity", () => {
 
   it("should mark as completed", () => {
     const subtask = Subtask.create("Test", parentId);
-    
+
     const completed = subtask.markCompleted();
     expect(completed.completed).toBe(true);
 

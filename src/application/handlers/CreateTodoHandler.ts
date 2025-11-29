@@ -38,11 +38,12 @@ export class CreateTodoHandler {
       completed: json.completed,
       createdAt: json.createdAt,
       updatedAt: json.updatedAt,
-      subtasks: json.subtasks.map(s => ({
+      subtasks: json.subtasks.map((s) => ({
         id: s.id,
         title: s.title,
-        completed: s.completed
-      }))
+        completed: s.completed,
+      })),
+      tags: json.tags || [],
     };
   }
 }

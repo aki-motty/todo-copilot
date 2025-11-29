@@ -7,14 +7,18 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda
 import type { ApiResponseDTO, ErrorResponseDTO } from "../../../application/dto/TodoDTO";
 import { type AppError, isAppError } from "../../../application/errors/AppError";
 import { AddSubtaskHandler } from "../../../application/handlers/AddSubtaskHandler";
+import { AddTagHandler } from "../../../application/handlers/AddTagHandler";
 import { CreateTodoHandler } from "../../../application/handlers/CreateTodoHandler";
 import { DeleteSubtaskHandler } from "../../../application/handlers/DeleteSubtaskHandler";
 import { DeleteTodoHandler } from "../../../application/handlers/DeleteTodoHandler";
+import { GetTagsHandler } from "../../../application/handlers/GetTagsHandler";
 import { GetTodoHandler } from "../../../application/handlers/GetTodoHandler";
 import { ListTodosHandler } from "../../../application/handlers/ListTodosHandler";
+import { RemoveTagHandler } from "../../../application/handlers/RemoveTagHandler";
 import { SaveTodoHandler } from "../../../application/handlers/SaveTodoHandler";
 import { ToggleSubtaskHandler } from "../../../application/handlers/ToggleSubtaskHandler";
 import { ToggleTodoHandler } from "../../../application/handlers/ToggleTodoHandler";
+import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
 import { DynamoDBTodoRepository } from "../../repositories/DynamoDBTodoRepository";
 
 // Initialize repository and handlers
@@ -29,6 +33,9 @@ let handlers: {
   addSubtask: AddSubtaskHandler;
   toggleSubtask: ToggleSubtaskHandler;
   deleteSubtask: DeleteSubtaskHandler;
+  addTag: AddTagHandler;
+  getTags: GetTagsHandler;
+  removeTag: RemoveTagHandler;
 };
 
 /**
@@ -38,6 +45,8 @@ async function initializeHandlers(): Promise<void> {
   if (!repository) {
     repository = new DynamoDBTodoRepository();
     await repository.initializeFromDynamoDB();
+
+    const service = new TodoApplicationService(repository);
 
     handlers = {
       createTodo: new CreateTodoHandler(repository),
@@ -49,6 +58,9 @@ async function initializeHandlers(): Promise<void> {
       addSubtask: new AddSubtaskHandler(repository),
       toggleSubtask: new ToggleSubtaskHandler(repository),
       deleteSubtask: new DeleteSubtaskHandler(repository),
+      addTag: new AddTagHandler(service),
+      getTags: new GetTagsHandler(),
+      removeTag: new RemoveTagHandler(service),
     };
   }
 }
@@ -113,10 +125,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       statusCode = 201;
     } else if (method === "GET" && path === "/todos") {
       // List todos
-      const limit = event.queryStringParameters?.['limit']
-        ? Number.parseInt(event.queryStringParameters['limit'])
+      const limit = event.queryStringParameters?.["limit"]
+        ? Number.parseInt(event.queryStringParameters["limit"])
         : undefined;
-      const cursor = event.queryStringParameters?.['cursor'];
+      const cursor = event.queryStringParameters?.["cursor"];
       response = await handlers.listTodos.execute({ limit, cursor });
     } else if (method === "GET" && path.match(/^\/todos\/[^/]+$/) && !path.endsWith("/toggle")) {
       // Get single todo
@@ -167,6 +179,27 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       const subtaskId = parts[4];
       if (todoId && subtaskId) {
         response = await handlers.deleteSubtask.execute(todoId, subtaskId);
+      }
+    } else if (method === "GET" && path === "/tags") {
+      // Get allowed tags
+      const result = await handlers.getTags.handle();
+      response = result;
+    } else if (method === "POST" && path.match(/^\/todos\/[^/]+\/tags$/)) {
+      // Add tag
+      const id = path.split("/")[2];
+      const { tagName } = requestBody;
+      if (id) {
+        response = await handlers.addTag.handle({ id, tagName });
+        statusCode = 201;
+      }
+    } else if (method === "DELETE" && path.match(/^\/todos\/[^\/]+\/tags\/[^\/]+$/)) {
+      // Remove tag
+      const parts = path.split("/");
+      const id = parts[2];
+      const tagPart = parts[4];
+      if (id && tagPart) {
+        const tagName = decodeURIComponent(tagPart);
+        response = await handlers.removeTag.handle({ id, tagName });
       }
     } else {
       // Not found

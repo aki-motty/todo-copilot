@@ -10,7 +10,7 @@
   color: var(--text-main);
   padding: 2rem 1rem;
   text-align: center;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .app-header h1 {
@@ -39,7 +39,7 @@
 
 .app-footer {
   background-color: var(--surface-color);
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
   text-align: center;
   color: var(--text-muted);

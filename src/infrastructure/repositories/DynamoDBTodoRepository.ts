@@ -1,13 +1,12 @@
 import {
-    DeleteItemCommand,
-    DynamoDBClient,
-    GetItemCommand,
-    PutItemCommand,
-    ScanCommand,
+  DeleteItemCommand,
+  DynamoDBClient,
+  GetItemCommand,
+  PutItemCommand,
+  ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { DatabaseError } from "../../application/errors/AppError";
-import { Subtask } from "../../domain/entities/Subtask";
 import { Todo, type TodoId } from "../../domain/entities/Todo";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 
@@ -131,6 +130,7 @@ export class DynamoDBTodoRepository implements ITodoRepository {
         createdAt: json.createdAt,
         updatedAt: json.updatedAt,
         subtasks: json.subtasks,
+        tags: json.tags,
       };
 
       await this.client.send(
@@ -164,19 +164,14 @@ export class DynamoDBTodoRepository implements ITodoRepository {
    * Convert DynamoDB item to Todo entity
    */
   private unmarshallTodo(item: any): Todo {
-    const subtasks = item.subtasks
-      ? item.subtasks.map((s: any) =>
-          Subtask.fromPersistence(s.id, s.title, s.completed, item.id)
-        )
-      : [];
-
     return Todo.fromPersistence(
       item.id,
       item.title,
       item.completed,
       item.createdAt,
       item.updatedAt,
-      subtasks
+      item.subtasks || [],
+      item.tags || []
     );
   }
 

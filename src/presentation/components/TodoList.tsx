@@ -10,6 +10,8 @@ interface TodoListProps {
   onAddSubtask?: (todoId: string, title: string) => Promise<void>;
   onToggleSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
   onDeleteSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
+  onAddTag?: (todoId: string, tagName: string) => Promise<void>;
+  onRemoveTag?: (todoId: string, tagName: string) => Promise<void>;
 }
 
 /**
@@ -24,6 +26,8 @@ export const TodoList: React.FC<TodoListProps> = ({
   onAddSubtask,
   onToggleSubtask,
   onDeleteSubtask,
+  onAddTag,
+  onRemoveTag,
 }) => {
   if (isLoading) {
     return (
@@ -41,11 +45,16 @@ export const TodoList: React.FC<TodoListProps> = ({
     );
   }
 
+  // Sort todos by createdAt (newest first)
+  const sortedTodos = [...todos].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <div className="todo-list">
       <h2 className="todo-list-header">My Todos ({todos.length})</h2>
       <ul className="todo-items">
-        {todos.map((todo) => (
+        {sortedTodos.map((todo) => (
           <TodoItem
             key={todo.id}
             todo={todo}
@@ -54,6 +63,8 @@ export const TodoList: React.FC<TodoListProps> = ({
             onAddSubtask={onAddSubtask}
             onToggleSubtask={onToggleSubtask}
             onDeleteSubtask={onDeleteSubtask}
+            onAddTag={onAddTag}
+            onRemoveTag={onRemoveTag}
           />
         ))}
       </ul>

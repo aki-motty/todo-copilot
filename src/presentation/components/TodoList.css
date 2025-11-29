@@ -28,7 +28,7 @@
   background-color: var(--surface-color);
   border-radius: var(--radius-md);
   color: var(--text-muted);
-  border: 1px dashed rgba(0,0,0,0.1);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .delete-btn:hover {

@@ -1,7 +1,7 @@
 import type {
-    CreateTodoCommand,
-    DeleteTodoCommand,
-    ToggleTodoCompletionCommand,
+  CreateTodoCommand,
+  DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../../application/commands";
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import type { GetAllTodosQuery } from "../../application/queries";
@@ -115,6 +115,34 @@ export class TodoController {
       await this.applicationService.deleteTodo(command);
     } catch (error) {
       this.logger.error("Controller: deleteTodo failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a tag to a todo
+   */
+  async addTag(todoId: string, tagName: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: addTag", { todoId, tagName });
+      const todo = await this.applicationService.addTag(todoId, tagName);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: addTag failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a tag from a todo
+   */
+  async removeTag(todoId: string, tagName: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: removeTag", { todoId, tagName });
+      const todo = await this.applicationService.removeTag(todoId, tagName);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: removeTag failed", error as Error);
       throw error;
     }
   }

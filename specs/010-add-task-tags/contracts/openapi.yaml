@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: Todo API - Task Tags
+  version: 1.0.0
+paths:
+  /tags:
+    get:
+      summary: Get list of available tags
+      responses:
+        '200':
+          description: List of allowed tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+  /todos/{id}/tags:
+    post:
+      summary: Add a tag to a Todo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  enum: [Summary, Research, Split]
+      responses:
+        '201':
+          description: Tag added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid tag name
+        '404':
+          description: Todo not found
+  /todos/{id}/tags/{tagName}:
+    delete:
+      summary: Remove a tag from a Todo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tagName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tag removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        completed:
+          type: boolean
+        tags:
+          type: array
+          items:
+            type: string

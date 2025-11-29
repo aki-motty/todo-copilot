@@ -1,18 +1,18 @@
 import { Todo, type TodoId, type TodoStatus } from "../../domain/entities/Todo";
 import {
-    type DomainEvent,
-    createTodoCompletedEvent,
-    createTodoCreatedEvent,
-    createTodoDeletedEvent,
+  type DomainEvent,
+  createTodoCompletedEvent,
+  createTodoCreatedEvent,
+  createTodoDeletedEvent,
 } from "../../domain/events/TodoEvents";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { brandTodoId } from "../../domain/value-objects/TodoId";
 import { createLogger } from "../../infrastructure/config/logger";
 import { NotFoundError } from "../../shared/types";
 import type {
-    CreateTodoCommand,
-    DeleteTodoCommand,
-    ToggleTodoCompletionCommand,
+  CreateTodoCommand,
+  DeleteTodoCommand,
+  ToggleTodoCompletionCommand,
 } from "../commands";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
@@ -140,6 +140,46 @@ export class TodoApplicationService {
       todoId,
       subtaskId,
     });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Add a tag to a todo
+   * COMMAND: Changes application state
+   */
+  async addTag(id: string, tagName: string): Promise<Todo> {
+    this.logger.debug("Adding tag", { id, tagName });
+
+    const todo = await this.todoRepository.findById(brandTodoId(id));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${id} not found`);
+    }
+
+    const updatedTodo = todo.addTag(tagName);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Tag added", { id, tagName });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Remove a tag from a todo
+   * COMMAND: Changes application state
+   */
+  async removeTag(id: string, tagName: string): Promise<Todo> {
+    this.logger.debug("Removing tag", { id, tagName });
+
+    const todo = await this.todoRepository.findById(brandTodoId(id));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${id} not found`);
+    }
+
+    const updatedTodo = todo.removeTag(tagName);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Tag removed", { id, tagName });
 
     return updatedTodo;
   }
