@@ -41,8 +41,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   dynamic "origin" {
     for_each = var.api_gateway_endpoint != "" ? [1] : []
     content {
-      domain_name = replace(replace(var.api_gateway_endpoint, "https://", ""), "/", "")
+      # Extract domain from URL like https://xxx.execute-api.region.amazonaws.com/prod
+      domain_name = element(split("/", replace(var.api_gateway_endpoint, "https://", "")), 0)
       origin_id   = "APIGateway"
+      origin_path = "/${element(split("/", replace(var.api_gateway_endpoint, "https://", "")), 1)}"
 
       custom_origin_config {
         http_port              = 80
