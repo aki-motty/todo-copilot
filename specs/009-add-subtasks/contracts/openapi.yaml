@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: Todo Copilot API
+  version: 1.0.0
+paths:
+  /todos/{id}/subtasks:
+    post:
+      summary: Create a subtask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '201':
+          description: Subtask created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subtask'
+
+  /todos/{id}/subtasks/{subtaskId}:
+    patch:
+      summary: Update a subtask (e.g. toggle completion)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subtaskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completed:
+                  type: boolean
+      responses:
+        '200':
+          description: Subtask updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subtask'
+    delete:
+      summary: Delete a subtask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subtaskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Subtask deleted
+
+components:
+  schemas:
+    Subtask:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        completed:
+          type: boolean

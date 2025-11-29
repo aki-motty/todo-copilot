@@ -1,0 +1,79 @@
+/* Subtask List */
+.subtask-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border-top: none;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem 0.5rem 3.5rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  border-bottom: none;
+  position: relative;
+}
+
+.subtask-item:last-child {
+  border-bottom: none;
+}
+
+.subtask-item::before {
+  content: "";
+  position: absolute;
+  left: 1.9rem;
+  top: 50%;
+  width: 1rem;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.subtask-item::after {
+  content: "";
+  position: absolute;
+  left: 1.9rem;
+  top: 0;
+  bottom: 50%;
+  width: 1px;
+  background-color: #e5e7eb;
+}
+
+.subtask-item:first-child::after {
+  top: -0.5rem; /* Connect to parent */
+}
+
+.subtask-checkbox {
+  margin-right: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--secondary-color);
+}
+
+.subtask-text.completed {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.subtask-delete-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.subtask-item:hover .subtask-delete-btn {
+  opacity: 1;
+}
+
+.subtask-delete-btn:hover {
+  color: var(--danger-color);
+  background-color: #fee2e2;
+}

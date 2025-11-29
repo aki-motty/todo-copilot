@@ -81,6 +81,13 @@ export class HttpClient {
   }
 
   /**
+   * Perform a PATCH request
+   */
+  async patch<T>(path: string, body: unknown, options?: HttpRequestOptions): Promise<T> {
+    return this.request<T>("PATCH", path, body, options);
+  }
+
+  /**
    * Perform a DELETE request
    */
   async delete<T>(path: string, options?: HttpRequestOptions): Promise<T> {
@@ -91,7 +98,7 @@ export class HttpClient {
    * Internal method to perform HTTP request with timeout and error handling
    */
   private async request<T>(
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     path: string,
     body?: unknown,
     options?: HttpRequestOptions
@@ -152,15 +159,15 @@ export class HttpClient {
 
         // Handle standard API response format { status, data, meta }
         if ("status" in apiData && "data" in apiData) {
-          return apiData.data as T;
+          return apiData["data"] as T;
         }
 
-        if ("body" in apiData && typeof apiData.body === "object") {
-          const apiBody = apiData.body as Record<string, unknown>;
+        if ("body" in apiData && typeof apiData["body"] === "object") {
+          const apiBody = apiData["body"] as Record<string, unknown>;
           if ("data" in apiBody) {
-            return apiBody.data as T;
+            return apiBody["data"] as T;
           }
-          if ("success" in apiBody && apiBody.success) {
+          if ("success" in apiBody && apiBody["success"]) {
             return apiBody as T;
           }
         }
@@ -222,22 +229,22 @@ export class HttpClient {
       const apiData = data as Record<string, unknown>;
 
       // Check for wrapped API response
-      if ("body" in apiData && typeof apiData.body === "object") {
-        const body = apiData.body as Record<string, unknown>;
-        if ("error" in body && typeof body.error === "string") {
-          return body.error;
+      if ("body" in apiData && typeof apiData["body"] === "object") {
+        const body = apiData["body"] as Record<string, unknown>;
+        if ("error" in body && typeof body["error"] === "string") {
+          return body["error"];
         }
-        if ("message" in body && typeof body.message === "string") {
-          return body.message;
+        if ("message" in body && typeof body["message"] === "string") {
+          return body["message"];
         }
       }
 
       // Check for direct error field
-      if ("error" in apiData && typeof apiData.error === "string") {
-        return apiData.error;
+      if ("error" in apiData && typeof apiData["error"] === "string") {
+        return apiData["error"];
       }
-      if ("message" in apiData && typeof apiData.message === "string") {
-        return apiData.message;
+      if ("message" in apiData && typeof apiData["message"] === "string") {
+        return apiData["message"];
       }
     }
 

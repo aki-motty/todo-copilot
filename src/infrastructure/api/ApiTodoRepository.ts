@@ -1,3 +1,4 @@
+import { Subtask } from "../../domain/entities/Subtask";
 import { Todo, type TodoId } from "../../domain/entities/Todo";
 import type { TodoDTO } from "../../shared/api/types";
 import { NotFoundError } from "../../shared/types";
@@ -98,6 +99,7 @@ export class AsyncApiTodoRepository {
         completed: todo.status === "Completed",
         createdAt: todo.createdAt.toISOString(),
         updatedAt: todo.updatedAt.toISOString(),
+        subtasks: todo.subtasks.map((s) => s.toJSON()),
       };
 
       if (isNew) {
@@ -179,7 +181,18 @@ export class AsyncApiTodoRepository {
    * Map TodoDTO from API to domain Todo entity
    */
   private mapTodoFromDTO(dto: TodoDTO): Todo {
-    return Todo.fromPersistence(dto.id, dto.title, dto.completed, dto.createdAt, dto.updatedAt);
+    const subtasks = dto.subtasks
+      ? dto.subtasks.map((s) => Subtask.fromPersistence(s.id, s.title, s.completed, dto.id))
+      : [];
+
+    return Todo.fromPersistence(
+      dto.id,
+      dto.title,
+      dto.completed,
+      dto.createdAt,
+      dto.updatedAt,
+      subtasks
+    );
   }
 
   /**

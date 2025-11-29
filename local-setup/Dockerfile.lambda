@@ -2,7 +2,8 @@ FROM public.ecr.aws/lambda/nodejs:20
 
 # Copy the built Lambda code
 # Note: Context should be the repository root
-COPY dist-lambda/index.cjs ${LAMBDA_TASK_ROOT}/index.cjs
+COPY dist-lambda/index.js ${LAMBDA_TASK_ROOT}/index.js
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "index.handler" ]
+

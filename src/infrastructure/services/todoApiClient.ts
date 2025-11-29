@@ -5,10 +5,11 @@
  */
 
 import type {
-  ApiResponseDTO,
-  ErrorResponseDTO,
-  ListTodosResponseDTO,
-  TodoResponseDTO,
+    ApiResponseDTO,
+    ErrorResponseDTO,
+    ListTodosResponseDTO,
+    SubtaskDTO,
+    TodoResponseDTO,
 } from "../../application/dto/TodoDTO";
 
 /**
@@ -21,8 +22,8 @@ function getApiBaseUrl(): string {
   if (typeof __VITE_API_URL__ !== "undefined") {
     return __VITE_API_URL__;
   }
-  if (typeof process !== "undefined" && process.env?.VITE_API_URL) {
-    return process.env.VITE_API_URL;
+  if (typeof process !== "undefined" && process.env?.['VITE_API_URL']) {
+    return process.env['VITE_API_URL'];
   }
   // Default fallback
   return "http://localhost:3000";
@@ -103,11 +104,42 @@ export const TodoApiClient = {
   },
 
   /**
+   * Add a subtask to a todo
+   */
+  async addSubtask(todoId: string, title: string): Promise<SubtaskDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${todoId}/subtasks`, "POST", { title });
+    return response.data as SubtaskDTO;
+  },
+
+  /**
+   * Toggle subtask completion status
+   */
+  async toggleSubtask(todoId: string, subtaskId: string): Promise<SubtaskDTO> {
+    const response = await TodoApiClient.fetch(
+      `/todos/${todoId}/subtasks/${subtaskId}`,
+      "PATCH",
+      {}
+    );
+    return response.data as SubtaskDTO;
+  },
+
+  /**
+   * Delete a subtask
+   */
+  async deleteSubtask(todoId: string, subtaskId: string): Promise<{ success: boolean; id: string }> {
+    const response = await TodoApiClient.fetch(
+      `/todos/${todoId}/subtasks/${subtaskId}`,
+      "DELETE"
+    );
+    return response.data as { success: boolean; id: string };
+  },
+
+  /**
    * Internal fetch method with retry logic and error handling
    */
   async fetch(
     endpoint: string,
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     body?: unknown,
     attempt = 1
   ): Promise<ApiResponseDTO<unknown>> {

@@ -1,7 +1,7 @@
 import type {
-  CreateTodoCommand,
-  DeleteTodoCommand,
-  ToggleTodoCompletionCommand,
+    CreateTodoCommand,
+    DeleteTodoCommand,
+    ToggleTodoCompletionCommand,
 } from "../../application/commands";
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import type { GetAllTodosQuery } from "../../application/queries";
@@ -59,6 +59,48 @@ export class TodoController {
       return todo.toJSON();
     } catch (error) {
       this.logger.error("Controller: toggleTodoCompletion failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a subtask to a todo
+   */
+  async addSubtask(todoId: string, title: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: addSubtask", { todoId, title });
+      const todo = await this.applicationService.addSubtask(todoId, title);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: addSubtask failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Toggle a subtask
+   */
+  async toggleSubtask(todoId: string, subtaskId: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: toggleSubtask", { todoId, subtaskId });
+      const todo = await this.applicationService.toggleSubtask(todoId, subtaskId);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: toggleSubtask failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a subtask
+   */
+  async deleteSubtask(todoId: string, subtaskId: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: deleteSubtask", { todoId, subtaskId });
+      const todo = await this.applicationService.deleteSubtask(todoId, subtaskId);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: deleteSubtask failed", error as Error);
       throw error;
     }
   }

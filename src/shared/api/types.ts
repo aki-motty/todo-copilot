@@ -23,12 +23,19 @@ export interface ApiResponse<T = unknown> {
  * Todo data transfer object for API responses
  * Minimal serializable representation of Todo domain entity
  */
+export interface SubtaskDTO {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface TodoDTO {
   id: string;
   title: string;
   completed: boolean;
   createdAt: string; // ISO 8601 timestamp
   updatedAt: string; // ISO 8601 timestamp
+  subtasks: SubtaskDTO[];
 }
 
 /**

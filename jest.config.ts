@@ -28,6 +28,7 @@ export default {
   },
   moduleNameMapper: {
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
+    '\\.(css|less|scss|sass)$': '<rootDir>/tests/styleMock.js',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
     '^@infrastructure/(.*)$': '<rootDir>/src/infrastructure/$1',
     '^@presentation/(.*)$': '<rootDir>/src/presentation/$1',

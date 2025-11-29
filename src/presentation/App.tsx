@@ -8,11 +8,33 @@ import { useTodoList } from "./hooks/useTodoList";
  * Uses Lambda API with fallback to localStorage
  */
 function AppContent() {
-  const { todos, error, loading, createTodo, toggleTodoCompletion, deleteTodo, clearError } =
-    useTodoList();
+  const {
+    todos,
+    error,
+    loading,
+    createTodo,
+    toggleTodoCompletion,
+    deleteTodo,
+    addSubtask,
+    toggleSubtask,
+    deleteSubtask,
+    clearError,
+  } = useTodoList();
 
   const handleToggleCompletion = async (id: string) => {
     await toggleTodoCompletion(id);
+  };
+
+  const handleAddSubtask = async (todoId: string, title: string) => {
+    await addSubtask(todoId, title);
+  };
+
+  const handleToggleSubtask = async (todoId: string, subtaskId: string) => {
+    await toggleSubtask(todoId, subtaskId);
+  };
+
+  const handleDeleteSubtask = async (todoId: string, subtaskId: string) => {
+    await deleteSubtask(todoId, subtaskId);
   };
 
   return (
@@ -38,6 +60,9 @@ function AppContent() {
           isLoading={loading}
           onToggleCompletion={handleToggleCompletion}
           onDelete={deleteTodo}
+          onAddSubtask={handleAddSubtask}
+          onToggleSubtask={handleToggleSubtask}
+          onDeleteSubtask={handleDeleteSubtask}
         />
       </main>
 

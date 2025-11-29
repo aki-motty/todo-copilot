@@ -7,6 +7,9 @@ interface TodoListProps {
   isLoading?: boolean;
   onToggleCompletion?: (id: string) => Promise<any>;
   onDelete?: (id: string) => Promise<void>;
+  onAddSubtask?: (todoId: string, title: string) => Promise<void>;
+  onToggleSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
+  onDeleteSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
 }
 
 /**
@@ -18,6 +21,9 @@ export const TodoList: React.FC<TodoListProps> = ({
   isLoading = false,
   onToggleCompletion,
   onDelete,
+  onAddSubtask,
+  onToggleSubtask,
+  onDeleteSubtask,
 }) => {
   if (isLoading) {
     return (
@@ -45,6 +51,9 @@ export const TodoList: React.FC<TodoListProps> = ({
             todo={todo}
             onToggleCompletion={onToggleCompletion}
             onDelete={onDelete}
+            onAddSubtask={onAddSubtask}
+            onToggleSubtask={onToggleSubtask}
+            onDeleteSubtask={onDeleteSubtask}
           />
         ))}
       </ul>
