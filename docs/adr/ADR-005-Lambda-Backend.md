@@ -1,4 +1,4 @@
-# ADR-004: Serverless Lambda Backend Architecture
+# ADR-005: Serverless Lambda Backend Architecture
 
 ## Status
 ✅ **ACCEPTED** - Implemented and validated in production
