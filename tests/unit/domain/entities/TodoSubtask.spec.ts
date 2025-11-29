@@ -36,7 +36,7 @@ describe("Todo Entity - Subtask Operations", () => {
     expect(todoToggled.subtasks[0]?.completed).toBe(true);
   });
 
-  it("should mark all subtasks as completed when parent is completed", () => {
+  it("should toggle parent completion independently of subtasks", () => {
     let todo = Todo.create("Parent Task");
     todo = todo.addSubtask("Subtask 1");
     todo = todo.addSubtask("Subtask 2");
@@ -44,17 +44,27 @@ describe("Todo Entity - Subtask Operations", () => {
     // Toggle parent to completed
     const completedTodo = todo.toggleCompletion();
 
+    // Parent is completed but subtasks remain unchanged
     expect(completedTodo.completed).toBe(true);
-    expect(completedTodo.subtasks[0]?.completed).toBe(true);
-    expect(completedTodo.subtasks[1]?.completed).toBe(true);
+    expect(completedTodo.subtasks[0]?.completed).toBe(false);
+    expect(completedTodo.subtasks[1]?.completed).toBe(false);
   });
 
-  it("should NOT unmark subtasks when parent is unmarked", () => {
+  it("should keep subtask state when parent is toggled", () => {
     let todo = Todo.create("Parent Task");
     todo = todo.addSubtask("Subtask 1");
 
-    // Mark parent completed (and subtask)
-    const completedTodo = todo.toggleCompletion();
+    // Manually complete the subtask first
+    const subtaskId = todo.subtasks[0]?.id;
+    if (!subtaskId) {
+      throw new Error("Subtask not created");
+    }
+    const todoWithCompletedSubtask = todo.toggleSubtask(subtaskId);
+    expect(todoWithCompletedSubtask.subtasks[0]?.completed).toBe(true);
+
+    // Toggle parent to completed
+    const completedTodo = todoWithCompletedSubtask.toggleCompletion();
+    expect(completedTodo.completed).toBe(true);
     expect(completedTodo.subtasks[0]?.completed).toBe(true);
 
     // Unmark parent
