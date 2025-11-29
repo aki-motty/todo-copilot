@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { ALLOWED_TAGS } from "../../domain/value-objects/Tag";
 
 interface TagSelectorProps {

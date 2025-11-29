@@ -1,5 +1,5 @@
 export const ALLOWED_TAGS = ["Summary", "Research", "Split"] as const;
-export type TagName = typeof ALLOWED_TAGS[number];
+export type TagName = (typeof ALLOWED_TAGS)[number];
 
 export class Tag {
   constructor(public readonly name: TagName) {}

@@ -1,5 +1,5 @@
-import { TodoResponseDTO } from "../dto/TodoDTO";
-import { TodoApplicationService } from "../services/TodoApplicationService";
+import type { TodoResponseDTO } from "../dto/TodoDTO";
+import type { TodoApplicationService } from "../services/TodoApplicationService";
 
 export interface RemoveTagCommand {
   id: string;
