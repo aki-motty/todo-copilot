@@ -1,17 +1,18 @@
-import { Todo, type TodoId } from "../../domain/entities/Todo";
+import { Todo, type TodoId, type TodoStatus } from "../../domain/entities/Todo";
 import {
-  type DomainEvent,
-  createTodoCompletedEvent,
-  createTodoCreatedEvent,
-  createTodoDeletedEvent,
+    type DomainEvent,
+    createTodoCompletedEvent,
+    createTodoCreatedEvent,
+    createTodoDeletedEvent,
 } from "../../domain/events/TodoEvents";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
+import { brandTodoId } from "../../domain/value-objects/TodoId";
 import { createLogger } from "../../infrastructure/config/logger";
 import { NotFoundError } from "../../shared/types";
 import type {
-  CreateTodoCommand,
-  DeleteTodoCommand,
-  ToggleTodoCompletionCommand,
+    CreateTodoCommand,
+    DeleteTodoCommand,
+    ToggleTodoCompletionCommand,
 } from "../commands";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
@@ -51,7 +52,7 @@ export class TodoApplicationService {
   async toggleTodoCompletion(command: ToggleTodoCompletionCommand): Promise<Todo> {
     this.logger.debug("Toggling todo completion", { id: command.id });
 
-    const todo = await this.todoRepository.findById(command.id as TodoId);
+    const todo = await this.todoRepository.findById(brandTodoId(command.id));
     if (!todo) {
       throw new NotFoundError(`Todo with id ${command.id} not found`);
     }
@@ -60,15 +61,84 @@ export class TodoApplicationService {
     await this.todoRepository.save(updatedTodo);
 
     // Publish domain event
-    const event = createTodoCompletedEvent(
-      updatedTodo.id,
-      updatedTodo.status,
-      updatedTodo.updatedAt
-    );
+    const status: TodoStatus = updatedTodo.completed ? "Completed" : "Pending";
+    const event = createTodoCompletedEvent(updatedTodo.id, status, new Date());
     this.domainEvents.push(event);
     this.logger.info("Todo toggled", {
       id: updatedTodo.id,
-      status: updatedTodo.status,
+      completed: updatedTodo.completed,
+    });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Toggle a subtask's completion status
+   * COMMAND: Changes application state
+   */
+  async toggleSubtask(todoId: string, subtaskId: string): Promise<Todo> {
+    this.logger.debug("Toggling subtask", { todoId, subtaskId });
+
+    const todo = await this.todoRepository.findById(brandTodoId(todoId));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${todoId} not found`);
+    }
+
+    const updatedTodo = todo.toggleSubtask(subtaskId);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Subtask toggled", {
+      todoId,
+      subtaskId,
+    });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Add a subtask to a todo
+   * COMMAND: Changes application state
+   */
+  async addSubtask(todoId: string, title: string): Promise<Todo> {
+    this.logger.debug("Adding subtask", { todoId, title });
+
+    const todo = await this.todoRepository.findById(brandTodoId(todoId));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${todoId} not found`);
+    }
+
+    const updatedTodo = todo.addSubtask(title);
+    await this.todoRepository.save(updatedTodo);
+
+    const newSubtask = updatedTodo.subtasks[updatedTodo.subtasks.length - 1];
+    if (newSubtask) {
+      this.logger.info("Subtask added", {
+        todoId,
+        subtaskId: newSubtask.id,
+      });
+    }
+
+    return updatedTodo;
+  }
+
+  /**
+   * Delete a subtask
+   * COMMAND: Changes application state
+   */
+  async deleteSubtask(todoId: string, subtaskId: string): Promise<Todo> {
+    this.logger.debug("Deleting subtask", { todoId, subtaskId });
+
+    const todo = await this.todoRepository.findById(brandTodoId(todoId));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${todoId} not found`);
+    }
+
+    const updatedTodo = todo.removeSubtask(subtaskId);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Subtask deleted", {
+      todoId,
+      subtaskId,
     });
 
     return updatedTodo;

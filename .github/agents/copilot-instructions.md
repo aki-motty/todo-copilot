@@ -11,6 +11,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-22
 - AWS S3 (Static Website Hosting) (006-deploy-spa-s3)
 - TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode) (008-local-sam-testing)
 - DynamoDB Local (Docker) (008-local-sam-testing)
+- TypeScript 5.x + React 18, AWS SDK v3 (009-add-subtasks)
+- DynamoDB (Single Table Design or Simple Table) (009-add-subtasks)
 
 - TypeScript 5.x、Node.js 18+ (001-basic-todo-list)
 
@@ -30,9 +32,9 @@ npm test && npm run lint
 TypeScript 5.x、Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 009-add-subtasks: Added TypeScript 5.x + React 18, AWS SDK v3
 - 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
 - 008-local-sam-testing: Added TypeScript (Node.js 18+) + AWS SAM CLI, Docker, DynamoDB Local, `ts-node` (for seeding), `nodemon` (for watch mode)
-- 007-enhance-ci-workflow: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 
 <!-- MANUAL ADDITIONS START -->

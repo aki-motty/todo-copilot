@@ -1,3 +1,4 @@
+import { Subtask } from "../../domain/entities/Subtask";
 import { Todo } from "../../domain/entities/Todo";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import type { TodoResponseDTO } from "../dto/TodoDTO";
@@ -9,6 +10,12 @@ export interface SaveTodoRequest {
   completed: boolean;
   createdAt: string;
   updatedAt: string;
+  subtasks?: {
+    id: string;
+    title: string;
+    completed: boolean;
+    parentId: string;
+  }[];
 }
 
 /**
@@ -27,13 +34,20 @@ export class SaveTodoHandler {
       throw new ValidationError("Todo title cannot be empty");
     }
 
+    const subtasks = request.subtasks
+      ? request.subtasks.map((s) =>
+          Subtask.fromPersistence(s.id, s.title, s.completed, s.parentId)
+        )
+      : [];
+
     // Reconstitute todo entity
     const todo = Todo.fromPersistence(
       request.id,
       request.title,
       request.completed,
-      new Date(request.createdAt),
-      new Date(request.updatedAt)
+      request.createdAt,
+      request.updatedAt,
+      subtasks
     );
 
     // Persist to repository

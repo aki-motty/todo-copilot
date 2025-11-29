@@ -40,6 +40,11 @@ export class ToggleTodoHandler {
       completed: json.completed,
       createdAt: json.createdAt,
       updatedAt: json.updatedAt,
+      subtasks: json.subtasks.map((s: any) => ({
+        id: s.id,
+        title: s.title,
+        completed: s.completed
+      }))
     };
   }
 }

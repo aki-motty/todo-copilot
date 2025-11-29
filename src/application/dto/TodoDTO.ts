@@ -4,6 +4,15 @@
  */
 
 /**
+ * DTO for subtask in API responses
+ */
+export interface SubtaskDTO {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+/**
  * DTO for todo in API responses
  * Flattens Todo entity structure for JSON serialization
  */
@@ -13,6 +22,7 @@ export interface TodoResponseDTO {
   completed: boolean;
   createdAt: string; // ISO 8601 format
   updatedAt: string; // ISO 8601 format
+  subtasks: SubtaskDTO[];
 }
 
 /**

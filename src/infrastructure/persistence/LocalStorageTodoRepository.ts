@@ -1,3 +1,4 @@
+import { Subtask } from "../../domain/entities/Subtask";
 import { Todo, type TodoId } from "../../domain/entities/Todo";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { NotFoundError, QuotaExceededError, StorageCorruptionError } from "../../shared/types";
@@ -68,22 +69,37 @@ export class LocalStorageTodoRepository implements ITodoRepository {
   async findById(id: TodoId): Promise<Todo | null> {
     const todos = this.getAllFromStorage();
     const todoData = todos.find((t) => t.id === id);
-    return todoData
-      ? Todo.fromPersistence(
-          todoData.id,
-          todoData.title,
-          todoData.completed,
-          todoData.createdAt,
-          todoData.updatedAt
-        )
-      : null;
+    if (!todoData) return null;
+
+    const subtasks = (todoData.subtasks || []).map((s: any) =>
+      Subtask.fromPersistence(s.id, s.title, s.completed, s.parentId)
+    );
+
+    return Todo.fromPersistence(
+      todoData.id,
+      todoData.title,
+      todoData.completed,
+      todoData.createdAt,
+      todoData.updatedAt,
+      subtasks
+    );
   }
 
   async findAll(): Promise<Todo[]> {
     const todos = this.getAllFromStorage();
-    return todos.map((t) =>
-      Todo.fromPersistence(t.id, t.title, t.completed, t.createdAt, t.updatedAt)
-    );
+    return todos.map((t) => {
+      const subtasks = (t.subtasks || []).map((s: any) =>
+        Subtask.fromPersistence(s.id, s.title, s.completed, s.parentId)
+      );
+      return Todo.fromPersistence(
+        t.id,
+        t.title,
+        t.completed,
+        t.createdAt,
+        t.updatedAt,
+        subtasks
+      );
+    });
   }
 
   async save(todo: Todo): Promise<void> {
@@ -136,6 +152,7 @@ export class LocalStorageTodoRepository implements ITodoRepository {
     completed: boolean;
     createdAt: string;
     updatedAt: string;
+    subtasks?: any[];
   }> {
     try {
       const data = this.storage.getItem(this.storageKey);

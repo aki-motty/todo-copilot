@@ -29,7 +29,7 @@ export default defineConfig({
       output: {
         format: "cjs",
         strict: true,
-        entryFileNames: "index.cjs",
+        entryFileNames: "index.js",
       },
     },
     // Enable source maps for debugging

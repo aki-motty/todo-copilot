@@ -5,6 +5,7 @@ import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { AsyncApiTodoRepository } from "../../infrastructure/api/ApiTodoRepository";
 import { createLogger } from "../../infrastructure/config/logger";
 import { LocalStorageTodoRepository } from "../../infrastructure/persistence/LocalStorageTodoRepository";
+import { TodoApiClient } from "../../infrastructure/services/todoApiClient";
 import { TodoController } from "../controllers/TodoController";
 import { useApiConfig } from "../providers/ApiConfigProvider";
 
@@ -87,7 +88,7 @@ export const useTodoList = () => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
         );
-        logger.info("Todo toggled via hook", { id, status: updatedTodo.status });
+        logger.info("Todo toggled via hook", { id, completed: updatedTodo.completed });
         return updatedTodo;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to toggle todo";
@@ -97,6 +98,130 @@ export const useTodoList = () => {
       }
     },
     [todoController]
+  );
+
+  // Add subtask
+  const addSubtask = useCallback(
+    async (todoId: string, title: string) => {
+      try {
+        setError(null);
+        
+        let updatedTodo: TodoResponseDTO;
+
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const subtask = await TodoApiClient.addSubtask(todoId, title);
+          
+          // Optimistically update local state or fetch fresh
+          // Here we manually construct the updated todo to avoid a full refetch if possible,
+          // but since we need the full Todo object for the state, let's fetch it or patch it.
+          // Actually, TodoApiClient.addSubtask returns SubtaskDTO, not Todo.
+          // So we need to patch the local state.
+          
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => {
+              if (todo.id === todoId) {
+                return {
+                  ...todo,
+                  subtasks: [...(todo.subtasks || []), subtask],
+                };
+              }
+              return todo;
+            })
+          );
+          
+          logger.info("Subtask added via API hook", { todoId, title });
+          return; // We don't have the full updatedTodo from API, but state is updated.
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          updatedTodo = await todoController.addSubtask(todoId, title);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Subtask added via Controller hook", { todoId, title });
+          return updatedTodo;
+        }
+
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to add subtask";
+        setError(message);
+        logger.error("Failed to add subtask", { error: message, todoId });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
+  // Toggle subtask
+  const toggleSubtask = useCallback(
+    async (todoId: string, subtaskId: string) => {
+      try {
+        setError(null);
+
+        if (backendMode === "api") {
+           const subtask = await TodoApiClient.toggleSubtask(todoId, subtaskId);
+           setTodos((prevTodos) =>
+            prevTodos.map((todo) => {
+              if (todo.id === todoId) {
+                return {
+                  ...todo,
+                  subtasks: todo.subtasks.map(s => s.id === subtaskId ? subtask : s),
+                };
+              }
+              return todo;
+            })
+          );
+        } else {
+          const updatedTodo = await todoController.toggleSubtask(todoId, subtaskId);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+        }
+        logger.info("Subtask toggled via hook", { todoId, subtaskId });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to toggle subtask";
+        setError(message);
+        logger.error("Failed to toggle subtask", { error: message, todoId, subtaskId });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
+  // Delete subtask
+  const deleteSubtask = useCallback(
+    async (todoId: string, subtaskId: string) => {
+      try {
+        setError(null);
+
+        if (backendMode === "api") {
+          await TodoApiClient.deleteSubtask(todoId, subtaskId);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => {
+              if (todo.id === todoId) {
+                return {
+                  ...todo,
+                  subtasks: todo.subtasks.filter(s => s.id !== subtaskId),
+                };
+              }
+              return todo;
+            })
+          );
+        } else {
+          const updatedTodo = await todoController.deleteSubtask(todoId, subtaskId);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+        }
+        logger.info("Subtask deleted via hook", { todoId, subtaskId });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to delete subtask";
+        setError(message);
+        logger.error("Failed to delete subtask", { error: message, todoId, subtaskId });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
   );
 
   // Delete todo
@@ -128,6 +253,9 @@ export const useTodoList = () => {
     loading,
     createTodo,
     toggleTodoCompletion,
+    addSubtask,
+    toggleSubtask,
+    deleteSubtask,
     deleteTodo,
     clearError,
     backendMode,

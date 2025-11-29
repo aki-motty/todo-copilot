@@ -1,11 +1,13 @@
 import {
-  DeleteItemCommand,
-  DynamoDBClient,
-  PutItemCommand,
-  ScanCommand,
+    DeleteItemCommand,
+    DynamoDBClient,
+    GetItemCommand,
+    PutItemCommand,
+    ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { DatabaseError } from "../../application/errors/AppError";
+import { Subtask } from "../../domain/entities/Subtask";
 import { Todo, type TodoId } from "../../domain/entities/Todo";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 
@@ -20,8 +22,9 @@ import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 export class DynamoDBTodoRepository implements ITodoRepository {
   private client: DynamoDBClient;
   private tableName: string;
-  private cache: Map<TodoId, Todo> = new Map();
-  private cacheAll: Todo[] | null = null;
+  // Cache is removed to ensure statelessness in Lambda environment
+  // private cache: Map<TodoId, Todo> = new Map();
+  // private cacheAll: Todo[] | null = null;
 
   constructor(tableName?: string) {
     this.tableName = tableName || process.env["DYNAMODB_TABLE_NAME"] || "todo-copilot-dev";
@@ -36,33 +39,21 @@ export class DynamoDBTodoRepository implements ITodoRepository {
    */
   async findById(id: TodoId): Promise<Todo | null> {
     try {
-      // Check cache first (optional optimization)
-      if (this.cache.has(id)) {
-        return this.cache.get(id) || null;
+      const command = new GetItemCommand({
+        TableName: this.tableName,
+        Key: marshall({ id }),
+        ConsistentRead: true,
+      });
+
+      const response = await this.client.send(command);
+
+      if (!response.Item) {
+        return null;
       }
 
-      // Fetch from DynamoDB
-      // Note: In a real implementation, we would use GetItemCommand here
-      // But since we have initializeFromDynamoDB, we might rely on that for now
-      // However, for correctness, we should implement GetItem
-
-      // For now, let's stick to the pattern of loading all if not cached,
-      // or just return null if we assume initializeFromDynamoDB was called.
-      // But since we changed the interface to async, we should probably implement the real fetch.
-
-      // Let's implement proper GetItem
-      // But wait, the previous implementation had `initializeFromDynamoDB`.
-      // Let's keep that pattern if it's used by the handler.
-
-      if (this.cacheAll) {
-        const todo = this.cacheAll.find((t) => t.id === id) || null;
-        return todo;
-      }
-
-      return null;
+      return this.unmarshallTodo(unmarshall(response.Item));
     } catch (error) {
-      console.error("Error finding todo:", error);
-      throw new DatabaseError("Failed to find todo");
+      throw this.handleError("findById", error);
     }
   }
 
@@ -70,68 +61,11 @@ export class DynamoDBTodoRepository implements ITodoRepository {
    * Find all todos
    */
   async findAll(): Promise<Todo[]> {
-    if (this.cacheAll) {
-      return this.cacheAll;
-    }
-    return [];
-  }
-
-  /**
-   * Save a todo (create or update)
-   */
-  async save(todo: Todo): Promise<void> {
-    // Update cache
-    this.cache.set(todo.id, todo);
-
-    // Update all-todos cache if present
-    if (this.cacheAll) {
-      const index = this.cacheAll.findIndex((t) => t.id === todo.id);
-      if (index >= 0) {
-        this.cacheAll[index] = todo;
-      } else {
-        this.cacheAll.push(todo);
-      }
-    }
-
-    // Persist to DynamoDB
-    await this.persistToDynamoDB(todo);
-  }
-
-  /**
-   * Remove a todo
-   */
-  async remove(id: TodoId): Promise<void> {
-    // Update cache
-    this.cache.delete(id);
-
-    // Update all-todos cache if present
-    if (this.cacheAll) {
-      this.cacheAll = this.cacheAll.filter((t) => t.id !== id);
-    }
-
-    // Delete from DynamoDB
-    await this.deleteFromDynamoDB(id);
-  }
-
-  async clear(): Promise<void> {
-    this.cache.clear();
-    this.cacheAll = [];
-    // Note: We don't clear DynamoDB table here as it's a dangerous operation
-  }
-
-  async count(): Promise<number> {
-    return this.cacheAll ? this.cacheAll.length : 0;
-  }
-
-  /**
-   * Initialize repository with todos from DynamoDB
-   * Must be called when Lambda handler is invoked
-   */
-  async initializeFromDynamoDB(): Promise<void> {
     try {
       const response = await this.client.send(
         new ScanCommand({
           TableName: this.tableName,
+          ConsistentRead: true,
         })
       );
 
@@ -141,14 +75,47 @@ export class DynamoDBTodoRepository implements ITodoRepository {
           const unmarshalled = unmarshall(item);
           const todo = this.unmarshallTodo(unmarshalled);
           todos.push(todo);
-          this.cache.set(todo.id, todo);
         }
       }
-
-      this.cacheAll = todos;
+      return todos;
     } catch (error) {
-      throw this.handleError("initializeFromDynamoDB", error);
+      throw this.handleError("findAll", error);
     }
+  }
+
+  /**
+   * Save a todo (create or update)
+   */
+  async save(todo: Todo): Promise<void> {
+    // Persist to DynamoDB
+    await this.persistToDynamoDB(todo);
+  }
+
+  /**
+   * Remove a todo
+   */
+  async remove(id: TodoId): Promise<void> {
+    // Delete from DynamoDB
+    await this.deleteFromDynamoDB(id);
+  }
+
+  async clear(): Promise<void> {
+    // No-op for stateless repository
+    // Note: We don't clear DynamoDB table here as it's a dangerous operation
+  }
+
+  async count(): Promise<number> {
+    const todos = await this.findAll();
+    return todos.length;
+  }
+
+  /**
+   * Initialize repository with todos from DynamoDB
+   * No-op for stateless repository, kept for compatibility
+   */
+  async initializeFromDynamoDB(): Promise<void> {
+    // No initialization needed for stateless repository
+    return Promise.resolve();
   }
 
   /**
@@ -163,12 +130,13 @@ export class DynamoDBTodoRepository implements ITodoRepository {
         completed: json.completed,
         createdAt: json.createdAt,
         updatedAt: json.updatedAt,
+        subtasks: json.subtasks,
       };
 
       await this.client.send(
         new PutItemCommand({
           TableName: this.tableName,
-          Item: marshall(item),
+          Item: marshall(item, { removeUndefinedValues: true }),
         })
       );
     } catch (error) {
@@ -196,12 +164,19 @@ export class DynamoDBTodoRepository implements ITodoRepository {
    * Convert DynamoDB item to Todo entity
    */
   private unmarshallTodo(item: any): Todo {
+    const subtasks = item.subtasks
+      ? item.subtasks.map((s: any) =>
+          Subtask.fromPersistence(s.id, s.title, s.completed, item.id)
+        )
+      : [];
+
     return Todo.fromPersistence(
       item.id,
       item.title,
       item.completed,
       item.createdAt,
-      item.updatedAt
+      item.updatedAt,
+      subtasks
     );
   }
 
