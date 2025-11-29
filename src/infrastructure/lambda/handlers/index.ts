@@ -125,10 +125,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       statusCode = 201;
     } else if (method === "GET" && path === "/todos") {
       // List todos
-      const limit = event.queryStringParameters?.['limit']
-        ? Number.parseInt(event.queryStringParameters['limit'])
+      const limit = event.queryStringParameters?.["limit"]
+        ? Number.parseInt(event.queryStringParameters["limit"])
         : undefined;
-      const cursor = event.queryStringParameters?.['cursor'];
+      const cursor = event.queryStringParameters?.["cursor"];
       response = await handlers.listTodos.execute({ limit, cursor });
     } else if (method === "GET" && path.match(/^\/todos\/[^/]+$/) && !path.endsWith("/toggle")) {
       // Get single todo

@@ -68,7 +68,9 @@ export class LocalStorageTodoRepository implements ITodoRepository {
   async findById(id: TodoId): Promise<Todo | null> {
     const todos = this.getAllFromStorage();
     const todoData = todos.find((t) => t.id === id);
-    if (!todoData) return null;
+    if (!todoData) {
+      return null;
+    }
 
     return Todo.fromPersistence(
       todoData.id,

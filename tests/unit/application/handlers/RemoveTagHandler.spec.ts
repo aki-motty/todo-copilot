@@ -25,10 +25,10 @@ describe("RemoveTagHandler", () => {
 
     // Verify
     expect(result.tags).not.toContain("Summary");
-    
+
     // Verify persistence
     const saved = await repository.findById(todo.id);
-    expect(saved?.tags.map(t => t.name)).not.toContain("Summary");
+    expect(saved?.tags.map((t) => t.name)).not.toContain("Summary");
   });
 
   it("should throw error if todo not found", async () => {

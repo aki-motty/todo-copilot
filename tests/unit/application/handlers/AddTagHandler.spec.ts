@@ -24,10 +24,10 @@ describe("AddTagHandler", () => {
 
     // Verify
     expect(result.tags).toContain("Summary");
-    
+
     // Verify persistence
     const saved = await repository.findById(todo.id);
-    expect(saved?.tags.map(t => t.name)).toContain("Summary");
+    expect(saved?.tags.map((t) => t.name)).toContain("Summary");
   });
 
   it("should throw error if todo not found", async () => {
@@ -37,7 +37,7 @@ describe("AddTagHandler", () => {
   it("should throw error if tag is invalid", async () => {
     const todo = Todo.create("Test Todo");
     await repository.save(todo);
-    
+
     await expect(handler.handle({ id: todo.id, tagName: "InvalidTag" })).rejects.toThrow();
   });
 });

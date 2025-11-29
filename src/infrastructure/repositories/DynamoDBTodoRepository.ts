@@ -1,9 +1,9 @@
 import {
-    DeleteItemCommand,
-    DynamoDBClient,
-    GetItemCommand,
-    PutItemCommand,
-    ScanCommand,
+  DeleteItemCommand,
+  DynamoDBClient,
+  GetItemCommand,
+  PutItemCommand,
+  ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { DatabaseError } from "../../application/errors/AppError";

@@ -5,11 +5,11 @@
  */
 
 import type {
-    ApiResponseDTO,
-    ErrorResponseDTO,
-    ListTodosResponseDTO,
-    SubtaskDTO,
-    TodoResponseDTO,
+  ApiResponseDTO,
+  ErrorResponseDTO,
+  ListTodosResponseDTO,
+  SubtaskDTO,
+  TodoResponseDTO,
 } from "../../application/dto/TodoDTO";
 
 /**
@@ -22,8 +22,8 @@ function getApiBaseUrl(): string {
   if (typeof __VITE_API_URL__ !== "undefined" && __VITE_API_URL__ !== "") {
     return __VITE_API_URL__;
   }
-  if (typeof process !== "undefined" && process.env?.['VITE_API_URL']) {
-    return process.env['VITE_API_URL'];
+  if (typeof process !== "undefined" && process.env?.["VITE_API_URL"]) {
+    return process.env["VITE_API_URL"];
   }
   // Default to empty string for relative URLs (works with Vite proxy in dev)
   return "";
@@ -135,7 +135,10 @@ export const TodoApiClient = {
    * Remove a tag from a todo
    */
   async removeTag(id: string, tagName: string): Promise<TodoResponseDTO> {
-    const response = await TodoApiClient.fetch(`/todos/${id}/tags/${encodeURIComponent(tagName)}`, "DELETE");
+    const response = await TodoApiClient.fetch(
+      `/todos/${id}/tags/${encodeURIComponent(tagName)}`,
+      "DELETE"
+    );
     return response.data as TodoResponseDTO;
   },
 
@@ -150,11 +153,11 @@ export const TodoApiClient = {
   /**
    * Delete a subtask
    */
-  async deleteSubtask(todoId: string, subtaskId: string): Promise<{ success: boolean; id: string }> {
-    const response = await TodoApiClient.fetch(
-      `/todos/${todoId}/subtasks/${subtaskId}`,
-      "DELETE"
-    );
+  async deleteSubtask(
+    todoId: string,
+    subtaskId: string
+  ): Promise<{ success: boolean; id: string }> {
+    const response = await TodoApiClient.fetch(`/todos/${todoId}/subtasks/${subtaskId}`, "DELETE");
     return response.data as { success: boolean; id: string };
   },
 

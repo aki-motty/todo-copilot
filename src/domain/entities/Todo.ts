@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 import { Tag } from "../value-objects/Tag";
-import { brandTodoId, type TodoId } from "../value-objects/TodoId";
+import { type TodoId, brandTodoId } from "../value-objects/TodoId";
 import { TodoTitle } from "../value-objects/TodoTitle";
 import { Subtask } from "./Subtask";
 
 export { Tag } from "../value-objects/Tag";
-export { type TodoId } from "../value-objects/TodoId";
+export type { TodoId } from "../value-objects/TodoId";
 export { TodoTitle } from "../value-objects/TodoTitle";
 
 /**

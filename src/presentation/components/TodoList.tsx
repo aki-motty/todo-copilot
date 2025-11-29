@@ -46,8 +46,8 @@ export const TodoList: React.FC<TodoListProps> = ({
   }
 
   // Sort todos by createdAt (newest first)
-  const sortedTodos = [...todos].sort((a, b) => 
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const sortedTodos = [...todos].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   return (

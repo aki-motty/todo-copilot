@@ -28,7 +28,7 @@ export class ToggleSubtaskHandler {
     await this.todoRepository.save(updatedTodo);
 
     const updatedSubtask = updatedTodo.subtasks.find((s) => s.id === subtaskId);
-    
+
     if (!updatedSubtask) {
       // This should theoretically not happen if subtaskExists check passed
       throw new NotFoundError(`Subtask with ID ${subtaskId} not found after update`);

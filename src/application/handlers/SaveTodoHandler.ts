@@ -38,7 +38,7 @@ export class SaveTodoHandler {
       ? request.subtasks.map((s) => ({
           id: s.id,
           title: s.title,
-          completed: s.completed
+          completed: s.completed,
         }))
       : [];
 

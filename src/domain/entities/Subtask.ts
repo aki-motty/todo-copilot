@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { TodoId } from "../value-objects/TodoId";
+import type { TodoId } from "../value-objects/TodoId";
 import { TodoTitle } from "../value-objects/TodoTitle";
 
 /**
@@ -27,12 +27,7 @@ export class Subtask {
     return new Subtask(id, subtaskTitle, false, parentId);
   }
 
-  static fromPersistence(
-    id: string,
-    title: string,
-    completed: boolean,
-    parentId: string
-  ): Subtask {
+  static fromPersistence(id: string, title: string, completed: boolean, parentId: string): Subtask {
     return new Subtask(
       brandSubtaskId(id),
       TodoTitle.create(title),
@@ -58,21 +53,11 @@ export class Subtask {
   }
 
   toggleCompletion(): Subtask {
-    return new Subtask(
-      this._id,
-      this._title,
-      !this._completed,
-      this._parentId
-    );
+    return new Subtask(this._id, this._title, !this._completed, this._parentId);
   }
 
   markCompleted(): Subtask {
-    return new Subtask(
-      this._id,
-      this._title,
-      true,
-      this._parentId
-    );
+    return new Subtask(this._id, this._title, true, this._parentId);
   }
 
   toJSON() {

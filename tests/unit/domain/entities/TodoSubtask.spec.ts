@@ -14,7 +14,9 @@ describe("Todo Entity - Subtask Operations", () => {
     let todo = Todo.create("Parent Task");
     todo = todo.addSubtask("Subtask 1");
     const subtaskId = todo.subtasks[0]?.id;
-    if (!subtaskId) throw new Error("Subtask not created");
+    if (!subtaskId) {
+      throw new Error("Subtask not created");
+    }
 
     const todoWithoutSubtask = todo.removeSubtask(subtaskId);
 
@@ -25,7 +27,9 @@ describe("Todo Entity - Subtask Operations", () => {
     let todo = Todo.create("Parent Task");
     todo = todo.addSubtask("Subtask 1");
     const subtaskId = todo.subtasks[0]?.id;
-    if (!subtaskId) throw new Error("Subtask not created");
+    if (!subtaskId) {
+      throw new Error("Subtask not created");
+    }
 
     const todoToggled = todo.toggleSubtask(subtaskId);
 
@@ -48,9 +52,9 @@ describe("Todo Entity - Subtask Operations", () => {
   it("should NOT unmark subtasks when parent is unmarked", () => {
     let todo = Todo.create("Parent Task");
     todo = todo.addSubtask("Subtask 1");
-    
+
     // Mark parent completed (and subtask)
-    let completedTodo = todo.toggleCompletion();
+    const completedTodo = todo.toggleCompletion();
     expect(completedTodo.subtasks[0]?.completed).toBe(true);
 
     // Unmark parent

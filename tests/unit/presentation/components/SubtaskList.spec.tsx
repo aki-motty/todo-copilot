@@ -1,12 +1,12 @@
-import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
-import type { SubtaskDTO } from '../../../../src/application/dto/TodoDTO';
-import { SubtaskList } from '../../../../src/presentation/components/SubtaskList';
+import "@testing-library/jest-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
+import type { SubtaskDTO } from "../../../../src/application/dto/TodoDTO";
+import { SubtaskList } from "../../../../src/presentation/components/SubtaskList";
 
-describe('SubtaskList Component', () => {
+describe("SubtaskList Component", () => {
   const mockSubtasks: SubtaskDTO[] = [
-    { id: '1', title: 'Subtask 1', completed: false },
-    { id: '2', title: 'Subtask 2', completed: true },
+    { id: "1", title: "Subtask 1", completed: false },
+    { id: "2", title: "Subtask 2", completed: true },
   ];
 
   const mockOnToggleSubtask = jest.fn();
@@ -16,7 +16,7 @@ describe('SubtaskList Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders a list of subtasks', () => {
+  it("renders a list of subtasks", () => {
     render(
       <SubtaskList
         subtasks={mockSubtasks}
@@ -25,11 +25,11 @@ describe('SubtaskList Component', () => {
       />
     );
 
-    expect(screen.getByText('Subtask 1')).toBeInTheDocument();
-    expect(screen.getByText('Subtask 2')).toBeInTheDocument();
+    expect(screen.getByText("Subtask 1")).toBeInTheDocument();
+    expect(screen.getByText("Subtask 2")).toBeInTheDocument();
   });
 
-  it('calls onToggleSubtask when a checkbox is clicked', () => {
+  it("calls onToggleSubtask when a checkbox is clicked", () => {
     render(
       <SubtaskList
         subtasks={mockSubtasks}
@@ -38,15 +38,18 @@ describe('SubtaskList Component', () => {
       />
     );
 
-    const checkboxes = screen.getAllByRole('checkbox');
+    const checkboxes = screen.getAllByRole("checkbox");
     // Ensure checkboxes exist before clicking
     expect(checkboxes.length).toBeGreaterThan(0);
-    fireEvent.click(checkboxes[0]!);
+    const firstCheckbox = checkboxes[0];
+    if (firstCheckbox) {
+      fireEvent.click(firstCheckbox);
+    }
 
-    expect(mockOnToggleSubtask).toHaveBeenCalledWith('1');
+    expect(mockOnToggleSubtask).toHaveBeenCalledWith("1");
   });
 
-  it('calls onDeleteSubtask when a delete button is clicked', () => {
+  it("calls onDeleteSubtask when a delete button is clicked", () => {
     render(
       <SubtaskList
         subtasks={mockSubtasks}
@@ -55,15 +58,18 @@ describe('SubtaskList Component', () => {
       />
     );
 
-    const deleteButtons = screen.getAllByRole('button', { name: /delete subtask/i });
+    const deleteButtons = screen.getAllByRole("button", { name: /delete subtask/i });
     // Ensure buttons exist before clicking
     expect(deleteButtons.length).toBeGreaterThan(0);
-    fireEvent.click(deleteButtons[0]!);
+    const firstDeleteBtn = deleteButtons[0];
+    if (firstDeleteBtn) {
+      fireEvent.click(firstDeleteBtn);
+    }
 
-    expect(mockOnDeleteSubtask).toHaveBeenCalledWith('1');
+    expect(mockOnDeleteSubtask).toHaveBeenCalledWith("1");
   });
 
-  it('renders completed subtasks with correct styling', () => {
+  it("renders completed subtasks with correct styling", () => {
     render(
       <SubtaskList
         subtasks={mockSubtasks}
@@ -72,7 +78,7 @@ describe('SubtaskList Component', () => {
       />
     );
 
-    const completedSubtask = screen.getByText('Subtask 2');
-    expect(completedSubtask).toHaveClass('completed');
+    const completedSubtask = screen.getByText("Subtask 2");
+    expect(completedSubtask).toHaveClass("completed");
   });
 });

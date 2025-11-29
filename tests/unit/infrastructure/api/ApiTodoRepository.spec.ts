@@ -1,4 +1,4 @@
-import { TodoId } from "../../../../src/domain/value-objects/TodoId";
+import type { TodoId } from "../../../../src/domain/value-objects/TodoId";
 import { AsyncApiTodoRepository } from "../../../../src/infrastructure/api/ApiTodoRepository";
 import { HttpClient } from "../../../../src/infrastructure/api/HttpClient";
 
@@ -28,9 +28,9 @@ describe("AsyncApiTodoRepository", () => {
         {
           id: subtaskId,
           title: "Subtask 1",
-          completed: true
-        }
-      ]
+          completed: true,
+        },
+      ],
     };
 
     mockHttpClient.get.mockResolvedValue(mockDto);

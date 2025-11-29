@@ -77,7 +77,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
   const handleAddSubtask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!onAddSubtask || !subtaskTitle.trim()) return;
+    if (!onAddSubtask || !subtaskTitle.trim()) {
+      return;
+    }
 
     try {
       await onAddSubtask(todo.id, subtaskTitle);
@@ -89,7 +91,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
-    if (!onToggleSubtask) return;
+    if (!onToggleSubtask) {
+      return;
+    }
     try {
       await onToggleSubtask(todo.id, subtaskId);
     } catch (err) {
@@ -98,7 +102,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleDeleteSubtask = async (subtaskId: string) => {
-    if (!onDeleteSubtask) return;
+    if (!onDeleteSubtask) {
+      return;
+    }
     try {
       await onDeleteSubtask(todo.id, subtaskId);
     } catch (err) {
@@ -107,7 +113,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleAddTag = async (tagName: string) => {
-    if (!onAddTag) return;
+    if (!onAddTag) {
+      return;
+    }
     try {
       await onAddTag(todo.id, tagName);
     } catch (err) {
@@ -116,7 +124,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleRemoveTag = async (tagName: string) => {
-    if (!onRemoveTag) return;
+    if (!onRemoveTag) {
+      return;
+    }
     try {
       await onRemoveTag(todo.id, tagName);
     } catch (err) {
@@ -156,6 +166,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                   {tag}
                   {onRemoveTag && (
                     <button
+                      type="button"
                       className="remove-tag-btn"
                       onClick={() => handleRemoveTag(tag)}
                       aria-label={`Remove tag ${tag}`}
@@ -228,7 +239,6 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                 value={subtaskTitle}
                 onChange={(e) => setSubtaskTitle(e.target.value)}
                 placeholder="Subtask title"
-                autoFocus
                 className="subtask-input"
               />
               <button type="submit" className="subtask-submit-btn">
