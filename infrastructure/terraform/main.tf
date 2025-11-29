@@ -82,14 +82,16 @@ module "compute" {
   lambda_execution_role_arn = local.lambda_execution_role_arn
   project_name              = var.project_name
   common_tags               = local.common_tags
-  allowed_origins           = ["https://${module.frontend.cloudfront_domain_name}"]
+  # CloudFront経由で同一ドメインからアクセスするため、ワイルドカードを許可
+  allowed_origins           = ["*"]
 }
 
 # Frontend Module - S3 + CloudFront
 module "frontend" {
   source = "./modules/frontend"
 
-  environment  = var.environment
-  project_name = var.project_name
-  common_tags  = local.common_tags
+  environment          = var.environment
+  project_name         = var.project_name
+  common_tags          = local.common_tags
+  api_gateway_endpoint = module.compute.api_gateway_endpoint
 }

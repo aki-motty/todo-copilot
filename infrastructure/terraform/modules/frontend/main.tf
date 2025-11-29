@@ -37,9 +37,96 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     origin_id                = "S3-${aws_s3_bucket.website_bucket.id}"
   }
 
+  # API Gateway Origin
+  dynamic "origin" {
+    for_each = var.api_gateway_endpoint != "" ? [1] : []
+    content {
+      domain_name = replace(replace(var.api_gateway_endpoint, "https://", ""), "/", "")
+      origin_id   = "APIGateway"
+
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
+    }
+  }
+
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
+
+  # API routes - /todos/*
+  dynamic "ordered_cache_behavior" {
+    for_each = var.api_gateway_endpoint != "" ? [1] : []
+    content {
+      path_pattern     = "/todos*"
+      allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = "APIGateway"
+
+      forwarded_values {
+        query_string = true
+        headers      = ["Authorization", "Content-Type", "Origin", "Accept"]
+        cookies {
+          forward = "none"
+        }
+      }
+
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+      default_ttl            = 0
+      max_ttl                = 0
+    }
+  }
+
+  # API routes - /tags
+  dynamic "ordered_cache_behavior" {
+    for_each = var.api_gateway_endpoint != "" ? [1] : []
+    content {
+      path_pattern     = "/tags*"
+      allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = "APIGateway"
+
+      forwarded_values {
+        query_string = true
+        headers      = ["Authorization", "Content-Type", "Origin", "Accept"]
+        cookies {
+          forward = "none"
+        }
+      }
+
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+      default_ttl            = 0
+      max_ttl                = 0
+    }
+  }
+
+  # API routes - /health
+  dynamic "ordered_cache_behavior" {
+    for_each = var.api_gateway_endpoint != "" ? [1] : []
+    content {
+      path_pattern     = "/health*"
+      allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+      cached_methods   = ["GET", "HEAD"]
+      target_origin_id = "APIGateway"
+
+      forwarded_values {
+        query_string = false
+        cookies {
+          forward = "none"
+        }
+      }
+
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+      default_ttl            = 0
+      max_ttl                = 0
+    }
+  }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]

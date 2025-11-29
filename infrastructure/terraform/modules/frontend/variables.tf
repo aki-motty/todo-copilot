@@ -13,3 +13,9 @@ variable "common_tags" {
   description = "Common tags to apply to all resources"
   default     = {}
 }
+
+variable "api_gateway_endpoint" {
+  type        = string
+  description = "API Gateway endpoint URL for backend routing"
+  default     = ""
+}
