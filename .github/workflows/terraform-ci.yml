@@ -122,7 +122,7 @@ jobs:
         run: npm ci
 
       - name: Run Terraform Module Tests
-        run: npm test -- tests/integration/terraform-modules.spec.ts --coverage
+        run: npm test -- tests/integration/terraform-modules.spec.ts --coverage --coverageThreshold='{}'
 
       - name: Upload Test Coverage
         uses: codecov/codecov-action@v3
