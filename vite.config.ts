@@ -13,6 +13,33 @@ export default defineConfig({
         target: 'http://127.0.0.1:3000',
         changeOrigin: true,
         secure: false,
+        timeout: 120000,
+        proxyTimeout: 120000,
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('Sending Request:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log('Received Response:', proxyRes.statusCode, req.url);
+          });
+        },
+      },
+      '/tags': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+        secure: false,
+        timeout: 120000,
+        proxyTimeout: 120000,
+      },
+      '/health': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+        secure: false,
+        timeout: 120000,
+        proxyTimeout: 120000,
       },
     },
   },

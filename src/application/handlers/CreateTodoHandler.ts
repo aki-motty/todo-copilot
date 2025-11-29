@@ -42,7 +42,8 @@ export class CreateTodoHandler {
         id: s.id,
         title: s.title,
         completed: s.completed
-      }))
+      })),
+      tags: json.tags || []
     };
   }
 }

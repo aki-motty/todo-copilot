@@ -18,6 +18,8 @@ function AppContent() {
     addSubtask,
     toggleSubtask,
     deleteSubtask,
+    addTag,
+    removeTag,
     clearError,
   } = useTodoList();
 
@@ -63,6 +65,8 @@ function AppContent() {
           onAddSubtask={handleAddSubtask}
           onToggleSubtask={handleToggleSubtask}
           onDeleteSubtask={handleDeleteSubtask}
+          onAddTag={addTag}
+          onRemoveTag={removeTag}
         />
       </main>
 

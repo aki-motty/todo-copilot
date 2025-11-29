@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
+import { Tag } from "../value-objects/Tag";
 import { brandTodoId, type TodoId } from "../value-objects/TodoId";
 import { TodoTitle } from "../value-objects/TodoTitle";
 import { Subtask } from "./Subtask";
 
+export { Tag } from "../value-objects/Tag";
 export { type TodoId } from "../value-objects/TodoId";
 export { TodoTitle } from "../value-objects/TodoTitle";
 
@@ -23,7 +25,8 @@ export class Todo {
     private readonly _completed: boolean,
     private readonly _createdAt: Date,
     private readonly _updatedAt: Date,
-    private readonly _subtasks: Subtask[]
+    private readonly _subtasks: Subtask[],
+    private readonly _tags: Tag[]
   ) {}
 
   /**
@@ -35,7 +38,7 @@ export class Todo {
     const todoTitle = TodoTitle.create(title);
     const now = new Date();
 
-    return new Todo(id, todoTitle, false, now, now, []);
+    return new Todo(id, todoTitle, false, now, now, [], []);
   }
 
   /**
@@ -48,40 +51,48 @@ export class Todo {
     completed: boolean,
     createdAt: string,
     updatedAt: string,
-    subtasks: Subtask[] = []
+    subtasks: { id: string; title: string; completed: boolean }[] = [],
+    tags: string[] = []
   ): Todo {
-    const todoId = brandTodoId(id);
-    const todoTitle = TodoTitle.create(title);
     return new Todo(
-      todoId,
-      todoTitle,
+      brandTodoId(id),
+      TodoTitle.create(title),
       completed,
       new Date(createdAt),
       new Date(updatedAt),
-      subtasks
+      subtasks.map((s) => Subtask.fromPersistence(s.id, s.title, s.completed, id)),
+      tags.map((t) => Tag.create(t))
     );
   }
 
   /**
-   * Create a new Todo with toggled completion status
-   * Maintains immutability by returning a new instance
+   * Toggle completion status
+   * Returns a new Todo instance (immutability)
    */
   toggleCompletion(): Todo {
-    const newCompleted = !this._completed;
-    let newSubtasks = this._subtasks;
-
-    // FR-006: System MUST automatically mark all incomplete subtasks as completed when a parent task is marked as completed.
-    if (newCompleted) {
-      newSubtasks = this._subtasks.map((s) => s.markCompleted());
-    }
-
     return new Todo(
       this._id,
       this._title,
-      newCompleted,
+      !this._completed,
       this._createdAt,
-      new Date(), // Update timestamp
-      newSubtasks
+      new Date(),
+      this._subtasks,
+      this._tags
+    );
+  }
+
+  /**
+   * Update todo title
+   */
+  updateTitle(title: string): Todo {
+    return new Todo(
+      this._id,
+      TodoTitle.create(title),
+      this._completed,
+      this._createdAt,
+      new Date(),
+      this._subtasks,
+      this._tags
     );
   }
 
@@ -96,7 +107,8 @@ export class Todo {
       this._completed,
       this._createdAt,
       new Date(),
-      [...this._subtasks, subtask]
+      [...this._subtasks, subtask],
+      this._tags
     );
   }
 
@@ -110,7 +122,8 @@ export class Todo {
       this._completed,
       this._createdAt,
       new Date(),
-      this._subtasks.filter((s) => s.id !== subtaskId)
+      this._subtasks.filter((s) => s.id !== subtaskId),
+      this._tags
     );
   }
 
@@ -124,7 +137,43 @@ export class Todo {
       this._completed,
       this._createdAt,
       new Date(),
-      this._subtasks.map((s) => (s.id === subtaskId ? s.toggleCompletion() : s))
+      this._subtasks.map((s) => (s.id === subtaskId ? s.toggleCompletion() : s)),
+      this._tags
+    );
+  }
+
+  /**
+   * Add a tag to the todo
+   */
+  addTag(tagName: string): Todo {
+    const tag = Tag.create(tagName);
+    if (this._tags.some((t) => t.equals(tag))) {
+      return this;
+    }
+    return new Todo(
+      this._id,
+      this._title,
+      this._completed,
+      this._createdAt,
+      new Date(),
+      this._subtasks,
+      [...this._tags, tag]
+    );
+  }
+
+  /**
+   * Remove a tag from the todo
+   */
+  removeTag(tagName: string): Todo {
+    const tag = Tag.create(tagName);
+    return new Todo(
+      this._id,
+      this._title,
+      this._completed,
+      this._createdAt,
+      new Date(),
+      this._subtasks,
+      this._tags.filter((t) => !t.equals(tag))
     );
   }
 
@@ -158,6 +207,10 @@ export class Todo {
     return [...this._subtasks];
   }
 
+  get tags(): Tag[] {
+    return [...this._tags];
+  }
+
   /**
    * Convert to plain object for serialization (e.g., to localStorage)
    */
@@ -169,6 +222,7 @@ export class Todo {
       createdAt: this._createdAt.toISOString(),
       updatedAt: this._updatedAt.toISOString(),
       subtasks: this._subtasks.map((s) => s.toJSON()),
+      tags: this._tags.map((t) => t.name),
     };
   }
 

@@ -145,6 +145,46 @@ export class TodoApplicationService {
   }
 
   /**
+   * Add a tag to a todo
+   * COMMAND: Changes application state
+   */
+  async addTag(id: string, tagName: string): Promise<Todo> {
+    this.logger.debug("Adding tag", { id, tagName });
+
+    const todo = await this.todoRepository.findById(brandTodoId(id));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${id} not found`);
+    }
+
+    const updatedTodo = todo.addTag(tagName);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Tag added", { id, tagName });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Remove a tag from a todo
+   * COMMAND: Changes application state
+   */
+  async removeTag(id: string, tagName: string): Promise<Todo> {
+    this.logger.debug("Removing tag", { id, tagName });
+
+    const todo = await this.todoRepository.findById(brandTodoId(id));
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${id} not found`);
+    }
+
+    const updatedTodo = todo.removeTag(tagName);
+    await this.todoRepository.save(updatedTodo);
+
+    this.logger.info("Tag removed", { id, tagName });
+
+    return updatedTodo;
+  }
+
+  /**
    * Delete a todo
    * COMMAND: Changes application state
    */

@@ -29,6 +29,7 @@ describe('TodoItem Component', () => {
       { id: 's1', title: 'Subtask 1', completed: false },
       { id: 's2', title: 'Subtask 2', completed: true },
     ],
+    tags: ['Summary', 'Research'],
   };
 
   const mockOnAddSubtask = jest.fn();
@@ -42,6 +43,16 @@ describe('TodoItem Component', () => {
   it('renders todo title', () => {
     render(<TodoItem todo={mockTodo} />);
     expect(screen.getByText('Test Todo')).toBeInTheDocument();
+  });
+
+  it('renders tags', () => {
+    render(<TodoItem todo={mockTodo} />);
+    
+    const summaryTag = screen.getAllByText('Summary').find(el => el.classList.contains('todo-tag'));
+    expect(summaryTag).toBeInTheDocument();
+
+    const researchTag = screen.getAllByText('Research').find(el => el.classList.contains('todo-tag'));
+    expect(researchTag).toBeInTheDocument();
   });
 
   it('toggles expansion when expand button is clicked', () => {

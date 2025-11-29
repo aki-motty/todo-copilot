@@ -242,6 +242,68 @@ export const useTodoList = () => {
     [todoController]
   );
 
+  // Add tag
+  const addTag = useCallback(
+    async (todoId: string, tagName: string) => {
+      try {
+        setError(null);
+        
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const updatedTodo = await TodoApiClient.addTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag added via API hook", { todoId, tagName });
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          const updatedTodo = await todoController.addTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag added via Controller hook", { todoId, tagName });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to add tag";
+        setError(message);
+        logger.error("Failed to add tag", { error: message, todoId, tagName });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
+  // Remove tag
+  const removeTag = useCallback(
+    async (todoId: string, tagName: string) => {
+      try {
+        setError(null);
+        
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const updatedTodo = await TodoApiClient.removeTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag removed via API hook", { todoId, tagName });
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          const updatedTodo = await todoController.removeTag(todoId, tagName);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          logger.info("Tag removed via Controller hook", { todoId, tagName });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to remove tag";
+        setError(message);
+        logger.error("Failed to remove tag", { error: message, todoId, tagName });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
   // Clear error message
   const clearError = useCallback(() => {
     setError(null);
@@ -257,6 +319,8 @@ export const useTodoList = () => {
     toggleSubtask,
     deleteSubtask,
     deleteTodo,
+    addTag,
+    removeTag,
     clearError,
     backendMode,
   };

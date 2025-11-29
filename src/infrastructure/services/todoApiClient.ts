@@ -19,14 +19,14 @@ declare const __VITE_API_URL__: string | undefined;
 
 function getApiBaseUrl(): string {
   // Try various sources for API URL
-  if (typeof __VITE_API_URL__ !== "undefined") {
+  if (typeof __VITE_API_URL__ !== "undefined" && __VITE_API_URL__ !== "") {
     return __VITE_API_URL__;
   }
   if (typeof process !== "undefined" && process.env?.['VITE_API_URL']) {
     return process.env['VITE_API_URL'];
   }
-  // Default fallback
-  return "http://localhost:3000";
+  // Default to empty string for relative URLs (works with Vite proxy in dev)
+  return "";
 }
 
 const REQUEST_TIMEOUT = 30000; // 30 seconds
@@ -121,6 +121,30 @@ export const TodoApiClient = {
       {}
     );
     return response.data as SubtaskDTO;
+  },
+
+  /**
+   * Add a tag to a todo
+   */
+  async addTag(id: string, tagName: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${id}/tags`, "POST", { tagName });
+    return response.data as TodoResponseDTO;
+  },
+
+  /**
+   * Remove a tag from a todo
+   */
+  async removeTag(id: string, tagName: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${id}/tags/${encodeURIComponent(tagName)}`, "DELETE");
+    return response.data as TodoResponseDTO;
+  },
+
+  /**
+   * Get allowed tags
+   */
+  async getTags(): Promise<string[]> {
+    const response = await TodoApiClient.fetch("/tags", "GET");
+    return response.data as string[];
   },
 
   /**

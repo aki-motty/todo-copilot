@@ -42,6 +42,7 @@ sam local start-api \
     --env-vars local-setup/env.json \
     --docker-network todo-network \
     --host 0.0.0.0 \
-    --container-host ${GATEWAY_IP} \
+    --container-host "${GATEWAY_IP}" \
     --container-host-interface 0.0.0.0 \
-    --skip-pull-image
+    --skip-pull-image \
+    --warm-containers EAGER
