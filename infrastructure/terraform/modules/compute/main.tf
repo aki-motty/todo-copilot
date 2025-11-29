@@ -1,4 +1,5 @@
 # Compute Module - Lambda & API Gateway
+# Updated: 2025-11-29
 
 variable "environment" {
   type        = string
