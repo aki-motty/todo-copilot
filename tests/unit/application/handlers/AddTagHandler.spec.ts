@@ -2,6 +2,7 @@ import { AddTagHandler } from "../../../../src/application/handlers/AddTagHandle
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { Todo } from "../../../../src/domain/entities/Todo";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("AddTagHandler", () => {
   let handler: AddTagHandler;
@@ -10,7 +11,7 @@ describe("AddTagHandler", () => {
 
   beforeEach(() => {
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
     handler = new AddTagHandler(service);
   });
 

@@ -2,6 +2,7 @@ import { CreateTodoCommandHandler } from "../../../../src/application/handlers/C
 import { ListTodosHandler } from "../../../../src/application/handlers/ListTodosHandler";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("ListTodosHandler", () => {
   let handler: ListTodosHandler;
@@ -12,7 +13,7 @@ describe("ListTodosHandler", () => {
   beforeEach(() => {
     localStorage.clear();
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
     handler = new ListTodosHandler(repository);
     createHandler = new CreateTodoCommandHandler(service);
   });

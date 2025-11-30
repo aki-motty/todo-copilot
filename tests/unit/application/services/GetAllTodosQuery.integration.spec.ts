@@ -1,6 +1,7 @@
 import type { GetAllTodosQuery } from "../../../../src/application/queries";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("GetAllTodosQuery - Integration Tests", () => {
   let service: TodoApplicationService;
@@ -9,7 +10,7 @@ describe("GetAllTodosQuery - Integration Tests", () => {
   beforeEach(() => {
     localStorage.clear();
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
   });
 
   describe("Query execution with service", () => {
@@ -148,7 +149,7 @@ describe("GetAllTodosQuery - Integration Tests", () => {
       expect(response1.count).toBe(2);
 
       // Simulate service restart with new service instance
-      const newService = new TodoApplicationService(new LocalStorageTodoRepository());
+      const newService = new TodoApplicationService(new LocalStorageTodoRepository(), mockLogger);
 
       const response2 = await newService.getAllTodos({});
       expect(response2.count).toBe(2);

@@ -1,6 +1,7 @@
 import { TodoApplicationService } from "../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { NotFoundError } from "../../src/shared/types";
+import { mockLogger } from "../mocks/mockLogger";
 
 describe("TodoApplicationService - Integration Tests", () => {
   let service: TodoApplicationService;
@@ -29,7 +30,7 @@ describe("TodoApplicationService - Integration Tests", () => {
     };
 
     repository = new LocalStorageTodoRepository(mockStorage);
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
   });
 
   describe("createTodo", () => {

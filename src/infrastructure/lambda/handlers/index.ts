@@ -19,6 +19,7 @@ import { SaveTodoHandler } from "../../../application/handlers/SaveTodoHandler";
 import { ToggleSubtaskHandler } from "../../../application/handlers/ToggleSubtaskHandler";
 import { ToggleTodoHandler } from "../../../application/handlers/ToggleTodoHandler";
 import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
+import { createLogger } from "../../config/logger";
 import { DynamoDBTodoRepository } from "../../repositories/DynamoDBTodoRepository";
 
 // Initialize repository and handlers
@@ -46,7 +47,8 @@ async function initializeHandlers(): Promise<void> {
     repository = new DynamoDBTodoRepository();
     await repository.initializeFromDynamoDB();
 
-    const service = new TodoApplicationService(repository);
+    const logger = createLogger("TodoApplicationService");
+    const service = new TodoApplicationService(repository, logger);
 
     handlers = {
       createTodo: new CreateTodoHandler(repository),

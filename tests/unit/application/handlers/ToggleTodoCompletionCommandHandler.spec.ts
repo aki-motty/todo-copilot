@@ -1,6 +1,7 @@
 import { ToggleTodoCompletionCommandHandler } from "../../../../src/application/handlers/ToggleTodoCompletionCommandHandler";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("ToggleTodoCompletionCommandHandler", () => {
   let handler: ToggleTodoCompletionCommandHandler;
@@ -8,7 +9,7 @@ describe("ToggleTodoCompletionCommandHandler", () => {
 
   beforeEach(() => {
     localStorage.clear();
-    service = new TodoApplicationService(new LocalStorageTodoRepository());
+    service = new TodoApplicationService(new LocalStorageTodoRepository(), mockLogger);
     handler = new ToggleTodoCompletionCommandHandler(service);
   });
 

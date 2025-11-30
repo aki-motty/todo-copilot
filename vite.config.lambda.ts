@@ -24,7 +24,7 @@ export default defineConfig({
         "@aws-sdk/client-dynamodb",
         "@aws-sdk/util-dynamodb",
         "@aws-sdk/lib-dynamodb",
-        "aws-lambda"
+        "aws-lambda",
       ],
       output: {
         format: "cjs",

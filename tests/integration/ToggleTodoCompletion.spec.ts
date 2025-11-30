@@ -1,5 +1,6 @@
 import { TodoApplicationService } from "../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../mocks/mockLogger";
 
 describe("ToggleTodoCompletion - Integration Tests", () => {
   let service: TodoApplicationService;
@@ -8,7 +9,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
   beforeEach(() => {
     localStorage.clear();
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
   });
 
   describe("Toggle completion through service", () => {
@@ -100,7 +101,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
       await service.toggleTodoCompletion({ id: todo.id });
 
       // Simulate service restart
-      const newService = new TodoApplicationService(new LocalStorageTodoRepository());
+      const newService = new TodoApplicationService(new LocalStorageTodoRepository(), mockLogger);
 
       const response = await newService.getAllTodos({});
       const retrieved = response.todos[0];
@@ -116,7 +117,7 @@ describe("ToggleTodoCompletion - Integration Tests", () => {
       // Leave todo2 uncompleted
       await service.toggleTodoCompletion({ id: todo3.id });
 
-      const newService = new TodoApplicationService(new LocalStorageTodoRepository());
+      const newService = new TodoApplicationService(new LocalStorageTodoRepository(), mockLogger);
 
       const response = await newService.getAllTodos({});
       const todos = response.todos;

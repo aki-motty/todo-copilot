@@ -108,7 +108,7 @@ VITE_API_BASE_URL=https://api.example.com
 VITE_LOG_LEVEL=warn
 ```
 
-### 7. E2E Tests with API Integration (`e2e/api-integration.spec.ts`)
+### 7. E2E Tests with API Integration (`tests/e2e/api-integration.spec.ts`)
 - **Purpose**: Comprehensive E2E tests against Lambda backend API
 - **Test Coverage**:
   - API mode indicator display
@@ -125,9 +125,9 @@ VITE_LOG_LEVEL=warn
 {
   "scripts": {
     "dev": "vite",
-    "dev:api": "VITE_API_BASE_URL=http://localhost:3000 vite",
+    "local:dev": "VITE_API_BASE_URL=/ vite",
     "e2e": "playwright test",
-    "e2e:api": "VITE_API_BASE_URL=http://localhost:3001 playwright test e2e/api-integration.spec.ts"
+    "e2e:api": "playwright test tests/e2e/api-integration.spec.ts"
   }
 }
 ```
@@ -199,7 +199,7 @@ All error scenarios are handled gracefully:
 1. `src/infrastructure/api/HttpClient.ts` - HTTP client implementation
 2. `src/infrastructure/api/ApiTodoRepository.ts` - Async API repository
 3. `src/presentation/providers/ApiConfigProvider.tsx` - API configuration provider
-4. `e2e/api-integration.spec.ts` - API E2E tests
+4. `tests/e2e/api-integration.spec.ts` - API E2E tests
 5. `.env.development` - Development environment configuration
 6. `.env.test` - Test environment configuration
 7. `.env.production` - Production environment configuration
@@ -207,5 +207,5 @@ All error scenarios are handled gracefully:
 ## Files Modified
 1. `src/presentation/hooks/useTodoList.ts` - Added API backend support
 2. `src/presentation/App.tsx` - Added ApiConfigProvider wrapper
-3. `package.json` - Added dev:api and e2e:api scripts
-4. `playwright.config.ts` - Updated testDir to include e2e directory
+3. `package.json` - Added local:dev and e2e:api scripts
+4. `playwright.config.ts` - Updated testDir to tests/e2e

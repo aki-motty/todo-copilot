@@ -9,7 +9,10 @@ import { TodoApiClient } from "../../infrastructure/services/todoApiClient";
 import { TodoController } from "../controllers/TodoController";
 import { useApiConfig } from "../providers/ApiConfigProvider";
 
-const logger = createLogger("useTodoList");
+// Create logger for hook-level logging
+const hookLogger = createLogger("useTodoList");
+// Create logger for service-level logging
+const serviceLogger = createLogger("TodoApplicationService");
 
 /**
  * Custom hook for managing Todo list state and operations
@@ -30,13 +33,13 @@ export const useTodoList = () => {
     let repo: ITodoRepository;
     if (backendMode === "api" && baseUrl) {
       repo = new AsyncApiTodoRepository(baseUrl);
-      logger.info("Using API backend", { baseUrl });
+      hookLogger.info("Using API backend", { baseUrl });
     } else {
       repo = new LocalStorageTodoRepository();
-      logger.info("Using localStorage backend");
+      hookLogger.info("Using localStorage backend");
     }
 
-    const appService = new TodoApplicationService(repo as any);
+    const appService = new TodoApplicationService(repo as any, serviceLogger);
     return new TodoController(appService);
   }, [backendMode, baseUrl]);
 
@@ -47,11 +50,11 @@ export const useTodoList = () => {
         setLoading(true);
         const allTodos = await todoController.getAllTodos();
         setTodos(allTodos);
-        logger.debug("TodoList initialized", { count: allTodos.length, mode: backendMode });
+        hookLogger.debug("TodoList initialized", { count: allTodos.length, mode: backendMode });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load todos";
         setError(message);
-        logger.error("Failed to load todos", { error: message });
+        hookLogger.error("Failed to load todos", { error: message });
       } finally {
         setLoading(false);
       }
@@ -67,12 +70,12 @@ export const useTodoList = () => {
         setError(null);
         const newTodo = await todoController.createTodo(title);
         setTodos((prevTodos) => [...prevTodos, newTodo]);
-        logger.info("Todo created via hook", { id: newTodo.id, title });
+        hookLogger.info("Todo created via hook", { id: newTodo.id, title });
         return newTodo;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to create todo";
         setError(message);
-        logger.error("Failed to create todo", { error: message, title });
+        hookLogger.error("Failed to create todo", { error: message, title });
         throw err;
       }
     },
@@ -88,12 +91,12 @@ export const useTodoList = () => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
         );
-        logger.info("Todo toggled via hook", { id, completed: updatedTodo.completed });
+        hookLogger.info("Todo toggled via hook", { id, completed: updatedTodo.completed });
         return updatedTodo;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to toggle todo";
         setError(message);
-        logger.error("Failed to toggle todo", { error: message, id });
+        hookLogger.error("Failed to toggle todo", { error: message, id });
         throw err;
       }
     },
@@ -128,7 +131,7 @@ export const useTodoList = () => {
             })
           );
 
-          logger.info("Subtask added via API hook", { todoId, title });
+          hookLogger.info("Subtask added via API hook", { todoId, title });
           return; // We don't have the full updatedTodo from API, but state is updated.
         }
         // LocalStorage mode uses the controller/service logic
@@ -136,12 +139,12 @@ export const useTodoList = () => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
         );
-        logger.info("Subtask added via Controller hook", { todoId, title });
+        hookLogger.info("Subtask added via Controller hook", { todoId, title });
         return updatedTodo;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to add subtask";
         setError(message);
-        logger.error("Failed to add subtask", { error: message, todoId });
+        hookLogger.error("Failed to add subtask", { error: message, todoId });
         throw err;
       }
     },
@@ -173,11 +176,11 @@ export const useTodoList = () => {
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
         }
-        logger.info("Subtask toggled via hook", { todoId, subtaskId });
+        hookLogger.info("Subtask toggled via hook", { todoId, subtaskId });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to toggle subtask";
         setError(message);
-        logger.error("Failed to toggle subtask", { error: message, todoId, subtaskId });
+        hookLogger.error("Failed to toggle subtask", { error: message, todoId, subtaskId });
         throw err;
       }
     },
@@ -209,11 +212,11 @@ export const useTodoList = () => {
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
         }
-        logger.info("Subtask deleted via hook", { todoId, subtaskId });
+        hookLogger.info("Subtask deleted via hook", { todoId, subtaskId });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to delete subtask";
         setError(message);
-        logger.error("Failed to delete subtask", { error: message, todoId, subtaskId });
+        hookLogger.error("Failed to delete subtask", { error: message, todoId, subtaskId });
         throw err;
       }
     },
@@ -227,11 +230,11 @@ export const useTodoList = () => {
         setError(null);
         await todoController.deleteTodo(id);
         setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-        logger.info("Todo deleted via hook", { id });
+        hookLogger.info("Todo deleted via hook", { id });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to delete todo";
         setError(message);
-        logger.error("Failed to delete todo", { error: message, id });
+        hookLogger.error("Failed to delete todo", { error: message, id });
         throw err;
       }
     },
@@ -250,19 +253,19 @@ export const useTodoList = () => {
           setTodos((prevTodos) =>
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
-          logger.info("Tag added via API hook", { todoId, tagName });
+          hookLogger.info("Tag added via API hook", { todoId, tagName });
         } else {
           // LocalStorage mode uses the controller/service logic
           const updatedTodo = await todoController.addTag(todoId, tagName);
           setTodos((prevTodos) =>
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
-          logger.info("Tag added via Controller hook", { todoId, tagName });
+          hookLogger.info("Tag added via Controller hook", { todoId, tagName });
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to add tag";
         setError(message);
-        logger.error("Failed to add tag", { error: message, todoId, tagName });
+        hookLogger.error("Failed to add tag", { error: message, todoId, tagName });
         throw err;
       }
     },
@@ -281,19 +284,19 @@ export const useTodoList = () => {
           setTodos((prevTodos) =>
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
-          logger.info("Tag removed via API hook", { todoId, tagName });
+          hookLogger.info("Tag removed via API hook", { todoId, tagName });
         } else {
           // LocalStorage mode uses the controller/service logic
           const updatedTodo = await todoController.removeTag(todoId, tagName);
           setTodos((prevTodos) =>
             prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
           );
-          logger.info("Tag removed via Controller hook", { todoId, tagName });
+          hookLogger.info("Tag removed via Controller hook", { todoId, tagName });
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to remove tag";
         setError(message);
-        logger.error("Failed to remove tag", { error: message, todoId, tagName });
+        hookLogger.error("Failed to remove tag", { error: message, todoId, tagName });
         throw err;
       }
     },

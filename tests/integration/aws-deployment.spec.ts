@@ -7,6 +7,17 @@
  * - Lambda 関数の実際の動作
  * - API Gateway エンドポイントの疎通
  * - DynamoDB テーブルの動作
+ *
+ * 前提条件:
+ * 1. AWS環境がTerraformでデプロイ済みであること
+ * 2. 有効なAWS認証情報が設定されていること (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+ * 3. 環境変数 AWS_INTEGRATION_TEST=true が設定されていること
+ *
+ * 実行方法:
+ *   AWS_INTEGRATION_TEST=true AWS_REGION=ap-northeast-1 npm test -- tests/integration/aws-deployment.spec.ts
+ *
+ * 注意: このテストはCI/CDパイプラインでデプロイ後に実行することを想定しています。
+ * ローカル開発環境では通常スキップされます。
  */
 
 import { Todo, TodoTitle } from "../../src/domain/entities/Todo";
@@ -21,6 +32,26 @@ import {
   getLambdaClient,
 } from "../../src/infrastructure/aws-integration/lambda-client";
 
+// AWS統合テストを実行するかどうかの環境変数チェック
+// AWS_INTEGRATION_TEST=true かつ 有効なAWS認証情報が必要
+const hasAWSCredentials =
+  !!(process.env["AWS_ACCESS_KEY_ID"] && process.env["AWS_SECRET_ACCESS_KEY"]) ||
+  !!(process.env["AWS_PROFILE"] || process.env["AWS_ROLE_ARN"]);
+
+const RUN_AWS_INTEGRATION_TESTS =
+  process.env["AWS_INTEGRATION_TEST"] === "true" && hasAWSCredentials;
+
+// テストをスキップする場合の理由をログ出力
+if (process.env["AWS_INTEGRATION_TEST"] === "true" && !hasAWSCredentials) {
+  console.warn(
+    "\n⚠️  AWS_INTEGRATION_TEST=true が設定されていますが、AWS認証情報が見つかりません。"
+  );
+  console.warn("   以下のいずれかを設定してください:");
+  console.warn("   - AWS_ACCESS_KEY_ID と AWS_SECRET_ACCESS_KEY");
+  console.warn("   - AWS_PROFILE");
+  console.warn("   - AWS_ROLE_ARN\n");
+}
+
 /**
  * テスト用 Todo 作成ヘルパー
  */
@@ -30,11 +61,14 @@ function createE2ETodo(title: string, completed = false): Todo {
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
 }
 
-describe("E2E Tests - AWS Deployment Verification", () => {
-  const environment = process.env.ENVIRONMENT || "dev";
-  const region = process.env.AWS_REGION || "ap-northeast-1";
-  const tableName = process.env.DYNAMODB_TABLE_NAME || `todo-${environment}`;
-  const logGroupName = process.env.CLOUDWATCH_LOG_GROUP || `/aws/lambda/todo-${environment}`;
+// AWS環境変数が設定されていない場合はテストをスキップ
+const describeIfAWS = RUN_AWS_INTEGRATION_TESTS ? describe : describe.skip;
+
+describeIfAWS("E2E Tests - AWS Deployment Verification", () => {
+  const environment = process.env["ENVIRONMENT"] || "dev";
+  const region = process.env["AWS_REGION"] || "ap-northeast-1";
+  const tableName = process.env["DYNAMODB_TABLE_NAME"] || `todo-${environment}`;
+  const logGroupName = process.env["CLOUDWATCH_LOG_GROUP"] || `/aws/lambda/todo-${environment}`;
 
   beforeAll(() => {
     console.log("\n📋 E2E テスト初期化");
@@ -134,7 +168,7 @@ describe("E2E Tests - AWS Deployment Verification", () => {
 
       // 完了済みのタスクが含まれていることを確認
       const completedIds = completed.map((t) => t.id);
-      expect(completedIds.some((id) => id === todos[0].id)).toBe(true);
+      expect(completedIds.some((id) => id === todos[0]?.id)).toBe(true);
     }, 20000);
 
     it("リポジトリのヘルスチェック", async () => {

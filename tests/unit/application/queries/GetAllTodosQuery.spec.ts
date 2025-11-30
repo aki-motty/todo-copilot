@@ -1,6 +1,7 @@
 import type { GetAllTodosQuery, GetAllTodosResponse } from "../../../../src/application/queries";
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("GetAllTodosQuery - Unit Tests", () => {
   let service: TodoApplicationService;
@@ -9,7 +10,7 @@ describe("GetAllTodosQuery - Unit Tests", () => {
   beforeEach(() => {
     localStorage.clear();
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
   });
 
   describe("Query definition", () => {

@@ -1,7 +1,7 @@
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
-import { createLogger } from "../../infrastructure/config/logger";
 import { NotFoundError } from "../../shared/types";
 import type { DeleteTodoCommand } from "../commands/DeleteTodoCommand";
+import type { ILogger } from "../ports/ILogger";
 
 /**
  * Handler for DeleteTodoCommand.
@@ -15,14 +15,16 @@ import type { DeleteTodoCommand } from "../commands/DeleteTodoCommand";
  * @class DeleteTodoCommandHandler
  */
 export class DeleteTodoCommandHandler {
-  private logger = createLogger("DeleteTodoCommandHandler");
-
   /**
-   * Initialize handler with repository.
+   * Initialize handler with repository and logger.
    *
    * @param todoRepository - Repository for deletion
+   * @param logger - Logger instance for operation logging
    */
-  constructor(private todoRepository: ITodoRepository) {}
+  constructor(
+    private todoRepository: ITodoRepository,
+    private logger: ILogger
+  ) {}
 
   /**
    * Handle command to delete a todo.

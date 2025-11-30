@@ -1,23 +1,23 @@
 {
-    "name": "AWS Lambda Rust/TypeScript DevContainer",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-            "version": "latest",
-            "enableNonRootDocker": "true",
-            "moby": "true"
-        }
-    },
-    "settings": {
-        "terminal.integrated.shell.linux": "/bin/bash"
-    },
-    "extensions": [
-        "ms-azuretools.vscode-docker",
-        "hashicorp.terraform",
-        "ms-vscode.vscode-typescript-next",
-        "amazonwebservices.aws-toolkit-vscode"
-    ],
-    "postCreateCommand": "sudo npm install -g typescript && terraform -install-autocomplete && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git && gh --version && npm install && npx playwright install --with-deps"
+  "name": "AWS Lambda Rust/TypeScript DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "enableNonRootDocker": "true",
+      "moby": "true"
+    }
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "ms-azuretools.vscode-docker",
+    "hashicorp.terraform",
+    "ms-vscode.vscode-typescript-next",
+    "amazonwebservices.aws-toolkit-vscode"
+  ],
+  "postCreateCommand": "sudo npm install -g typescript && terraform -install-autocomplete && uv tool install specify-cli --from git+https://github.com/github/spec-kit.git && gh --version && npm install && npx playwright install --with-deps"
 }

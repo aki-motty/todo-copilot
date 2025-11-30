@@ -1,6 +1,7 @@
 import { performance } from "node:perf_hooks";
 import { TodoApplicationService } from "../../src/application/services/TodoApplicationService";
 import { LocalStorageTodoRepository } from "../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../mocks/mockLogger";
 
 describe("Performance Tests (T060)", () => {
   let service: TodoApplicationService;
@@ -9,7 +10,7 @@ describe("Performance Tests (T060)", () => {
   beforeEach(() => {
     localStorage.clear();
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
   });
 
   describe("List loading performance", () => {
