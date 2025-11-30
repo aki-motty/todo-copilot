@@ -127,6 +127,7 @@ export class DynamoDBTodoRepository implements ITodoRepository {
         id: json.id,
         title: json.title,
         completed: json.completed,
+        description: json.description || "",
         createdAt: json.createdAt,
         updatedAt: json.updatedAt,
         subtasks: json.subtasks,
@@ -171,7 +172,8 @@ export class DynamoDBTodoRepository implements ITodoRepository {
       item.createdAt,
       item.updatedAt,
       item.subtasks || [],
-      item.tags || []
+      item.tags || [],
+      item.description || ""
     );
   }
 

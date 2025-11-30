@@ -84,3 +84,32 @@ export const createTodoDeletedEvent = (id: TodoId, deletedAt: Date): TodoDeleted
     deletedAt: deletedAt.toISOString(),
   },
 });
+
+/**
+ * Event fired when a Todo's description is updated
+ */
+export interface TodoDescriptionUpdatedEvent extends DomainEvent {
+  eventType: "TodoDescriptionUpdated";
+  data: {
+    previousDescription: string;
+    newDescription: string;
+    updatedAt: string;
+  };
+}
+
+export const createTodoDescriptionUpdatedEvent = (
+  id: TodoId,
+  previousDescription: string,
+  newDescription: string,
+  updatedAt: Date
+): TodoDescriptionUpdatedEvent => ({
+  aggregateId: id,
+  aggregateType: "Todo",
+  eventType: "TodoDescriptionUpdated",
+  timestamp: new Date(),
+  data: {
+    previousDescription,
+    newDescription,
+    updatedAt: updatedAt.toISOString(),
+  },
+});

@@ -6,6 +6,7 @@ import type {
 import type { TodoResponseDTO } from "../../application/dto/TodoDTO";
 import type { GetAllTodosQuery } from "../../application/queries";
 import type { TodoApplicationService } from "../../application/services/TodoApplicationService";
+import type { TodoId } from "../../domain/entities/Todo";
 import { createLogger } from "../../infrastructure/config/logger";
 
 /**
@@ -143,6 +144,21 @@ export class TodoController {
       return todo.toJSON();
     } catch (error) {
       this.logger.error("Controller: removeTag failed", error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a todo's description
+   */
+  async updateTodoDescription(todoId: string, description: string): Promise<TodoResponseDTO> {
+    try {
+      this.logger.debug("Controller: updateTodoDescription", { todoId });
+      const command = { todoId: todoId as TodoId, description };
+      const todo = await this.applicationService.updateTodoDescription(command);
+      return todo.toJSON();
+    } catch (error) {
+      this.logger.error("Controller: updateTodoDescription failed", error as Error);
       throw error;
     }
   }

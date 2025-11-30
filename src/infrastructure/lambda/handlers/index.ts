@@ -18,6 +18,7 @@ import { RemoveTagHandler } from "../../../application/handlers/RemoveTagHandler
 import { SaveTodoHandler } from "../../../application/handlers/SaveTodoHandler";
 import { ToggleSubtaskHandler } from "../../../application/handlers/ToggleSubtaskHandler";
 import { ToggleTodoHandler } from "../../../application/handlers/ToggleTodoHandler";
+import { UpdateDescriptionHandler } from "../../../application/handlers/UpdateDescriptionHandler";
 import { TodoApplicationService } from "../../../application/services/TodoApplicationService";
 import { createLogger } from "../../config/logger";
 import { DynamoDBTodoRepository } from "../../repositories/DynamoDBTodoRepository";
@@ -37,6 +38,7 @@ let handlers: {
   addTag: AddTagHandler;
   getTags: GetTagsHandler;
   removeTag: RemoveTagHandler;
+  updateDescription: UpdateDescriptionHandler;
 };
 
 /**
@@ -63,6 +65,7 @@ async function initializeHandlers(): Promise<void> {
       addTag: new AddTagHandler(service),
       getTags: new GetTagsHandler(),
       removeTag: new RemoveTagHandler(service),
+      updateDescription: new UpdateDescriptionHandler(repository),
     };
   }
 }
@@ -202,6 +205,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
       if (id && tagPart) {
         const tagName = decodeURIComponent(tagPart);
         response = await handlers.removeTag.handle({ id, tagName });
+      }
+    } else if (method === "PUT" && path.match(/^\/todos\/[^/]+\/description$/)) {
+      // Update description
+      const id = path.split("/")[2];
+      const { description } = requestBody;
+      if (id) {
+        response = await handlers.updateDescription.execute(id, description || "");
       }
     } else {
       // Not found

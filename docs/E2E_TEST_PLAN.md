@@ -23,6 +23,7 @@
 - ✅ **US4: Delete Todos** - Deletion flow, validation
 - ✅ **Subtasks** - Add, toggle, delete subtasks
 - ✅ **Tags** - Add, remove tags (Summary, Research, Split)
+- ✅ **Task Details (Markdown)** - Add, edit, preview descriptions with markdown support
 - ⏳ **Undo/Redo** - State restoration, operation history
 - ⏳ **Search/Filter** - Text search, category filtering
 
@@ -350,6 +351,116 @@ test('Reject title > 500 chars', async ({ page }) => {
   // Verify button disabled
   const button = page.locator('button:has-text("Add")');
   await expect(button).toBeDisabled();
+});
+```
+
+### Scenario 6: Todo Detail/Description
+
+**Description**: User can add and edit markdown descriptions for todos
+
+**Steps**:
+```gherkin
+Feature: Todo Detail/Description
+  Scenario: Add description to todo
+    Given user has created a todo
+    When user clicks the detail icon on the todo
+    Then the detail panel opens on the right
+    And user can enter a markdown description
+    And user clicks the save button
+    Then the description is saved
+
+  Scenario: Preview markdown formatting
+    Given user has opened a todo detail panel
+    And user has entered markdown text
+    When user clicks the preview button
+    Then the markdown is rendered as HTML
+    And headings, lists, code blocks are properly formatted
+
+  Scenario: Description character limit
+    Given user has opened a todo detail panel
+    When user enters more than 10,000 characters
+    Then an error message appears
+    And the save button is disabled
+
+  Scenario: Unsaved changes warning
+    Given user has modified the description
+    And user has not saved the changes
+    When user tries to close the panel
+    Then a warning message appears
+    And user can choose to discard or save changes
+```
+
+**Test Implementation**:
+```typescript
+test('Add description to todo', async ({ page }) => {
+  await page.goto('http://localhost:5173');
+  
+  // Create a todo first
+  const input = page.locator('input[placeholder*="add"]');
+  await input.fill('Todo with description');
+  await page.keyboard.press('Enter');
+  
+  // Click detail icon
+  const detailButton = page.locator('.detail-btn').first();
+  await detailButton.click();
+  
+  // Verify panel opened
+  const detailPanel = page.locator('.todo-detail-panel');
+  await expect(detailPanel).toBeVisible();
+  
+  // Enter description
+  const editor = page.locator('.markdown-editor textarea');
+  await editor.fill('# Task Details\n\n- Step 1\n- Step 2');
+  
+  // Save
+  const saveButton = page.locator('button:has-text("Save")');
+  await saveButton.click();
+  
+  // Verify saved indicator
+  const savedIndicator = page.locator('.save-status');
+  await expect(savedIndicator).toContainText('Saved');
+});
+
+test('Preview markdown formatting', async ({ page }) => {
+  await page.goto('http://localhost:5173');
+  
+  // Setup: create todo and open detail
+  await createTodoWithDetail(page);
+  
+  // Enter markdown
+  const editor = page.locator('.markdown-editor textarea');
+  await editor.fill('# Heading\n\n**Bold** and *italic*\n\n- List item');
+  
+  // Switch to preview
+  const previewTab = page.locator('button:has-text("Preview")');
+  await previewTab.click();
+  
+  // Verify rendered markdown
+  const preview = page.locator('.markdown-preview');
+  await expect(preview.locator('h1')).toHaveText('Heading');
+  await expect(preview.locator('strong')).toHaveText('Bold');
+  await expect(preview.locator('em')).toHaveText('italic');
+  await expect(preview.locator('li')).toHaveText('List item');
+});
+
+test('Unsaved changes warning', async ({ page }) => {
+  await page.goto('http://localhost:5173');
+  
+  // Setup: create todo and open detail
+  await createTodoWithDetail(page);
+  
+  // Enter description without saving
+  const editor = page.locator('.markdown-editor textarea');
+  await editor.fill('Unsaved content');
+  
+  // Try to close panel
+  const closeButton = page.locator('.todo-detail-panel .close-btn');
+  await closeButton.click();
+  
+  // Verify warning appears
+  const warning = page.locator('.unsaved-warning');
+  await expect(warning).toBeVisible();
+  await expect(warning).toContainText('unsaved changes');
 });
 ```
 

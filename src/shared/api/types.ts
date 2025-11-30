@@ -33,6 +33,7 @@ export interface TodoDTO {
   id: string;
   title: string;
   completed: boolean;
+  description?: string;
   createdAt: string; // ISO 8601 timestamp
   updatedAt: string; // ISO 8601 timestamp
   subtasks: SubtaskDTO[];

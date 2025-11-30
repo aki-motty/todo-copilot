@@ -143,6 +143,14 @@ export const TodoApiClient = {
   },
 
   /**
+   * Update a todo's description
+   */
+  async updateDescription(id: string, description: string): Promise<TodoResponseDTO> {
+    const response = await TodoApiClient.fetch(`/todos/${id}/description`, "PUT", { description });
+    return response.data as TodoResponseDTO;
+  },
+
+  /**
    * Get allowed tags
    */
   async getTags(): Promise<string[]> {

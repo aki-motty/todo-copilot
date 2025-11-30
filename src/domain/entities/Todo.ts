@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { Tag } from "../value-objects/Tag";
+import { TodoDescription } from "../value-objects/TodoDescription";
 import { type TodoId, brandTodoId } from "../value-objects/TodoId";
 import { TodoTitle } from "../value-objects/TodoTitle";
 import { Subtask } from "./Subtask";
 
 export { Tag } from "../value-objects/Tag";
+export { TodoDescription } from "../value-objects/TodoDescription";
 export type { TodoId } from "../value-objects/TodoId";
 export { TodoTitle } from "../value-objects/TodoTitle";
 
@@ -22,6 +24,7 @@ export class Todo {
   private constructor(
     private readonly _id: TodoId,
     private readonly _title: TodoTitle,
+    private readonly _description: TodoDescription,
     private readonly _completed: boolean,
     private readonly _createdAt: Date,
     private readonly _updatedAt: Date,
@@ -38,7 +41,7 @@ export class Todo {
     const todoTitle = TodoTitle.create(title);
     const now = new Date();
 
-    return new Todo(id, todoTitle, false, now, now, [], []);
+    return new Todo(id, todoTitle, TodoDescription.empty(), false, now, now, [], []);
   }
 
   /**
@@ -52,11 +55,13 @@ export class Todo {
     createdAt: string,
     updatedAt: string,
     subtasks: { id: string; title: string; completed: boolean }[] = [],
-    tags: string[] = []
+    tags: string[] = [],
+    description = ""
   ): Todo {
     return new Todo(
       brandTodoId(id),
       TodoTitle.create(title),
+      TodoDescription.create(description),
       completed,
       new Date(createdAt),
       new Date(updatedAt),
@@ -73,6 +78,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       !this._completed,
       this._createdAt,
       new Date(),
@@ -88,6 +94,24 @@ export class Todo {
     return new Todo(
       this._id,
       TodoTitle.create(title),
+      this._description,
+      this._completed,
+      this._createdAt,
+      new Date(),
+      this._subtasks,
+      this._tags
+    );
+  }
+
+  /**
+   * Update todo description
+   * Returns a new Todo instance (immutability)
+   */
+  updateDescription(description: string): Todo {
+    return new Todo(
+      this._id,
+      this._title,
+      TodoDescription.create(description),
       this._completed,
       this._createdAt,
       new Date(),
@@ -104,6 +128,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       this._completed,
       this._createdAt,
       new Date(),
@@ -119,6 +144,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       this._completed,
       this._createdAt,
       new Date(),
@@ -134,6 +160,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       this._completed,
       this._createdAt,
       new Date(),
@@ -153,6 +180,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       this._completed,
       this._createdAt,
       new Date(),
@@ -169,6 +197,7 @@ export class Todo {
     return new Todo(
       this._id,
       this._title,
+      this._description,
       this._completed,
       this._createdAt,
       new Date(),
@@ -185,6 +214,17 @@ export class Todo {
 
   get title(): TodoTitle {
     return this._title;
+  }
+
+  get description(): TodoDescription {
+    return this._description;
+  }
+
+  /**
+   * Check if todo has a non-empty description
+   */
+  get hasDescription(): boolean {
+    return this._description.hasContent;
   }
 
   get completed(): boolean {
@@ -218,6 +258,7 @@ export class Todo {
     return {
       id: this._id,
       title: this._title.value,
+      description: this._description.value,
       completed: this._completed,
       createdAt: this._createdAt.toISOString(),
       updatedAt: this._updatedAt.toISOString(),

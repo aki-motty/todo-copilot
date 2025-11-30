@@ -13,6 +13,10 @@ interface TodoItemProps {
   onDeleteSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
   onAddTag?: (todoId: string, tagName: string) => Promise<void>;
   onRemoveTag?: (todoId: string, tagName: string) => Promise<void>;
+  /** Callback to show detail panel for this todo */
+  onShowDetail?: (id: string) => void;
+  /** Whether this todo is currently selected (detail panel open) */
+  isSelected?: boolean;
 }
 
 /**
@@ -28,6 +32,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   onDeleteSubtask,
   onAddTag,
   onRemoveTag,
+  onShowDetail,
+  isSelected,
 }) => {
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -137,10 +143,19 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   const hasSubtasks = todo.subtasks && todo.subtasks.length > 0;
   const completedSubtasks = todo.subtasks?.filter((s) => s.completed).length || 0;
   const totalSubtasks = todo.subtasks?.length || 0;
+  const hasDescription = todo.description && todo.description.length > 0;
+
+  const handleShowDetail = () => {
+    if (onShowDetail) {
+      onShowDetail(todo.id);
+    }
+  };
 
   return (
     <li className="todo-item-container">
-      <div className={`todo-item ${todo.completed ? "completed" : ""}`}>
+      <div
+        className={`todo-item ${todo.completed ? "completed" : ""} ${isSelected ? "selected" : ""}`}
+      >
         <div className="todo-item-content">
           <button
             type="button"
@@ -186,6 +201,15 @@ export const TodoItem: React.FC<TodoItemProps> = ({
         </div>
 
         <div className="todo-item-actions">
+          <button
+            type="button"
+            onClick={handleShowDetail}
+            className={`detail-btn ${hasDescription ? "has-content" : ""}`}
+            aria-label="Show details"
+            title={hasDescription ? "View/edit description" : "Add description"}
+          >
+            📝
+          </button>
           <TagSelector onSelect={handleAddTag} />
           <button
             type="button"

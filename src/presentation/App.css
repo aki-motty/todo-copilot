@@ -1,3 +1,20 @@
+/* App wrapper - side by side layout with panel */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
+.app-wrapper.with-panel {
+  /* When panel is open, main content shrinks */
+}
+
+.app-wrapper .app-container {
+  flex: 1;
+  min-width: 0;
+  transition: flex 0.2s ease;
+}
+
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -53,5 +70,10 @@
 
   .app-main {
     padding: 1rem;
+  }
+
+  .app-wrapper.with-panel .app-container {
+    /* On mobile, main content is hidden when panel is open */
+    display: none;
   }
 }

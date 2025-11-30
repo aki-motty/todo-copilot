@@ -79,7 +79,8 @@ export class LocalStorageTodoRepository implements ITodoRepository {
       todoData.createdAt,
       todoData.updatedAt,
       todoData.subtasks || [],
-      todoData.tags || []
+      todoData.tags || [],
+      todoData.description ?? "" // Backward compatibility: default to empty string
     );
   }
 
@@ -93,7 +94,8 @@ export class LocalStorageTodoRepository implements ITodoRepository {
         t.createdAt,
         t.updatedAt,
         t.subtasks || [],
-        t.tags || []
+        t.tags || [],
+        t.description ?? "" // Backward compatibility: default to empty string
       );
     });
   }
@@ -145,6 +147,7 @@ export class LocalStorageTodoRepository implements ITodoRepository {
   private getAllFromStorage(): Array<{
     id: string;
     title: string;
+    description?: string;
     completed: boolean;
     createdAt: string;
     updatedAt: string;

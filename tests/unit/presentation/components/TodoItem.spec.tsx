@@ -27,6 +27,7 @@ describe("TodoItem Component", () => {
     id: "1",
     title: "Test Todo",
     completed: false,
+    description: "",
     createdAt: "2023-01-01",
     updatedAt: "2023-01-01",
     subtasks: [
