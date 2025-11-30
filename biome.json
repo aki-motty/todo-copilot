@@ -1,53 +1,57 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
-    "organizeImports": {
-        "enabled": true
-    },
-    "linter": {
-        "enabled": true,
-        "rules": {
-            "recommended": true,
-            "style": {
-                "useBlockStatements": "error",
-                "useConst": "error",
-                "useDefaultParameterLast": "error",
-                "useNumericLiterals": "error",
-                "noNonNullAssertion": "off"
-            },
-            "suspicious": {
-                "noAssignInExpressions": "error",
-                "noMisleadingCharacterClass": "error",
-                "noMisleadingInstantiator": "error",
-                "noExplicitAny": "off"
-            },
-            "complexity": {
-                "noBannedTypes": "error",
-                "noExcessiveNestedTestSuites": "error",
-                "useLiteralKeys": "off"
-            }
-        }
-    },
-    "formatter": {
-        "enabled": true,
-        "formatWithErrors": false,
-        "indentStyle": "space",
-        "indentWidth": 2,
-        "lineEnding": "lf",
-        "lineWidth": 100,
-        "attributePosition": "auto"
-    },
-    "javascript": {
-        "formatter": {
-            "quoteProperties": "asNeeded",
-            "trailingCommas": "es5",
-            "semicolons": "always",
-            "arrowParentheses": "always"
-        }
-    },
-    "json": {
-        "formatter": {
-            "trailingCommas": "none",
-            "indentWidth": 2
-        }
+  "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
+  "files": {
+    "ignore": ["coverage/**", "dist/**", "dist-lambda/**", "node_modules/**", "playwright-report/**"]
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useBlockStatements": "error",
+        "useConst": "error",
+        "useDefaultParameterLast": "error",
+        "useNumericLiterals": "error",
+        "noNonNullAssertion": "off",
+        "useNodejsImportProtocol": "off"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "error",
+        "noMisleadingCharacterClass": "error",
+        "noMisleadingInstantiator": "error",
+        "noExplicitAny": "off"
+      },
+      "complexity": {
+        "noBannedTypes": "error",
+        "noExcessiveNestedTestSuites": "error",
+        "useLiteralKeys": "off"
+      }
     }
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none",
+      "indentWidth": 2
+    }
+  }
 }

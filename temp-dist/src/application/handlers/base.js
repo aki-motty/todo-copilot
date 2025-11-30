@@ -6,11 +6,9 @@
  * Base command handler
  * Commands represent actions that change state
  */
-export class CommandHandler {
-}
+export class CommandHandler {}
 /**
  * Base query handler
  * Queries represent read-only operations
  */
-export class QueryHandler {
-}
+export class QueryHandler {}

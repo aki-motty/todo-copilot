@@ -64,14 +64,18 @@ describe("AddSubtaskHandler", () => {
     it("should throw ValidationError for whitespace-only title", async () => {
       const todo = await createHandler.execute("Parent Todo");
 
-      await expect(handler.execute(todo.id, "   ")).rejects.toThrow("Subtask title cannot be empty");
+      await expect(handler.execute(todo.id, "   ")).rejects.toThrow(
+        "Subtask title cannot be empty"
+      );
     });
 
     it("should throw ValidationError for title exceeding 500 characters", async () => {
       const todo = await createHandler.execute("Parent Todo");
       const longTitle = "a".repeat(501);
 
-      await expect(handler.execute(todo.id, longTitle)).rejects.toThrow("Subtask title cannot exceed 500 characters");
+      await expect(handler.execute(todo.id, longTitle)).rejects.toThrow(
+        "Subtask title cannot exceed 500 characters"
+      );
     });
 
     it("should accept title with exactly 500 characters", async () => {
@@ -84,7 +88,9 @@ describe("AddSubtaskHandler", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(handler.execute("non-existent-id", "Subtask")).rejects.toThrow("Todo with ID non-existent-id not found");
+      await expect(handler.execute("non-existent-id", "Subtask")).rejects.toThrow(
+        "Todo with ID non-existent-id not found"
+      );
     });
 
     it("should generate unique IDs for subtasks", async () => {

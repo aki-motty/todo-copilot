@@ -91,9 +91,8 @@ class ConsoleLogger implements ILogger {
 
   error(message: string, context?: LogContext | Error): void {
     if (this.shouldLog("error")) {
-      const data = context instanceof Error 
-        ? { message: context.message, stack: context.stack } 
-        : context;
+      const data =
+        context instanceof Error ? { message: context.message, stack: context.stack } : context;
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
         level: "error",

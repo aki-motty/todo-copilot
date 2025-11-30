@@ -24,7 +24,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.toggleSubtask("non-existent", "sub-id")).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.toggleSubtask("non-existent", "sub-id")).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
   });
 
@@ -39,7 +41,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.addSubtask("non-existent", "Subtask")).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.addSubtask("non-existent", "Subtask")).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
 
     it("should add multiple subtasks", async () => {
@@ -65,7 +69,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.deleteSubtask("non-existent", "sub-id")).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.deleteSubtask("non-existent", "sub-id")).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
   });
 
@@ -79,7 +85,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.addTag("non-existent", "Summary")).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.addTag("non-existent", "Summary")).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
 
     it("should add multiple tags", async () => {
@@ -104,7 +112,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.removeTag("non-existent", "Summary")).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.removeTag("non-existent", "Summary")).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
   });
 
@@ -119,7 +129,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.deleteTodo({ id: "non-existent" as any })).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.deleteTodo({ id: "non-existent" as any })).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
 
     it("should publish TodoDeleted event", async () => {
@@ -178,7 +190,9 @@ describe("TodoApplicationService - Extended Coverage", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(service.getTodoById({ id: "non-existent" as any })).rejects.toThrow("Todo with id non-existent not found");
+      await expect(service.getTodoById({ id: "non-existent" as any })).rejects.toThrow(
+        "Todo with id non-existent not found"
+      );
     });
   });
 

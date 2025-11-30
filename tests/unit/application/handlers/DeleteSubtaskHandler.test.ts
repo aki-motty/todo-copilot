@@ -43,13 +43,17 @@ describe("DeleteSubtaskHandler", () => {
     });
 
     it("should throw NotFoundError for non-existent todo", async () => {
-      await expect(handler.execute("non-existent-id", "subtask-id")).rejects.toThrow("Todo with ID non-existent-id not found");
+      await expect(handler.execute("non-existent-id", "subtask-id")).rejects.toThrow(
+        "Todo with ID non-existent-id not found"
+      );
     });
 
     it("should throw NotFoundError for non-existent subtask", async () => {
       const todo = await createHandler.execute("Parent Todo");
 
-      await expect(handler.execute(todo.id, "non-existent-subtask")).rejects.toThrow("Subtask with ID non-existent-subtask not found");
+      await expect(handler.execute(todo.id, "non-existent-subtask")).rejects.toThrow(
+        "Subtask with ID non-existent-subtask not found"
+      );
     });
 
     it("should only delete the specified subtask", async () => {

@@ -28,10 +28,10 @@ describe("ToggleTodoHandler", () => {
 
     it("should toggle completed todo to uncompleted", async () => {
       const created = await createHandler.execute("Toggle Back Test");
-      
+
       // Toggle to completed
       await handler.execute(created.id);
-      
+
       // Toggle back to uncompleted
       const result = await handler.execute(created.id);
 
@@ -40,9 +40,9 @@ describe("ToggleTodoHandler", () => {
 
     it("should persist toggled state to repository", async () => {
       const created = await createHandler.execute("Persist Toggle");
-      
+
       await handler.execute(created.id);
-      
+
       const saved = await repository.findById(created.id as any);
       expect(saved?.completed).toBe(true);
     });
@@ -68,12 +68,14 @@ describe("ToggleTodoHandler", () => {
     });
 
     it("should throw NotFoundError for non-existent ID", async () => {
-      await expect(handler.execute("non-existent-id")).rejects.toThrow('Todo with ID "non-existent-id" not found');
+      await expect(handler.execute("non-existent-id")).rejects.toThrow(
+        'Todo with ID "non-existent-id" not found'
+      );
     });
 
     it("should preserve subtasks when toggling", async () => {
       const created = await createHandler.execute("Todo with Subtasks");
-      
+
       // Add subtask
       const todo = await repository.findById(created.id as any);
       if (todo) {
@@ -89,7 +91,7 @@ describe("ToggleTodoHandler", () => {
 
     it("should preserve tags when toggling", async () => {
       const created = await createHandler.execute("Todo with Tags");
-      
+
       // Add tag
       const todo = await repository.findById(created.id as any);
       if (todo) {
@@ -117,7 +119,7 @@ describe("ToggleTodoHandler", () => {
 
     it("should be idempotent when toggled twice", async () => {
       const created = await createHandler.execute("Idempotent Test");
-      
+
       // Toggle twice
       await handler.execute(created.id);
       const result = await handler.execute(created.id);

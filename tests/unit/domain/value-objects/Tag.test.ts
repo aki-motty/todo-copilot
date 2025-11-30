@@ -113,7 +113,7 @@ describe("Tag Value Object", () => {
     it("should be immutable", () => {
       const tag = Tag.create("Summary");
       const originalName = tag.name;
-      
+
       // Tag should remain unchanged
       expect(tag.name).toBe(originalName);
     });
@@ -122,7 +122,7 @@ describe("Tag Value Object", () => {
   describe("type safety", () => {
     it("should only accept TagName type in constructor", () => {
       // These should compile (runtime test)
-      const validTags: Tag[] = ALLOWED_TAGS.map(name => new Tag(name));
+      const validTags: Tag[] = ALLOWED_TAGS.map((name) => new Tag(name));
       expect(validTags).toHaveLength(3);
     });
   });

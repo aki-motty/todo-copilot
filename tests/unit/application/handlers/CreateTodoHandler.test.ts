@@ -43,7 +43,9 @@ describe("CreateTodoHandler", () => {
 
     it("should throw ValidationError for title exceeding 500 characters", async () => {
       const longTitle = "a".repeat(501);
-      await expect(handler.execute(longTitle)).rejects.toThrow("Todo title cannot exceed 500 characters");
+      await expect(handler.execute(longTitle)).rejects.toThrow(
+        "Todo title cannot exceed 500 characters"
+      );
     });
 
     it("should accept title with exactly 500 characters", async () => {

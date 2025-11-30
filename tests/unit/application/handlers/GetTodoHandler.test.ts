@@ -34,7 +34,9 @@ describe("GetTodoHandler", () => {
     });
 
     it("should throw NotFoundError for non-existent ID", async () => {
-      await expect(handler.execute("non-existent-id")).rejects.toThrow('Todo with ID "non-existent-id" not found');
+      await expect(handler.execute("non-existent-id")).rejects.toThrow(
+        'Todo with ID "non-existent-id" not found'
+      );
     });
 
     it("should return todo with subtasks", async () => {

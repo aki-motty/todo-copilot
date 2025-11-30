@@ -34,24 +34,22 @@ import {
 
 // AWS統合テストを実行するかどうかの環境変数チェック
 // AWS_INTEGRATION_TEST=true かつ 有効なAWS認証情報が必要
-const hasAWSCredentials = !!(
-  process.env['AWS_ACCESS_KEY_ID'] && 
-  process.env['AWS_SECRET_ACCESS_KEY']
-) || !!(
-  process.env['AWS_PROFILE'] ||
-  process.env['AWS_ROLE_ARN']
-);
+const hasAWSCredentials =
+  !!(process.env["AWS_ACCESS_KEY_ID"] && process.env["AWS_SECRET_ACCESS_KEY"]) ||
+  !!(process.env["AWS_PROFILE"] || process.env["AWS_ROLE_ARN"]);
 
-const RUN_AWS_INTEGRATION_TESTS = 
-  process.env['AWS_INTEGRATION_TEST'] === 'true' && hasAWSCredentials;
+const RUN_AWS_INTEGRATION_TESTS =
+  process.env["AWS_INTEGRATION_TEST"] === "true" && hasAWSCredentials;
 
 // テストをスキップする場合の理由をログ出力
-if (process.env['AWS_INTEGRATION_TEST'] === 'true' && !hasAWSCredentials) {
-  console.warn('\n⚠️  AWS_INTEGRATION_TEST=true が設定されていますが、AWS認証情報が見つかりません。');
-  console.warn('   以下のいずれかを設定してください:');
-  console.warn('   - AWS_ACCESS_KEY_ID と AWS_SECRET_ACCESS_KEY');
-  console.warn('   - AWS_PROFILE');
-  console.warn('   - AWS_ROLE_ARN\n');
+if (process.env["AWS_INTEGRATION_TEST"] === "true" && !hasAWSCredentials) {
+  console.warn(
+    "\n⚠️  AWS_INTEGRATION_TEST=true が設定されていますが、AWS認証情報が見つかりません。"
+  );
+  console.warn("   以下のいずれかを設定してください:");
+  console.warn("   - AWS_ACCESS_KEY_ID と AWS_SECRET_ACCESS_KEY");
+  console.warn("   - AWS_PROFILE");
+  console.warn("   - AWS_ROLE_ARN\n");
 }
 
 /**
@@ -67,10 +65,10 @@ function createE2ETodo(title: string, completed = false): Todo {
 const describeIfAWS = RUN_AWS_INTEGRATION_TESTS ? describe : describe.skip;
 
 describeIfAWS("E2E Tests - AWS Deployment Verification", () => {
-  const environment = process.env['ENVIRONMENT'] || "dev";
-  const region = process.env['AWS_REGION'] || "ap-northeast-1";
-  const tableName = process.env['DYNAMODB_TABLE_NAME'] || `todo-${environment}`;
-  const logGroupName = process.env['CLOUDWATCH_LOG_GROUP'] || `/aws/lambda/todo-${environment}`;
+  const environment = process.env["ENVIRONMENT"] || "dev";
+  const region = process.env["AWS_REGION"] || "ap-northeast-1";
+  const tableName = process.env["DYNAMODB_TABLE_NAME"] || `todo-${environment}`;
+  const logGroupName = process.env["CLOUDWATCH_LOG_GROUP"] || `/aws/lambda/todo-${environment}`;
 
   beforeAll(() => {
     console.log("\n📋 E2E テスト初期化");

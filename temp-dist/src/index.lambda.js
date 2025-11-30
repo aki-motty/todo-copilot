@@ -20,5 +20,5 @@ export const handler = withMockAuth(originalHandler);
  * For development/testing purposes, ensure the handler can be invoked directly
  */
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { handler };
+  module.exports = { handler };
 }

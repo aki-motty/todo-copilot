@@ -12,7 +12,7 @@ test.describe("Subtask Integration E2E Tests", () => {
     const parentTitle = `Parent Task ${Date.now()}`;
     await page.locator("input.todo-input").fill(parentTitle);
     await page.locator("button.create-button").click();
-    
+
     // Wait for todo to appear
     const todoItem = page.locator(".todo-item-container", { hasText: parentTitle });
     await expect(todoItem).toBeVisible();
@@ -28,7 +28,7 @@ test.describe("Subtask Integration E2E Tests", () => {
     // Verify subtask is visible
     const subtaskItem = todoItem.locator(".subtask-item", { hasText: subtaskTitle });
     await expect(subtaskItem).toBeVisible();
-    
+
     // Verify progress indicator
     await expect(todoItem).toContainText("(0/1)");
   });
@@ -38,7 +38,7 @@ test.describe("Subtask Integration E2E Tests", () => {
     const parentTitle = `Toggle Task ${Date.now()}`;
     await page.locator("input.todo-input").fill(parentTitle);
     await page.locator("button.create-button").click();
-    
+
     const todoItem = page.locator(".todo-item-container", { hasText: parentTitle });
     await expect(todoItem).toBeVisible();
 
@@ -64,7 +64,7 @@ test.describe("Subtask Integration E2E Tests", () => {
     const parentTitle = `Delete Task ${Date.now()}`;
     await page.locator("input.todo-input").fill(parentTitle);
     await page.locator("button.create-button").click();
-    
+
     const todoItem = page.locator(".todo-item-container", { hasText: parentTitle });
     await expect(todoItem).toBeVisible();
 
@@ -79,7 +79,7 @@ test.describe("Subtask Integration E2E Tests", () => {
     // Verify subtask is gone
     const subtaskItem = todoItem.locator(".subtask-item");
     await expect(subtaskItem).not.toBeVisible();
-    
+
     // Verify progress indicator is gone or (0/0) - actually it disappears if no subtasks
     await expect(todoItem).not.toContainText("(0/1)");
   });

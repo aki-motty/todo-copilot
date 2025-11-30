@@ -1,5 +1,8 @@
 import { CreateTodoHandler } from "../../../../src/application/handlers/CreateTodoHandler";
-import { SaveTodoHandler, type SaveTodoRequest } from "../../../../src/application/handlers/SaveTodoHandler";
+import {
+  SaveTodoHandler,
+  type SaveTodoRequest,
+} from "../../../../src/application/handlers/SaveTodoHandler";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 
 describe("SaveTodoHandler", () => {
@@ -175,7 +178,7 @@ describe("SaveTodoHandler", () => {
     it("should preserve original createdAt when updating", async () => {
       const originalCreatedAt = new Date("2023-01-01").toISOString();
       const newUpdatedAt = new Date().toISOString();
-      
+
       const request: SaveTodoRequest = {
         id: "preserve-created-id",
         title: "Preserve Created",

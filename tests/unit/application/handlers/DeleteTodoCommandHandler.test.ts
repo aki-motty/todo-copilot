@@ -44,7 +44,9 @@ describe("DeleteTodoCommandHandler", () => {
     it("should throw NotFoundError for non-existent todo", async () => {
       const command: DeleteTodoCommand = { id: brandTodoId("non-existent-id") };
 
-      await expect(handler.handle(command)).rejects.toThrow("Todo with id non-existent-id not found");
+      await expect(handler.handle(command)).rejects.toThrow(
+        "Todo with id non-existent-id not found"
+      );
     });
 
     it("should not affect other todos when deleting one", async () => {

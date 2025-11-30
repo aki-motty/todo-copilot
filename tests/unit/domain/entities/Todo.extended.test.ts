@@ -24,9 +24,9 @@ describe("Todo Entity - Extended Coverage Tests", () => {
       const withTags = todo.addTag("Summary").addTag("Research").addTag("Split");
 
       expect(withTags.tags).toHaveLength(3);
-      expect(withTags.tags.map(t => t.name)).toContain("Summary");
-      expect(withTags.tags.map(t => t.name)).toContain("Research");
-      expect(withTags.tags.map(t => t.name)).toContain("Split");
+      expect(withTags.tags.map((t) => t.name)).toContain("Summary");
+      expect(withTags.tags.map((t) => t.name)).toContain("Research");
+      expect(withTags.tags.map((t) => t.name)).toContain("Split");
     });
 
     it("should maintain immutability when adding tag", () => {
@@ -72,9 +72,9 @@ describe("Todo Entity - Extended Coverage Tests", () => {
       const withoutTag = todo.removeTag("Research");
 
       expect(withoutTag.tags).toHaveLength(2);
-      expect(withoutTag.tags.map(t => t.name)).toContain("Summary");
-      expect(withoutTag.tags.map(t => t.name)).toContain("Split");
-      expect(withoutTag.tags.map(t => t.name)).not.toContain("Research");
+      expect(withoutTag.tags.map((t) => t.name)).toContain("Summary");
+      expect(withoutTag.tags.map((t) => t.name)).toContain("Split");
+      expect(withoutTag.tags.map((t) => t.name)).not.toContain("Research");
     });
 
     it("should maintain immutability when removing tag", () => {
@@ -144,14 +144,14 @@ describe("Todo Entity - Extended Coverage Tests", () => {
         .addSubtask("Keep 1")
         .addSubtask("Remove")
         .addSubtask("Keep 2");
-      
+
       const subtaskToRemove = todo.subtasks[1]!;
       const withoutSubtask = todo.removeSubtask(subtaskToRemove.id);
 
       expect(withoutSubtask.subtasks).toHaveLength(2);
-      expect(withoutSubtask.subtasks.map(s => s.title.value)).toContain("Keep 1");
-      expect(withoutSubtask.subtasks.map(s => s.title.value)).toContain("Keep 2");
-      expect(withoutSubtask.subtasks.map(s => s.title.value)).not.toContain("Remove");
+      expect(withoutSubtask.subtasks.map((s) => s.title.value)).toContain("Keep 1");
+      expect(withoutSubtask.subtasks.map((s) => s.title.value)).toContain("Keep 2");
+      expect(withoutSubtask.subtasks.map((s) => s.title.value)).not.toContain("Remove");
     });
 
     it("should maintain immutability when removing subtask", () => {
@@ -187,7 +187,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
         .addSubtask("Sub 1")
         .addSubtask("Sub 2")
         .addSubtask("Sub 3");
-      
+
       const subtaskId = todo.subtasks[1]!.id;
       const toggled = todo.toggleSubtask(subtaskId);
 
@@ -242,7 +242,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
         .addTag("Summary")
         .addSubtask("subtask")
         .toggleCompletion();
-      
+
       const updated = todo.updateTitle("New Title");
 
       expect(updated.tags).toHaveLength(1);
@@ -264,17 +264,10 @@ describe("Todo Entity - Extended Coverage Tests", () => {
   describe("fromPersistence", () => {
     it("should recreate todo with subtasks", () => {
       const now = new Date().toISOString();
-      const todo = Todo.fromPersistence(
-        "test-id",
-        "Test Todo",
-        false,
-        now,
-        now,
-        [
-          { id: "sub-1", title: "Subtask 1", completed: false },
-          { id: "sub-2", title: "Subtask 2", completed: true },
-        ]
-      );
+      const todo = Todo.fromPersistence("test-id", "Test Todo", false, now, now, [
+        { id: "sub-1", title: "Subtask 1", completed: false },
+        { id: "sub-2", title: "Subtask 2", completed: true },
+      ]);
 
       expect(todo.subtasks).toHaveLength(2);
       expect(todo.subtasks[0]!.title.value).toBe("Subtask 1");
@@ -294,19 +287,13 @@ describe("Todo Entity - Extended Coverage Tests", () => {
       );
 
       expect(todo.tags).toHaveLength(2);
-      expect(todo.tags.map(t => t.name)).toContain("Summary");
-      expect(todo.tags.map(t => t.name)).toContain("Research");
+      expect(todo.tags.map((t) => t.name)).toContain("Summary");
+      expect(todo.tags.map((t) => t.name)).toContain("Research");
     });
 
     it("should recreate completed todo", () => {
       const now = new Date().toISOString();
-      const todo = Todo.fromPersistence(
-        "test-id",
-        "Completed Todo",
-        true,
-        now,
-        now
-      );
+      const todo = Todo.fromPersistence("test-id", "Completed Todo", true, now, now);
 
       expect(todo.completed).toBe(true);
       expect(todo.status).toBe("Completed");
@@ -314,15 +301,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
 
     it("should handle empty subtasks and tags arrays", () => {
       const now = new Date().toISOString();
-      const todo = Todo.fromPersistence(
-        "test-id",
-        "Empty Todo",
-        false,
-        now,
-        now,
-        [],
-        []
-      );
+      const todo = Todo.fromPersistence("test-id", "Empty Todo", false, now, now, [], []);
 
       expect(todo.subtasks).toEqual([]);
       expect(todo.tags).toEqual([]);
@@ -330,13 +309,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
 
     it("should handle undefined subtasks and tags", () => {
       const now = new Date().toISOString();
-      const todo = Todo.fromPersistence(
-        "test-id",
-        "Undefined Todo",
-        false,
-        now,
-        now
-      );
+      const todo = Todo.fromPersistence("test-id", "Undefined Todo", false, now, now);
 
       expect(todo.subtasks).toEqual([]);
       expect(todo.tags).toEqual([]);
@@ -349,7 +322,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
         .addTag("Summary")
         .addSubtask("subtask1")
         .toggleCompletion();
-      
+
       const json = todo.toJSON();
 
       expect(json.id).toBe(todo.id);
@@ -387,7 +360,7 @@ describe("Todo Entity - Extended Coverage Tests", () => {
       const tags2 = todo.tags;
 
       expect(tags1).not.toBe(tags2);
-      expect(tags1.map(t => t.name)).toEqual(tags2.map(t => t.name));
+      expect(tags1.map((t) => t.name)).toEqual(tags2.map((t) => t.name));
     });
   });
 });
