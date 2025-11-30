@@ -7,6 +7,9 @@
  * - Lambda 関数の実際の動作
  * - API Gateway エンドポイントの疎通
  * - DynamoDB テーブルの動作
+ *
+ * 注意: このテストは AWS 環境がデプロイされている場合のみ実行されます。
+ * AWS_INTEGRATION_TEST=true 環境変数を設定して実行してください。
  */
 
 import { Todo, TodoTitle } from "../../src/domain/entities/Todo";
@@ -21,6 +24,9 @@ import {
   getLambdaClient,
 } from "../../src/infrastructure/aws-integration/lambda-client";
 
+// AWS統合テストを実行するかどうかの環境変数チェック
+const RUN_AWS_INTEGRATION_TESTS = process.env['AWS_INTEGRATION_TEST'] === 'true';
+
 /**
  * テスト用 Todo 作成ヘルパー
  */
@@ -30,11 +36,14 @@ function createE2ETodo(title: string, completed = false): Todo {
   return new (Todo as any)(todoId, todoTitle, completed, new Date(), new Date());
 }
 
-describe("E2E Tests - AWS Deployment Verification", () => {
-  const environment = process.env.ENVIRONMENT || "dev";
-  const region = process.env.AWS_REGION || "ap-northeast-1";
-  const tableName = process.env.DYNAMODB_TABLE_NAME || `todo-${environment}`;
-  const logGroupName = process.env.CLOUDWATCH_LOG_GROUP || `/aws/lambda/todo-${environment}`;
+// AWS環境変数が設定されていない場合はテストをスキップ
+const describeIfAWS = RUN_AWS_INTEGRATION_TESTS ? describe : describe.skip;
+
+describeIfAWS("E2E Tests - AWS Deployment Verification", () => {
+  const environment = process.env['ENVIRONMENT'] || "dev";
+  const region = process.env['AWS_REGION'] || "ap-northeast-1";
+  const tableName = process.env['DYNAMODB_TABLE_NAME'] || `todo-${environment}`;
+  const logGroupName = process.env['CLOUDWATCH_LOG_GROUP'] || `/aws/lambda/todo-${environment}`;
 
   beforeAll(() => {
     console.log("\n📋 E2E テスト初期化");
@@ -134,7 +143,7 @@ describe("E2E Tests - AWS Deployment Verification", () => {
 
       // 完了済みのタスクが含まれていることを確認
       const completedIds = completed.map((t) => t.id);
-      expect(completedIds.some((id) => id === todos[0].id)).toBe(true);
+      expect(completedIds.some((id) => id === todos[0]?.id)).toBe(true);
     }, 20000);
 
     it("リポジトリのヘルスチェック", async () => {
