@@ -13,11 +13,57 @@ The application communicates with a Serverless Backend via REST API.
 | `GET` | `/todos` | List all todos (supports pagination) |
 | `POST` | `/todos` | Create a new todo |
 | `GET` | `/todos/{id}` | Get a single todo by ID |
+| `PUT` | `/todos/{id}` | Update a todo |
 | `PUT` | `/todos/{id}/toggle` | Toggle todo completion status |
+| `PUT` | `/todos/{id}/description` | Update todo description (markdown) |
 | `DELETE` | `/todos/{id}` | Delete a todo |
 | `GET` | `/tags` | Get list of available tags |
 | `POST` | `/todos/{id}/tags` | Add a tag to a todo |
 | `DELETE` | `/todos/{id}/tags/{tagName}` | Remove a tag from a todo |
+
+### PUT /todos/{id}/description
+
+Update the description (markdown content) for a specific todo.
+
+**Request Body:**
+```json
+{
+  "description": "# Task Details\n\n- Step 1\n- Step 2\n\n**Important note**"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": 200,
+  "data": {
+    "id": "uuid-string",
+    "title": "Todo title",
+    "completed": false,
+    "description": "# Task Details\n\n- Step 1\n- Step 2\n\n**Important note**",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "meta": {
+    "timestamp": "2024-01-01T00:00:00.000Z",
+    "requestId": "request-uuid"
+  }
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Description exceeds maximum length (10,000 characters)
+- `404 Not Found` - Todo with specified ID does not exist
+
+**Supported Markdown:**
+- Headings (`#`, `##`, `###`, etc.)
+- Bold (`**text**`) and Italic (`*text*`)
+- Unordered lists (`-` or `*`)
+- Ordered lists (`1.`, `2.`, etc.)
+- Code blocks (fenced with triple backticks)
+- Inline code (single backticks)
+- Links (`[text](url)`)
+- Blockquotes (`>`)
 
 ---
 
@@ -245,6 +291,95 @@ export class TodoTitle {
    * @returns true if both have same value
    */
   equals(other: TodoTitle): boolean;
+}
+```
+
+### TodoDescription (Value Object)
+
+```typescript
+/**
+ * Value object representing a todo's detailed description.
+ * 
+ * Business rules:
+ * - Maximum 10,000 characters
+ * - Can be empty (optional field)
+ * - Supports markdown formatting
+ * - Immutable
+ * - Automatically trimmed
+ * 
+ * Supported markdown features:
+ * - Headings (h1-h6)
+ * - Bold and italic text
+ * - Lists (ordered and unordered)
+ * - Code blocks and inline code
+ * - Links
+ * - Blockquotes
+ * 
+ * @class TodoDescription
+ */
+export class TodoDescription {
+  /**
+   * Maximum allowed length for description content.
+   * @constant {number}
+   */
+  static readonly MAX_LENGTH: number = 10000;
+
+  /**
+   * Create validated todo description.
+   * 
+   * @param value - Description string (markdown supported)
+   * @returns TodoDescription instance
+   * @throws Error if > 10,000 characters
+   * 
+   * @example
+   * const desc = TodoDescription.create('# Project Details\n\n- Task 1\n- Task 2');
+   * 
+   * // Validation examples:
+   * TodoDescription.create('');           // ✅ returns (empty allowed)
+   * TodoDescription.create('a'.repeat(10001)); // ❌ throws (too long)
+   * TodoDescription.create('  Trimmed  ');  // ✅ returns (auto-trimmed)
+   */
+  static create(value: string): TodoDescription;
+
+  /**
+   * Create an empty description (factory method).
+   * 
+   * @returns TodoDescription with empty value
+   * 
+   * @example
+   * const emptyDesc = TodoDescription.empty();
+   * console.log(emptyDesc.isEmpty()); // true
+   */
+  static empty(): TodoDescription;
+
+  /**
+   * Get description string value.
+   * 
+   * @type {string}
+   */
+  readonly value: string;
+
+  /**
+   * Get the length of the description content.
+   * 
+   * @type {number}
+   */
+  readonly length: number;
+
+  /**
+   * Check if description is empty.
+   * 
+   * @returns true if description has no content
+   */
+  isEmpty(): boolean;
+
+  /**
+   * Check equality with another TodoDescription.
+   * 
+   * @param other - TodoDescription to compare
+   * @returns true if both have same value
+   */
+  equals(other: TodoDescription): boolean;
 }
 ```
 

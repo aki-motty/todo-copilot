@@ -4,6 +4,7 @@ import {
   createTodoCompletedEvent,
   createTodoCreatedEvent,
   createTodoDeletedEvent,
+  createTodoDescriptionUpdatedEvent,
 } from "../../domain/events/TodoEvents";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { brandTodoId } from "../../domain/value-objects/TodoId";
@@ -13,6 +14,7 @@ import type {
   DeleteTodoCommand,
   ToggleTodoCompletionCommand,
 } from "../commands";
+import type { UpdateTodoDescriptionCommand } from "../commands/UpdateTodoDescriptionCommand";
 import type { ILogger } from "../ports/ILogger";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
@@ -182,6 +184,38 @@ export class TodoApplicationService {
     await this.todoRepository.save(updatedTodo);
 
     this.logger.info("Tag removed", { id, tagName });
+
+    return updatedTodo;
+  }
+
+  /**
+   * Update todo description
+   * COMMAND: Changes application state
+   */
+  async updateTodoDescription(command: UpdateTodoDescriptionCommand): Promise<Todo> {
+    this.logger.debug("Updating todo description", { todoId: command.todoId });
+
+    const todo = await this.todoRepository.findById(command.todoId);
+    if (!todo) {
+      throw new NotFoundError(`Todo with id ${command.todoId} not found`);
+    }
+
+    const previousDescription = todo.description.value;
+    const updatedTodo = todo.updateDescription(command.description);
+    await this.todoRepository.save(updatedTodo);
+
+    // Publish domain event
+    const event = createTodoDescriptionUpdatedEvent(
+      updatedTodo.id,
+      previousDescription,
+      command.description,
+      updatedTodo.updatedAt
+    );
+    this.domainEvents.push(event);
+    this.logger.info("Todo description updated", {
+      todoId: command.todoId,
+      hasDescription: updatedTodo.hasDescription,
+    });
 
     return updatedTodo;
   }

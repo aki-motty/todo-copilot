@@ -188,7 +188,8 @@ export class AsyncApiTodoRepository {
       dto.createdAt,
       dto.updatedAt,
       dto.subtasks || [],
-      dto.tags || []
+      dto.tags || [],
+      dto.description || ""
     );
   }
 

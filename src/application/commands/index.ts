@@ -23,3 +23,11 @@ export interface ToggleTodoCompletionCommand {
 export interface DeleteTodoCommand {
   id: string;
 }
+
+/**
+ * Re-export UpdateTodoDescriptionCommand
+ */
+export {
+  createUpdateTodoDescriptionCommand,
+  type UpdateTodoDescriptionCommand,
+} from "./UpdateTodoDescriptionCommand";

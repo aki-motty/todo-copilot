@@ -308,6 +308,37 @@ export const useTodoList = () => {
     setError(null);
   }, []);
 
+  // Update todo description
+  const updateTodoDescription = useCallback(
+    async (todoId: string, description: string) => {
+      try {
+        setError(null);
+
+        if (backendMode === "api") {
+          // Use dedicated API endpoint for atomic update
+          const updatedTodo = await TodoApiClient.updateDescription(todoId, description);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          hookLogger.info("Description updated via API hook", { todoId });
+        } else {
+          // LocalStorage mode uses the controller/service logic
+          const updatedTodo = await todoController.updateTodoDescription(todoId, description);
+          setTodos((prevTodos) =>
+            prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+          );
+          hookLogger.info("Description updated via Controller hook", { todoId });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to update description";
+        setError(message);
+        hookLogger.error("Failed to update description", { error: message, todoId });
+        throw err;
+      }
+    },
+    [todoController, backendMode]
+  );
+
   return {
     todos,
     error,
@@ -321,6 +352,7 @@ export const useTodoList = () => {
     addTag,
     removeTag,
     clearError,
+    updateTodoDescription,
     backendMode,
   };
 };

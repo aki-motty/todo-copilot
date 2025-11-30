@@ -36,6 +36,7 @@ export class CreateTodoHandler {
       id: json.id,
       title: json.title,
       completed: json.completed,
+      description: json.description || "",
       createdAt: json.createdAt,
       updatedAt: json.updatedAt,
       subtasks: json.subtasks.map((s) => ({

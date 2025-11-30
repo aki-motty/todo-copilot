@@ -1,0 +1,70 @@
+.markdown-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.markdown-editor__textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color, #1a1a1a);
+  background-color: var(--bg-color, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.markdown-editor__textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.markdown-editor__textarea:disabled {
+  background-color: var(--disabled-bg, #f5f5f5);
+  cursor: not-allowed;
+}
+
+.markdown-editor__textarea::placeholder {
+  color: var(--placeholder-color, #9ca3af);
+}
+
+.markdown-editor__textarea--error {
+  border-color: var(--error-color, #ef4444);
+}
+
+.markdown-editor__textarea--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.markdown-editor__char-count {
+  font-size: 0.75rem;
+  color: var(--muted-color, #6b7280);
+  text-align: right;
+}
+
+.markdown-editor__char-count--warning {
+  color: var(--warning-color, #f59e0b);
+}
+
+.markdown-editor__char-count--error {
+  color: var(--error-color, #ef4444);
+  font-weight: 600;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .markdown-editor__textarea {
+    --text-color: #f3f4f6;
+    --bg-color: #1f2937;
+    --border-color: #374151;
+    --placeholder-color: #6b7280;
+  }
+}

@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: Todo Copilot API - Task Details Extension
+  description: API contract for task details with markdown support
+  version: 1.0.0
+
+paths:
+  /todos/{todoId}:
+    get:
+      summary: Get a todo by ID
+      description: Returns a single todo including its description
+      operationId: getTodoById
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Update a todo
+      description: Partially update a todo (including description)
+      operationId: updateTodo
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodoRequest'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid request (e.g., description too long)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /todos/{todoId}/description:
+    put:
+      summary: Update todo description
+      description: Update only the description of a todo
+      operationId: updateTodoDescription
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDescriptionRequest'
+      responses:
+        '200':
+          description: Description updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                descriptionTooLong:
+                  summary: Description exceeds limit
+                  value:
+                    error: "VALIDATION_ERROR"
+                    message: "Description cannot exceed 10000 characters"
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Todo:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - completed
+        - status
+        - createdAt
+        - updatedAt
+        - subtasks
+        - tags
+        - hasDescription
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the todo
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Todo title
+          example: "Buy groceries"
+        description:
+          type: string
+          maxLength: 10000
+          description: Markdown-formatted description
+          example: "## Shopping List\n- Milk\n- Eggs\n- Bread"
+        completed:
+          type: boolean
+          description: Whether the todo is completed
+          example: false
+        status:
+          type: string
+          enum: [Pending, Completed]
+          description: Human-readable status
+          example: "Pending"
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2025-11-30T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2025-11-30T10:30:00.000Z"
+        subtasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subtask'
+          description: List of subtasks
+        tags:
+          type: array
+          items:
+            type: string
+          description: List of tag names
+          example: ["Summary", "Research"]
+        hasDescription:
+          type: boolean
+          description: Whether the todo has a non-empty description
+          example: true
+
+    Subtask:
+      type: object
+      required:
+        - id
+        - title
+        - completed
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        completed:
+          type: boolean
+
+    UpdateTodoRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 10000
+        completed:
+          type: boolean
+
+    UpdateDescriptionRequest:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          maxLength: 10000
+          description: Markdown-formatted description text
+          example: "## Notes\n\nThis is a **bold** statement."
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Description cannot exceed 10000 characters"

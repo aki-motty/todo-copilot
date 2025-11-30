@@ -12,6 +12,10 @@ interface TodoListProps {
   onDeleteSubtask?: (todoId: string, subtaskId: string) => Promise<void>;
   onAddTag?: (todoId: string, tagName: string) => Promise<void>;
   onRemoveTag?: (todoId: string, tagName: string) => Promise<void>;
+  /** Callback to show detail panel for a todo */
+  onShowDetail?: (id: string) => void;
+  /** ID of currently selected todo */
+  selectedTodoId?: string;
 }
 
 /**
@@ -28,6 +32,8 @@ export const TodoList: React.FC<TodoListProps> = ({
   onDeleteSubtask,
   onAddTag,
   onRemoveTag,
+  onShowDetail,
+  selectedTodoId,
 }) => {
   if (isLoading) {
     return (
@@ -65,6 +71,8 @@ export const TodoList: React.FC<TodoListProps> = ({
             onDeleteSubtask={onDeleteSubtask}
             onAddTag={onAddTag}
             onRemoveTag={onRemoveTag}
+            onShowDetail={onShowDetail}
+            isSelected={selectedTodoId === todo.id}
           />
         ))}
       </ul>

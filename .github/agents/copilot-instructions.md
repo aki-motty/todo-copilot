@@ -17,6 +17,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-22
 - DynamoDB (Single Table Design) (010-add-task-tags)
 - TypeScript 5.x, Node.js 18+ + React 18, Vite, Jest, Playwright, Biome (011-codebase-refactor)
 - DynamoDB (AWS), localStorage (ブラウザ) (011-codebase-refactor)
+- TypeScript 5.x (strict mode) + React 18, Vite, marked（マークダウンパーサー）, DOMPurify（XSSサニタイズ） (012-task-details-markdown)
+- localStorage（既存）、DynamoDB（Lambda backend） (012-task-details-markdown)
 
 - TypeScript 5.x、Node.js 18+ (001-basic-todo-list)
 
@@ -36,8 +38,8 @@ npm test && npm run lint
 TypeScript 5.x、Node.js 18+: Follow standard conventions
 
 ## Recent Changes
+- 012-task-details-markdown: Added TypeScript 5.x (strict mode) + React 18, Vite, marked（マークダウンパーサー）, DOMPurify（XSSサニタイズ）
 - 011-codebase-refactor: Added TypeScript 5.x, Node.js 18+ + React 18, Vite, Jest, Playwright, Biome
-- 010-add-task-tags: Added TypeScript 5.x (Node.js 20.x for Lambda, React 18.x for Frontend) + AWS SDK v3, React, Vite
 - 010-add-task-tags: Added TypeScript 5.x (Node.js 20.x for Lambda, React 18.x for Frontend) + AWS SDK v3, React, Vite
 
 

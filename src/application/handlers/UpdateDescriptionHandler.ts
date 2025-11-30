@@ -1,29 +1,39 @@
+/**
+ * Handler for updating a todo's description
+ * Endpoint: PUT /todos/{id}/description
+ */
+
 import type { TodoId } from "../../domain/entities/Todo";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import type { TodoResponseDTO } from "../dto/TodoDTO";
 import { NotFoundError } from "../errors/AppError";
 
 /**
- * Handler for getting a single todo by ID
- * Query: GET /todos/{id}
+ * Handler for updating todo description
  */
-export class GetTodoHandler {
+export class UpdateDescriptionHandler {
   constructor(private readonly todoRepository: ITodoRepository) {}
 
-  async execute(id: string): Promise<TodoResponseDTO> {
+  async execute(id: string, description: string): Promise<TodoResponseDTO> {
     // Validate ID format
     if (!id || id.trim().length === 0) {
       throw new NotFoundError("Todo ID cannot be empty");
     }
 
-    // Fetch from repository
+    // Fetch existing todo
     const todo = await this.todoRepository.findById(id as TodoId);
 
     if (!todo) {
       throw new NotFoundError(`Todo with ID "${id}" not found`);
     }
 
-    return this.toDTO(todo);
+    // Update description (value object is created inside entity)
+    const updated = todo.updateDescription(description);
+
+    // Persist updated todo
+    await this.todoRepository.save(updated);
+
+    return this.toDTO(updated);
   }
 
   private toDTO(todo: any): TodoResponseDTO {

@@ -20,6 +20,7 @@ export interface TodoResponseDTO {
   id: string;
   title: string;
   completed: boolean;
+  description: string;
   createdAt: string; // ISO 8601 format
   updatedAt: string; // ISO 8601 format
   subtasks: SubtaskDTO[];
