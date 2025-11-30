@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
   "files": {
-    "ignore": ["coverage/**", "dist/**", "dist-lambda/**", "node_modules/**", "playwright-report/**"]
+    "ignore": [
+      "coverage/**",
+      "dist/**",
+      "dist-lambda/**",
+      "node_modules/**",
+      "playwright-report/**"
+    ]
   },
   "organizeImports": {
     "enabled": true
