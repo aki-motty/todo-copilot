@@ -11,7 +11,8 @@
                 "useBlockStatements": "error",
                 "useConst": "error",
                 "useDefaultParameterLast": "error",
-                "useNumericLiterals": "error"
+                "useNumericLiterals": "error",
+                "noNonNullAssertion": "off"
             },
             "suspicious": {
                 "noAssignInExpressions": "error",

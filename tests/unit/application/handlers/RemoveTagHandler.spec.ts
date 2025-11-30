@@ -2,6 +2,7 @@ import { RemoveTagHandler } from "../../../../src/application/handlers/RemoveTag
 import { TodoApplicationService } from "../../../../src/application/services/TodoApplicationService";
 import { Todo } from "../../../../src/domain/entities/Todo";
 import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
+import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("RemoveTagHandler", () => {
   let handler: RemoveTagHandler;
@@ -10,7 +11,7 @@ describe("RemoveTagHandler", () => {
 
   beforeEach(() => {
     repository = new LocalStorageTodoRepository();
-    service = new TodoApplicationService(repository);
+    service = new TodoApplicationService(repository, mockLogger);
     handler = new RemoveTagHandler(service);
   });
 

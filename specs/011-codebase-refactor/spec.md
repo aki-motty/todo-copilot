@@ -2,7 +2,8 @@
 
 **Feature Branch**: `011-codebase-refactor`  
 **Created**: 2025-11-29  
-**Status**: Draft  
+**Status**: Complete  
+**Completed**: 2025-11-30
 **Input**: User description: "現状のコードをリファクタリングしたいです。デグレを検知できるようにテストをしっかりと拡充したいです。DDD、クリーンアーキテクチャに則っているかどうかも確認したいです。ドキュメントも最新化したいです。動作確認などで使っているコマンドの名前も再検討したいです。"
 
 ## User Scenarios & Testing *(mandatory)*

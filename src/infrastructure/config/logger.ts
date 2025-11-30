@@ -1,7 +1,10 @@
 /**
  * Logger configuration for the application
  * Provides structured logging with consistent format
+ * Implements ILogger interface for clean architecture compliance
  */
+
+import type { ILogger, LogContext, LoggerFactory } from "../../application/ports/ILogger";
 
 interface LogEntry {
   timestamp: string;
@@ -11,7 +14,11 @@ interface LogEntry {
   data?: Record<string, unknown>;
 }
 
-class Logger {
+/**
+ * Console-based logger implementation
+ * Implements ILogger interface from application layer
+ */
+class ConsoleLogger implements ILogger {
   private logLevel: "debug" | "info" | "warn" | "error" = "info";
 
   constructor(private moduleName?: string) {
@@ -43,48 +50,50 @@ class Logger {
     return `${timestamp} ${level.toUpperCase()}${moduleStr}: ${message}${dataStr}`;
   }
 
-  debug(message: string, data?: Record<string, unknown>): void {
+  debug(message: string, context?: LogContext): void {
     if (this.shouldLog("debug")) {
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
         level: "debug",
         module: this.moduleName,
         message,
-        data,
+        data: context,
       };
       console.debug(this.formatEntry(entry));
     }
   }
 
-  info(message: string, data?: Record<string, unknown>): void {
+  info(message: string, context?: LogContext): void {
     if (this.shouldLog("info")) {
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
         level: "info",
         module: this.moduleName,
         message,
-        data,
+        data: context,
       };
       console.info(this.formatEntry(entry));
     }
   }
 
-  warn(message: string, data?: Record<string, unknown>): void {
+  warn(message: string, context?: LogContext): void {
     if (this.shouldLog("warn")) {
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
         level: "warn",
         module: this.moduleName,
         message,
-        data,
+        data: context,
       };
       console.warn(this.formatEntry(entry));
     }
   }
 
-  error(message: string, error?: Error | Record<string, unknown>): void {
+  error(message: string, context?: LogContext | Error): void {
     if (this.shouldLog("error")) {
-      const data = error instanceof Error ? { message: error.message, stack: error.stack } : error;
+      const data = context instanceof Error 
+        ? { message: context.message, stack: context.stack } 
+        : context;
       const entry: LogEntry = {
         timestamp: new Date().toISOString(),
         level: "error",
@@ -97,6 +106,13 @@ class Logger {
   }
 }
 
-export const createLogger = (moduleName?: string): Logger => {
-  return new Logger(moduleName);
+/**
+ * Factory function to create logger instances
+ * Returns ILogger interface for dependency injection
+ */
+export const createLogger: LoggerFactory = (moduleName?: string): ILogger => {
+  return new ConsoleLogger(moduleName);
 };
+
+// Export the class for testing purposes
+export { ConsoleLogger };

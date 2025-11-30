@@ -17,7 +17,7 @@ This guide explains how to run the backend locally using AWS SAM and DynamoDB Lo
    This command starts DynamoDB Local, seeds it with data, builds the Lambda code in watch mode, and starts the SAM Local API.
 
    ```bash
-   npm run dev:local
+   npm run local:start
    ```
 
    The API will be available at `http://localhost:3000`.
@@ -27,7 +27,7 @@ This guide explains how to run the backend locally using AWS SAM and DynamoDB Lo
    To test a specific function invocation without the API Gateway layer:
 
    ```bash
-   npm run test:local:invoke
+   npm run local:invoke
    ```
 
 ## Architecture
@@ -48,17 +48,17 @@ When running inside a Dev Container (Docker-in-Docker), special networking confi
 
 ### "Connection Refused" to DynamoDB
 
-Ensure `npm run db:start` has been run and the container is healthy.
+Ensure `npm run local:db:start` has been run and the container is healthy.
 
 ### "Internal Server Error" from Lambda
 
-Check the logs in the terminal running `npm run dev:local`. Common issues include:
+Check the logs in the terminal running `npm run local:start`. Common issues include:
 - Environment variable mismatches (Table name, Endpoint).
 - Network connectivity issues between SAM container and DynamoDB container.
 
 ### Changes not reflecting
 
 Since we use `PackageType: Image` for stability in DIND:
-- `npm run dev:local` builds the image on startup.
+- `npm run local:start` builds the image on startup.
 - **Hot Reloading limitation**: While Vite rebuilds the JS code instantly, the Docker image used by SAM needs to be rebuilt to pick up changes.
-- To apply changes, restart `npm run dev:local` or run `sam build -t local-setup/template.yaml` manually in another terminal.
+- To apply changes, restart `npm run local:start` or run `sam build -t local-setup/template.yaml` manually in another terminal.

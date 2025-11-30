@@ -7,13 +7,13 @@ import {
 } from "../../domain/events/TodoEvents";
 import type { ITodoRepository } from "../../domain/repositories/TodoRepository";
 import { brandTodoId } from "../../domain/value-objects/TodoId";
-import { createLogger } from "../../infrastructure/config/logger";
 import { NotFoundError } from "../../shared/types";
 import type {
   CreateTodoCommand,
   DeleteTodoCommand,
   ToggleTodoCompletionCommand,
 } from "../commands";
+import type { ILogger } from "../ports/ILogger";
 import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "../queries";
 
 /**
@@ -22,10 +22,12 @@ import type { GetAllTodosQuery, GetAllTodosResponse, GetTodoByIdQuery } from "..
  * Implements CQRS pattern with separate command and query methods
  */
 export class TodoApplicationService {
-  private logger = createLogger("TodoApplicationService");
   private domainEvents: DomainEvent[] = [];
 
-  constructor(private todoRepository: ITodoRepository) {}
+  constructor(
+    private todoRepository: ITodoRepository,
+    private logger: ILogger
+  ) {}
 
   /**
    * Create a new todo

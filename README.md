@@ -41,7 +41,7 @@ To run the backend locally using AWS SAM and DynamoDB Local:
 
 ```bash
 # Start local environment (DB, API, Watch mode)
-npm run dev:local
+npm run local:start
 ```
 
 See [Local SAM Testing Guide](specs/008-local-sam-testing/quickstart.md) for details.
