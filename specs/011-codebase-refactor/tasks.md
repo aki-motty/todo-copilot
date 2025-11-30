@@ -147,6 +147,17 @@
 - [X] T034 Update spec.md status from "Draft" to "Complete"
 - [X] T035 Final review of all changes and commit
 
+## Phase 8: E2E Test Expansion
+
+**Purpose**: E2Eテストの拡充
+
+- [X] T036 Add edge cases E2E tests (empty input, special chars, long titles)
+- [X] T037 Add empty state E2E tests
+- [X] T038 Add persistence E2E tests (reload, multiple todos)
+- [X] T039 Add multiple operations E2E tests
+- [X] T040 Add user journey E2E tests
+- [X] T041 Add accessibility E2E tests
+
 ---
 
 ## Dependencies & Execution Order
