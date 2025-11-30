@@ -1,8 +1,8 @@
+import type { DeleteTodoCommand } from "../../../../src/application/commands/DeleteTodoCommand";
 import { CreateTodoHandler } from "../../../../src/application/handlers/CreateTodoHandler";
 import { DeleteTodoCommandHandler } from "../../../../src/application/handlers/DeleteTodoCommandHandler";
-import type { DeleteTodoCommand } from "../../../../src/application/commands/DeleteTodoCommand";
-import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { brandTodoId } from "../../../../src/domain/value-objects/TodoId";
+import { LocalStorageTodoRepository } from "../../../../src/infrastructure/persistence/LocalStorageTodoRepository";
 import { mockLogger } from "../../../mocks/mockLogger";
 
 describe("DeleteTodoCommandHandler", () => {
