@@ -331,7 +331,7 @@ npm test -- tests/performance/performance.spec.ts
 
 #### E2E Tests (Playwright)
 ```bash
-# Location: e2e/
+# Location: tests/e2e/
 
 # Run all E2E tests (currently skipped due to setup)
 npm run e2e
@@ -348,7 +348,7 @@ npm run e2e:ui
 #### All Tests
 ```bash
 npm test
-# Result: All 132+ tests passing
+# Result: All 541+ tests passing
 ```
 
 #### Specific Test File

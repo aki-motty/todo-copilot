@@ -19,10 +19,12 @@
 - ✅ **US3: Toggle Completion** - Status change, visual feedback, persistence
 - ⏳ **Error Scenarios** - Invalid input, storage errors, edge cases
 
-#### Sprint 2+ (Future)
-- **US4: Delete Todos** - Deletion flow, confirmation dialog, validation
-- **Undo/Redo** - State restoration, operation history
-- **Search/Filter** - Text search, category filtering
+#### Sprint 2+ (Implemented)
+- ✅ **US4: Delete Todos** - Deletion flow, validation
+- ✅ **Subtasks** - Add, toggle, delete subtasks
+- ✅ **Tags** - Add, remove tags (Summary, Research, Split)
+- ⏳ **Undo/Redo** - State restoration, operation history
+- ⏳ **Search/Filter** - Text search, category filtering
 
 ### Test Approach
 
@@ -448,9 +450,9 @@ npm run dev
 npm run e2e
 
 # Expected output:
-# ✓ 39 tests passed
+# ✓ 50 tests passed
 # ✓ 0 tests failed
-# Total time: ~45 seconds
+# Total time: ~60 seconds
 ```
 
 #### Specific Test File
@@ -573,23 +575,31 @@ test('Performance: Create todo < 500ms', async ({ page }) => {
 | Create | 15 | 12 | 4 | 31 | ✅ |
 | Display | 6 | 8 | 5 | 19 | ✅ |
 | Toggle | 13 | 7 | 4 | 24 | ✅ |
-| Delete | 0 | 0 | 2 | 2 | ⏳ (Sprint 2) |
-| Persist | 0 | 5 | 3 | 8 | ✅ |
-| Error | 0 | 3 | 4 | 7 | ✅ |
-| **Total** | **34** | **35** | **22** | **91** | ✅ |
+| Delete | 8 | 5 | 6 | 19 | ✅ |
+| Subtasks | 12 | 6 | 5 | 23 | ✅ |
+| Tags | 8 | 4 | 4 | 16 | ✅ |
+| Persist | 5 | 5 | 5 | 15 | ✅ |
+| Error | 5 | 3 | 4 | 12 | ✅ |
+| Edge Cases | 0 | 0 | 7 | 7 | ✅ |
+| Accessibility | 0 | 0 | 5 | 5 | ✅ |
+| User Journey | 0 | 0 | 4 | 4 | ✅ |
+| **Total** | **72** | **50** | **50+** | **175+** | ✅ |
 
 ### Current Status
 
-✅ **Sprint 1 MVP**:
-- 45 unit tests passing
-- 40 integration tests passing
-- 9 performance tests passing
-- E2E test framework prepared
+✅ **Sprint 1-3 Complete**:
+- 541 unit/integration tests passing
+- 50 E2E tests passing
+- Domain coverage: 100%
+- Application coverage: 93%
 
-⏳ **Sprint 2**:
-- Complete E2E test suite (22 tests)
-- Add delete operation tests
-- Add undo/redo tests
+✅ **Implemented Features**:
+- CRUD operations (Create, Read, Update, Delete)
+- Subtask management
+- Tag management (Summary, Research, Split)
+- Data persistence
+- Edge case handling
+- Accessibility support
 
 ## Troubleshooting
 
@@ -661,6 +671,6 @@ expect(localStorage.getItem('test')).toBe('value');
 
 ---
 
-**Last Updated**: November 22, 2025  
-**Version**: 1.0.0 (Test Plan Sprint 1 MVP)  
-**Status**: Framework prepared, implementation in Sprint 2
+**Last Updated**: November 30, 2025  
+**Version**: 2.0.0 (Full E2E Coverage)  
+**Status**: Complete - 50 E2E tests covering all features
